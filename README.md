@@ -1,21 +1,15 @@
 # Beings
 
-**TODO: Add description**
+An elixir app for simulating a large collection of eldrich beings floating through the cosmos, living the social
+lives that eldrich beings appearently have.
 
-## Installation
+## Progress so far
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `beings` to your list of dependencies in `mix.exs`:
+As you can see, not very far.
 
-```elixir
-def deps do
-  [
-    {:beings, "~> 0.1.0"}
-  ]
-end
-```
+## Progress Goals 
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at <https://hexdocs.pm/beings>.
-
+- Define the data and functions on that data that make up the beings. 
+- Define a suitable cosmos where these beings can live and roam.
+- Create parameters which define different kinds of cosms where these beings have interesting emergent interactions.
+- Build a visualizaiton tool for the simulation.
