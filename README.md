@@ -7,6 +7,12 @@ lives that eldrich beings appearently have.
 
 As you can see, not very far.
 
+Basically all that works are the tests.
+
+``` bash
+mix test
+```
+
 ## Progress Goals 
 
 - Define the data and functions on that data that make up the beings. 
