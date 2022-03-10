@@ -7,6 +7,12 @@ defmodule Being do
   position_x integer positions
   position_y integer positions
   """
+
+  @data_path "./data"
+  @max_age 99999
+  @max_ichor 8888
+  @max_starting_ichor 88
+
   defstruct [
     :shell_name,
     :core_name,
@@ -44,5 +50,21 @@ defmodule Being do
   def move_right(b, n \\ 1) do
     new_x = b.position_x + n
     %{b | position_x: new_x}
+  end
+
+  def get_random_being() do
+    # Path.expand tries to convert relative paths
+    path = Path.join(Path.expand(@data_path), "being_name_registry.yaml")
+
+    {:ok, names} = YamlElixir.read_from_file(path)
+
+    %Being{
+      shell_name: Enum.random(Map.get(names, "shell_name")),
+      core_name: Enum.random(Map.get(names, "core_name")),
+      age: :rand.uniform(@max_age),
+      ichor_count: :random.uniform(@max_starting_ichor),
+      position_x: 0,
+      position_y: 0
+    }
   end
 end

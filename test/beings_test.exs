@@ -28,7 +28,7 @@ defmodule BeingsTest do
     %{test_beings: [test_being_1, test_being_2]}
   end
 
-  test "greets each other", %{test_beings: [b1, b2]} do
+  test "greet each other", %{test_beings: [b1, b2]} do
     Beings.interact(b1, b2)
     assert Beings.hello() == :world
   end

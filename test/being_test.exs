@@ -49,4 +49,9 @@ defmodule BeingTest do
     b = Being.move_right(b, 4)
     assert b.position_x == 2
   end
+
+  test "generate random being" do
+    b = Being.get_random_being()
+    IO.puts("#{b.shell_name} #{b.core_name} was randomly generated")
+  end
 end
