@@ -1,4 +1,7 @@
 defmodule Being do
+  # TODO be sure to add ids to beings
+  # need to find a way to generate ids
+
   @moduledoc """
   shell_name
   core_name
@@ -66,5 +69,10 @@ defmodule Being do
       position_x: 0,
       position_y: 0
     }
+  end
+
+  def generate_id() do
+    # TODO fill in this function
+    1
   end
 end

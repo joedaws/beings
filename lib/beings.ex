@@ -2,7 +2,6 @@ defmodule Beings do
   @moduledoc """
   Definitions of basic beings and their attributes
   """
-  import Being
 
   @doc """
   The first being greets the second by shell name
