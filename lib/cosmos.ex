@@ -1,4 +1,4 @@
-defmodule Beings.Cosmos do
+defmodule Cosmos do
   use Agent
 
   @doc """
@@ -15,4 +15,7 @@ defmodule Beings.Cosmos do
   def put(cosmos, key, value) do
     Agent.update(cosmos, &Map.put(&1, key, value))
   end
+
+  # How to fit a concept of time in here? cyclic time?
+  # Should the time go in the GenServer?
 end

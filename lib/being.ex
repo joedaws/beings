@@ -65,14 +65,13 @@ defmodule Being do
       shell_name: Enum.random(Map.get(names, "shell_name")),
       core_name: Enum.random(Map.get(names, "core_name")),
       age: :rand.uniform(@max_age),
-      ichor_count: :random.uniform(@max_starting_ichor),
+      ichor_count: :rand.uniform(@max_starting_ichor),
       position_x: 0,
       position_y: 0
     }
   end
 
-  def generate_id() do
-    # TODO fill in this function
-    1
+  def generate_id(being) do
+    :erlang.md5("#{being.shell_name}#{being.core_name}")
   end
 end

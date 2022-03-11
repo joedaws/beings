@@ -54,4 +54,8 @@ defmodule BeingTest do
     b = Being.get_random_being()
     IO.puts("#{b.shell_name} #{b.core_name} was randomly generated")
   end
+
+  test "generate id from being", %{test_being: b} do
+    assert Being.generate_id(b) != nil
+  end
 end
