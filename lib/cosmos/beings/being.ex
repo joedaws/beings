@@ -1,15 +1,19 @@
-defmodule Being do
-  # TODO be sure to add ids to beings
-  # need to find a way to generate ids
-
+defmodule Cosmos.Beings.Being do
   @moduledoc """
-  shell_name
-  core_name
-  ichor_count
-  age
-  position_x integer positions
-  position_y integer positions
+  Beings have:
+    - shell_name
+    - core_prefix
+    - core_name
+    - ichor_count
+    - age
+    - position_x
+    - position_y
+
+  Think about implementing
+  - Jobs for beings
+  - How do they generate resources?
   """
+  alias Cosmos.Beings.Being
 
   @data_path "./data"
   @max_age 99999
@@ -18,6 +22,7 @@ defmodule Being do
 
   defstruct [
     :shell_name,
+    :core_prefix,
     :core_name,
     :age,
     ichor_count: 0,
@@ -25,8 +30,8 @@ defmodule Being do
     position_y: 0
   ]
 
-  def say_full_name(b) do
-    IO.puts("#{b.shell_name} #{b.core_name}")
+  def get_full_name(b) do
+    "#{b.shell_name} #{b.core_prefix}#{b.core_name}"
   end
 
   def get_position(b) do
@@ -63,6 +68,7 @@ defmodule Being do
 
     %Being{
       shell_name: Enum.random(Map.get(names, "shell_name")),
+      core_prefix: Enum.random(Map.get(names, "core_prefix")),
       core_name: Enum.random(Map.get(names, "core_name")),
       age: :rand.uniform(@max_age),
       ichor_count: :rand.uniform(@max_starting_ichor),
@@ -71,7 +77,13 @@ defmodule Being do
     }
   end
 
+  @doc """
+  Generate a md5 for hashing the beings
+
+  time is added to the hash string so that two beings can
+  have the same name without colliding in the cosmos bucket
+  """
   def generate_id(being) do
-    :erlang.md5("#{being.shell_name}#{being.core_name}")
+    :erlang.md5(get_full_name(being) <> (:os.system_time(:millisecond) |> to_string))
   end
 end

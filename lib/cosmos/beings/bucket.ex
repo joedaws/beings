@@ -1,19 +1,19 @@
-defmodule Cosmos do
+defmodule Cosmos.Beings.Bucket do
   use Agent
 
   @doc """
-  starts new cosmos
+  starts new cosmos bucket
   """
   def start_link(_opts) do
     Agent.start_link(fn -> %{} end)
   end
 
-  def get(cosmos, key) do
-    Agent.get(cosmos, &Map.get(&1, key))
+  def get(bucket, key) do
+    Agent.get(bucket, &Map.get(&1, key))
   end
 
-  def put(cosmos, key, value) do
-    Agent.update(cosmos, &Map.put(&1, key, value))
+  def put(bucket, key, value) do
+    Agent.update(bucket, &Map.put(&1, key, value))
   end
 
   # How to fit a concept of time in here? cyclic time?

@@ -1,13 +1,16 @@
-defmodule BeingTest do
+defmodule Cosmos.Beings.BeingTest do
   use ExUnit.Case
+  alias Cosmos.Beings.Being
 
   setup do
     # setup a test being
     n1 = "Ghulop"
     n2 = "Jorsa"
+    np = "L'"
 
     test_being = %Being{
       shell_name: n1,
+      core_prefix: np,
       core_name: n2,
       age: 666,
       ichor_count: 7,
@@ -22,14 +25,14 @@ defmodule BeingTest do
     b = %Being{}
     # test for default nils
     assert b.shell_name == nil
+    assert b.core_prefix == nil
     assert b.core_name == nil
     assert b.age == nil
   end
 
   test "say full name", %{test_being: test_being, n1: n1} do
-    # Name should read n1 <> n2 in the output
     assert test_being.shell_name == n1
-    Being.say_full_name(test_being)
+    assert Being.get_full_name(test_being) |> is_bitstring
   end
 
   test "get tuple position", %{test_being: b} do
@@ -52,7 +55,7 @@ defmodule BeingTest do
 
   test "generate random being" do
     b = Being.get_random_being()
-    IO.puts("#{b.shell_name} #{b.core_name} was randomly generated")
+    IO.puts("#{Being.get_full_name(b)} was randomly generated")
   end
 
   test "generate id from being", %{test_being: b} do

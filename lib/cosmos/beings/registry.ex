@@ -1,5 +1,6 @@
-defmodule Registers.CosmosRegistry do
+defmodule Cosmos.Beings.Registry do
   use GenServer
+  alias Cosmos.Beings.Bucket
 
   # Client API
   @doc """
@@ -10,7 +11,7 @@ defmodule Registers.CosmosRegistry do
   end
 
   @doc """
-  Looks up the cosmos pid for `name` stored in `server`.
+  Looks up the bucket pid for `name` stored in `server`.
 
   Returns `{:ok, pid}` if the bucket exists, `:error` otherwise.
   """
@@ -19,7 +20,7 @@ defmodule Registers.CosmosRegistry do
   end
 
   @doc """
-  Ensures there is a cosmos associated with the given `name` in `server`.
+  Ensures there is a bucket associated with the given `name` in `server`.
   """
   def create(server, name) do
     GenServer.cast(server, {:create, name})
@@ -45,17 +46,17 @@ defmodule Registers.CosmosRegistry do
     if Map.has_key?(names, name) do
       {:noreply, {names, refs}}
     else
-      {:ok, cosmos} = Cosmos.start_link([])
-      ref = Process.monitor(cosmos)
+      {:ok, bucket} = Bucket.start_link([])
+      ref = Process.monitor(bucket)
       refs = Map.put(refs, ref, name)
-      names = Map.put(names, name, cosmos)
+      names = Map.put(names, name, bucket)
       {:noreply, {names, refs}}
     end
   end
 
   @impl true
   def handle_info({:DOWN, ref, :process, _ids, _reason}, {names, refs}) do
-    {name, ref} = Map.pop(refs, ref)
+    {name, _ref} = Map.pop(refs, ref)
     names = Map.delete(names, name)
     {:noreply, {names, refs}}
   end
@@ -63,7 +64,7 @@ defmodule Registers.CosmosRegistry do
   @impl true
   def handle_info(msg, state) do
     require Logger
-    Logger.debug("Unexpected message in Registers.CosmosRegistry: #{inspect(msg)}")
+    Logger.debug("Unexpected message in Cosmos.Beings.Registry: #{inspect(msg)}")
     {:noreply, state}
   end
 end

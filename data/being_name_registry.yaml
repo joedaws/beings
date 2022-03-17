@@ -2,8 +2,18 @@ shell_name:
   - "Shuglyn"
   - "Cryk"
   - "Jhuftoo"
+  - "Ghulop"
 
 core_name:
   - "Gyla"
   - "Uiwr"
   - "Motz"
+  - "Jorsa"
+  - "Chiu"
+
+core_prefix:
+  - "L'"
+  - "Y'"
+  - "U'"
+  - "Gy'"
+  - "K'"
