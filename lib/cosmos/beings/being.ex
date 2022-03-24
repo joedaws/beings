@@ -5,9 +5,8 @@ defmodule Cosmos.Beings.Being do
     - core_prefix
     - core_name
     - ichor_count
+    - node
     - age
-    - position_x
-    - position_y
 
   Think about implementing
   - Jobs for beings
@@ -25,39 +24,19 @@ defmodule Cosmos.Beings.Being do
     :core_prefix,
     :core_name,
     :age,
-    ichor_count: 0,
-    position_x: 0,
-    position_y: 0
+    :node,
+    ichor_count: 0
   ]
 
   def get_full_name(b) do
     "#{b.shell_name} #{b.core_prefix}#{b.core_name}"
   end
 
-  def get_position(b) do
-    {b.position_x, b.position_y}
-  end
-
-  # TODO consider just using one single move function
-
-  def move_up(b, n \\ 1) do
-    new_y = b.position_y + n
-    %{b | position_y: new_y}
-  end
-
-  def move_down(b, n \\ 1) do
-    new_y = b.position_y - n
-    %{b | position_y: new_y}
-  end
-
-  def move_left(b, n \\ 1) do
-    new_x = b.position_x - n
-    %{b | position_x: new_x}
-  end
-
-  def move_right(b, n \\ 1) do
-    new_x = b.position_x + n
-    %{b | position_x: new_x}
+  def get_location_node_name_and_type(b) do
+    case b.node do
+      nil -> "Lost in Space"
+      _ -> "#{b.node.name}: #{b.node.type}"
+    end
   end
 
   def get_random_being() do
@@ -72,8 +51,7 @@ defmodule Cosmos.Beings.Being do
       core_name: Enum.random(Map.get(names, "core_name")),
       age: :rand.uniform(@max_age),
       ichor_count: :rand.uniform(@max_starting_ichor),
-      position_x: 0,
-      position_y: 0
+      node: nil
     }
   end
 

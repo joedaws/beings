@@ -16,9 +16,7 @@ defmodule Cosmos.Beings.ActionsTest do
       core_prefix: np,
       core_name: n2,
       age: 666,
-      ichor_count: 7,
-      position_x: 0,
-      position_y: 0
+      ichor_count: 7
     }
 
     test_being_2 = %Being{
@@ -26,9 +24,7 @@ defmodule Cosmos.Beings.ActionsTest do
       core_prefix: np,
       core_name: "Fe",
       age: 3,
-      ichor_count: 111,
-      position_x: 0,
-      position_y: 0
+      ichor_count: 111
     }
 
     %{test_beings: [test_being_1, test_being_2]}

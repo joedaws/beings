@@ -1,6 +1,7 @@
 defmodule Cosmos.Beings.BeingTest do
   use ExUnit.Case
   alias Cosmos.Beings.Being
+  alias Cosmos.Locations.Node
 
   setup do
     # setup a test being
@@ -13,9 +14,8 @@ defmodule Cosmos.Beings.BeingTest do
       core_prefix: np,
       core_name: n2,
       age: 666,
-      ichor_count: 7,
-      position_x: 0,
-      position_y: 0
+      node: nil,
+      ichor_count: 7
     }
 
     %{test_being: test_being, n1: n1, n2: n2}
@@ -35,22 +35,21 @@ defmodule Cosmos.Beings.BeingTest do
     assert Being.get_full_name(test_being) |> is_bitstring
   end
 
-  test "get tuple position", %{test_being: b} do
-    assert Being.get_position(b) == {b.position_x, b.position_y}
+  test "get node name", %{test_being: b} do
+    assert Being.get_location_node_name_and_type(b) == "Lost in Space"
   end
 
-  test "move around", %{test_being: b} do
-    b = Being.move_up(b, 2)
-    assert b.position_y == 2
+  test "set being node", %{test_being: b} do
+    node = %Node{
+      name: "here",
+      type: Node.get_random_node_type(),
+      occupancy: 1,
+      occupancy_limit: 10
+    }
 
-    b = Being.move_down(b, 3)
-    assert b.position_y == -1
+    b = %{b | node: node}
 
-    b = Being.move_left(b, 2)
-    assert b.position_x == -2
-
-    b = Being.move_right(b, 4)
-    assert b.position_x == 2
+    assert Node.get_name(node) == Node.get_name(b.node)
   end
 
   test "generate random being" do
