@@ -33,4 +33,16 @@ defmodule Cosmos.Beings.ActionsTest do
   test "greet each other", %{test_beings: [b1, b2]} do
     assert is_bitstring(Actions.greet(b1, b2))
   end
+
+  test "perform transfer", %{test_beings: [b1, b2]} do
+    b1_original_ichor_count = b1.ichor_count
+    b2_original_ichor_count = b2.ichor_count
+    amount = 3
+    commodity = :ichor_count
+
+    {:ok, b1, b2} = Actions.transfer(commodity, amount, b1, b2)
+
+    assert b1.ichor_count == b1_original_ichor_count - amount
+    assert b2.ichor_count == b2_original_ichor_count + amount
+  end
 end

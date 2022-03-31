@@ -20,8 +20,13 @@ defmodule Cosmos.Locations.NodeTest do
     assert test_node.occupancy < test_node.occupancy_limit
   end
 
-  test "test generate node" do
-    node = Node.generate_node("hello")
+  test "test generate node with given name" do
+    node = Node.generate_node("The hello Cafe")
     assert node.occupancy == 0
+  end
+
+  test "test generate random node" do
+    node = Node.generate_random_node()
+    assert node.name |> is_bitstring
   end
 end

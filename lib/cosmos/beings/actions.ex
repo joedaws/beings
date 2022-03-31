@@ -18,4 +18,19 @@ defmodule Cosmos.Beings.Actions do
     IO.puts(b2_says)
     b1_says <> "\n" <> b2_says
   end
+
+  @doc """
+  Function to perform the transfer something between two beings
+
+  The giver gives amount of commodity to the receiver
+  """
+  def transfer(commodity, amount, giver, receiver) do
+    # TODO add in check to make sure that giver has enough commodity to transfer
+    # take commodity away from giver
+    giver = %{giver | commodity => Map.get(giver, commodity) - amount}
+    # give commodity to receiver
+    receiver = %{receiver | commodity => Map.get(receiver, commodity) + amount}
+
+    {:ok, giver, receiver}
+  end
 end
