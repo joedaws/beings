@@ -15,7 +15,7 @@ defmodule Cosmos.Beings.BeingTest do
       core_name: n2,
       age: 666,
       node: nil,
-      ichor_count: 7
+      ichor: 7
     }
 
     %{test_being: test_being, n1: n1, n2: n2}

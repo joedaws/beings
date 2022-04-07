@@ -1,0 +1,6 @@
+#+TITLE: Stream Goals
+
+1. implement ranks
+2. implement beings function that collects resources
+3. add ichor generation to nodes
+4. simple script to run

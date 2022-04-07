@@ -4,7 +4,7 @@ defmodule Cosmos.Beings.Being do
     - shell_name
     - core_prefix
     - core_name
-    - ichor_count
+    - ichor
     - node
     - age
 
@@ -25,7 +25,7 @@ defmodule Cosmos.Beings.Being do
     :core_name,
     :age,
     :node,
-    ichor_count: 0
+    ichor: 0
   ]
 
   def get_full_name(b) do
@@ -50,7 +50,7 @@ defmodule Cosmos.Beings.Being do
       core_prefix: Enum.random(Map.get(names, "core_prefix")),
       core_name: Enum.random(Map.get(names, "core_name")),
       age: :rand.uniform(@max_age),
-      ichor_count: :rand.uniform(@max_starting_ichor),
+      ichor: :rand.uniform(@max_starting_ichor),
       node: nil
     }
   end
