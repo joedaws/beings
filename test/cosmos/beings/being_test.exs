@@ -1,6 +1,7 @@
 defmodule Cosmos.Beings.BeingTest do
   use ExUnit.Case
   alias Cosmos.Beings.Being
+  alias Cosmos.Beings.Rank
   alias Cosmos.Locations.Node
 
   setup do
@@ -15,7 +16,8 @@ defmodule Cosmos.Beings.BeingTest do
       core_name: n2,
       age: 666,
       node: nil,
-      ichor: 7
+      ichor: 7,
+      rank: Rank.get_lowest_rank()
     }
 
     %{test_being: test_being, n1: n1, n2: n2}
@@ -27,7 +29,6 @@ defmodule Cosmos.Beings.BeingTest do
     assert b.shell_name == nil
     assert b.core_prefix == nil
     assert b.core_name == nil
-    assert b.age == nil
   end
 
   test "say full name", %{test_being: test_being, n1: n1} do
@@ -59,5 +60,13 @@ defmodule Cosmos.Beings.BeingTest do
 
   test "generate id from being", %{test_being: b} do
     assert Being.generate_id(b) != nil
+  end
+
+  test "test changes of rank", %{test_being: test_being} do
+    # starting rank should be the lowest
+    assert test_being.rank == Rank.get_lowest_rank()
+    test_being = %{test_being | ichor: 222}
+    {:ok, test_being} = Being.change_rank(test_being)
+    assert test_being.rank != Rank.get_lowest_rank()
   end
 end

@@ -5,27 +5,27 @@ defmodule Cosmos.Beings.Being do
     - core_prefix
     - core_name
     - ichor
+    - rank
     - node
     - age
 
-  Think about implementing
-  - Jobs for beings
-  - How do they generate resources?
   """
   alias Cosmos.Beings.Being
+  alias Cosmos.Beings.Rank
 
   @data_path "./data"
   @max_age 99999
-  @max_ichor 8888
+  @max_ichor 99999
   @max_starting_ichor 88
 
   defstruct [
     :shell_name,
     :core_prefix,
     :core_name,
-    :age,
     :node,
-    ichor: 0
+    age: 0,
+    ichor: 0,
+    rank: Rank.get_lowest_rank()
   ]
 
   def get_full_name(b) do
@@ -53,6 +53,21 @@ defmodule Cosmos.Beings.Being do
       ichor: :rand.uniform(@max_starting_ichor),
       node: nil
     }
+  end
+
+  def change_rank(being) do
+    buckets = Rank.get_rank_to_ichor_bucket_map()
+    # should always return only one
+    [{order, interval}] =
+      Enum.filter(
+        buckets,
+        fn {order, interval} ->
+          being.ichor > Enum.at(interval, 0) and
+            being.ichor < Enum.at(interval, 1)
+        end
+      )
+
+    {:ok, Map.replace!(being, :rank, Rank.get_rank_from_order(order))}
   end
 
   @doc """
