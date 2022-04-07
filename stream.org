@@ -1,6 +1,12 @@
 #+TITLE: Stream Goals
 
-1. implement ranks
-2. implement beings function that collects resources
-3. add ichor generation to nodes
-4. simple script to run
+* DONE implement ranks
+* TODO implement ichor generation from node
+** DONE nodes have ichor_supply
+** DONE beings have location
+** DONE change node occupancy when visited by a being
+* TODO implement beings function that collects resources
+Probably means that we need a function to look at all beings at a certain node
+and decides who gets what. Does it make sense for a being registry to take care of this?
+* TODO add ichor generation to nodes
+* TODO simple script to run

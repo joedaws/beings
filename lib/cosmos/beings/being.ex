@@ -12,6 +12,7 @@ defmodule Cosmos.Beings.Being do
   """
   alias Cosmos.Beings.Being
   alias Cosmos.Beings.Rank
+  alias Cosmos.Locations.Node
 
   @data_path "./data"
   @max_age 99999
@@ -68,6 +69,11 @@ defmodule Cosmos.Beings.Being do
       )
 
     {:ok, Map.replace!(being, :rank, Rank.get_rank_from_order(order))}
+  end
+
+  def occupy_node(being, node) do
+    node = Node.change_occupancy(node, 1)
+    being = %{being | node: node}
   end
 
   @doc """
