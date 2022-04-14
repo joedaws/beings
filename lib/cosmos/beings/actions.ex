@@ -20,7 +20,7 @@ defmodule Cosmos.Beings.Actions do
   end
 
   @doc """
-  Function to perform the transfer something between two beings
+  Function to perform the transfer of commodity between two beings
 
   The giver gives amount of commodity to the receiver
   """

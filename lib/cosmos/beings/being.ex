@@ -56,6 +56,10 @@ defmodule Cosmos.Beings.Being do
     }
   end
 
+  @doc """
+  Takes a being and updates the rank based on the
+  beings current ichor amount.
+  """
   def change_rank(being) do
     buckets = Rank.get_rank_to_ichor_bucket_map()
     # should always return only one
@@ -71,9 +75,19 @@ defmodule Cosmos.Beings.Being do
     {:ok, Map.replace!(being, :rank, Rank.get_rank_from_order(order))}
   end
 
-  def occupy_node(being, node) do
-    node = Node.change_occupancy(node, 1)
-    being = %{being | node: node}
+  @doc """
+  Attaches the node to all of the beings given and
+  updates the node
+  """
+  def occupy_node([first_being | rest_beings], accumulated_beings, node) do
+    current_occupancy = node.occupancy
+    node = Node.change_occupancy(node, current_occupancy + 1)
+    first_being = %{first_being | node: node}
+    occupy_node(rest_beings, [first_being] ++ accumulated_beings, node)
+  end
+
+  def occupy_node([], accumulated_beings, node) do
+    {accumulated_beings, node}
   end
 
   @doc """

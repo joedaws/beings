@@ -29,6 +29,9 @@ defmodule Cosmos.Locations.Node do
     5 * node.occupancy_limit + :rand.uniform(45 * node.occupancy_limit)
   end
 
+  @doc """
+  Set the ichor_supply attribute which is not set at creation time.
+  """
   def set_ichor_supply(node) do
     ichor_supply = get_ichor_supply(node)
     node = %{node | ichor_supply: ichor_supply}

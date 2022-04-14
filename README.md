@@ -13,9 +13,10 @@ Basically all that works are the tests.
 mix test
 ```
 
-## Progress Goals 
+## Goals 
 
-- Define the data and functions on that data that make up the beings. 
-- Define a suitable cosmos where these beings can live and roam.
-- Create parameters which define different kinds of cosms where these beings have interesting emergent interactions.
-- Build a visualizaiton tool for the simulation.
+- [ ] Define a suitable cosmos where these beings can live and roam.
+- [x] Define the data and functions the beings. 
+- [ ] parameterize the social connections of beings.
+- [ ] Build a visualizaiton tool for the simulation.
+
