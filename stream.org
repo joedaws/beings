@@ -1,5 +1,12 @@
 #+TITLE: Stream Goals
 
+* TODO implement GenServer that holds a commodity and can accept requests and give out resources based on seniority.
+The idea is to use a genserver which holds the amount of commonidites a
+node has and then can handle calls to give out these commodities.
+see [[file:lib/exp/server_node.ex][server_node.ex]]
+
+follow the path laid out in the [[https://elixir-lang.org/getting-started/mix-otp/genserver.html][tutorial]]
+
 * TODO implement beings function that collects resources
 Probably means that we need a function to look at all beings at a certain node
 and decides who gets what. Does it make sense for a being registry to take care of this?
@@ -9,3 +16,7 @@ and decides who gets what. Does it make sense for a being registry to take care 
 ** DONE beings have location
 ** DONE change node occupancy when visited by a being
 * DONE implement ranks
+
+* Emacs oddities
+** What to do when emacs hangs [[https://www.reddit.com/r/emacs/comments/k7cku8/when_emacs_hangs_what_do_you_do/][here]]
+** Learn to use the eshell better

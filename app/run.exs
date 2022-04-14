@@ -14,6 +14,7 @@ defmodule SimulationRunner do
   end
 
   def run_simple() do
+    IO.puts("------------------------------")
     IO.puts("Setting up the beings and node")
     beings = setup_beings()
     node = generate_single_node()
