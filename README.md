@@ -1,13 +1,12 @@
 # Beings
 
 An elixir app for simulating a large collection of eldrich beings floating through the cosmos, living the social
-lives that eldrich beings appearently have.
+lives that eldrich beings appearently have. The purpose of building this simulation is to see if it is possible
+to discern
 
-## Progress so far
+## Running a simulation 
 
-As you can see, not very far.
-
-Basically all that works are the tests.
+Currently the main simulation is 
 
 ``` bash
 mix test
