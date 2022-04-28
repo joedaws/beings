@@ -15,7 +15,4 @@ defmodule Cosmos.Beings.Bucket do
   def put(bucket, key, value) do
     Agent.update(bucket, &Map.put(&1, key, value))
   end
-
-  # How to fit a concept of time in here? cyclic time?
-  # Should the time go in the GenServer?
 end

@@ -75,6 +75,8 @@ defmodule Exp.ServerNode do
       node = %{node | ichor: new_amount}
     end
 
+    node_id = Node.generate_id(node)
+
     # update the nodes map in this server
     nodes = %{nodes | node_id => node}
     {:reply, amount, nodes}

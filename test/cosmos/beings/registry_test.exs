@@ -20,10 +20,10 @@ defmodule Cosmos.Beings.RegistryTest do
     assert Bucket.get(cosmos, being_id) == test_being
   end
 
-  test "removes bucket on exit", %{registry: registry} do
+  test "removes buckets on exit", %{registry: registry} do
     Cosmos.Beings.Registry.create(registry, "monoverse")
-    {:ok, cosmos} = Cosmos.Beings.Registry.lookup(registry, "monoverse")
-    Agent.stop(cosmos)
+    {:ok, bucket} = Cosmos.Beings.Registry.lookup(registry, "monoverse")
+    Agent.stop(bucket)
     assert Cosmos.Beings.Registry.lookup(registry, "monoverse") == :error
   end
 end

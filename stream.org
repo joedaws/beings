@@ -1,22 +1,48 @@
 #+TITLE: Stream Goals
 
-* TODO implement GenServer that holds a commodity and can accept requests and give out resources based on seniority.
-The idea is to use a genserver which holds the amount of commonidites a
-node has and then can handle calls to give out these commodities.
+* Tasks
+** TODO Ask people for their weird eldrich beings names.
+These are stored in the [[file:data/being_name_registry.yaml][name registry]] yaml.
+** TODO add supervision to the genserver and it's child processes.
+
+** TODO implement beings function that collects resources
+Probably means that we need a function to look at all beings at a certain node
+and decides who gets what. Does it make sense for a being registry to take care of this?
+
+Look at this function
+
+
+** DONE GenServer to hold nodes and beings
+The idea is to use a genserver which holds a node struct
+and handles calls to udpate that node.
+Work in progress
 see [[file:lib/exp/server_node.ex][server_node.ex]]
 
 follow the path laid out in the [[https://elixir-lang.org/getting-started/mix-otp/genserver.html][tutorial]]
 
-* TODO implement beings function that collects resources
-Probably means that we need a function to look at all beings at a certain node
-and decides who gets what. Does it make sense for a being registry to take care of this?
-* TODO simple script to run
-* DONE implement ichor generation from node
-** DONE nodes have ichor_supply
-** DONE beings have location
-** DONE change node occupancy when visited by a being
-* DONE implement ranks
+** DONE simple script to run
+** DONE implement ichor generation from node
+*** DONE nodes have ichor_supply
+*** DONE beings have location
+*** DONE change node occupancy when visited by a being
+** DONE implement ranks
+
+* Learnings
+** How to use genserver
+Originally, I had planned to use the genserver to hold the data for beings.
+However following the [[https://elixir-lang.org/getting-started/mix-otp/genserver.html][tutorial]] The genserver holds the buckets which will
+store the data. When updating the buckets using the Buckets implemented API,
+since we are using the Agent behaviour, the bucket retrived from the GenServer API
+lookup will also be updated.
+
+_tl;dr_
+Still use genserver but now we will deal with the buckets once they are created.
 
 * Emacs oddities
 ** What to do when emacs hangs [[https://www.reddit.com/r/emacs/comments/k7cku8/when_emacs_hangs_what_do_you_do/][here]]
 ** Learn to use the eshell better
+
+* Resources
+** Viz libraries
+*** [[https://github.com/mindok/contex][contex]] library in elixir for making SVG
+*** [[https://d3js.org/][d3]] js library for awesome visualizations
