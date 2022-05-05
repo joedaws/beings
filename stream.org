@@ -1,16 +1,16 @@
 #+TITLE: Stream Goals
 
 * Tasks
+** TODO Work on [[https://elixir-lang.org/getting-started/mix-otp/supervisor-and-application.html#our-first-supervisor][adding application start up customization]]
 ** TODO Ask people for their weird eldrich beings names.
 These are stored in the [[file:data/being_name_registry.yaml][name registry]] yaml.
-** TODO add supervision to the genserver and it's child processes.
 
 ** TODO implement beings function that collects resources
 Probably means that we need a function to look at all beings at a certain node
 and decides who gets what. Does it make sense for a being registry to take care of this?
 
-Look at this function
-
+** DONE add supervision to the genserver and it's child processes.
+Working on this starting 5/4
 
 ** DONE GenServer to hold nodes and beings
 The idea is to use a genserver which holds a node struct
