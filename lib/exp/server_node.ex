@@ -65,7 +65,7 @@ defmodule Exp.ServerNode do
   @impl true
   def handle_call({:extract, commodity_type, amount}, _from, nodes) do
     # TODO consider a callback to use a way to update ichor amount in node
-    node_hash = Enum.at(Map.keys(nodes))
+    node_hash = Enum.at(Map.keys(nodes), 0)
     node = Map.fetch(nodes, node_hash)
     # update the node
     old_amount = Map.get(node, commodity_type)

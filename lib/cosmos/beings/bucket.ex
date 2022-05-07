@@ -1,5 +1,5 @@
 defmodule Cosmos.Beings.Bucket do
-  use Agent
+  use Agent, restart: :temporary
 
   @doc """
   starts new cosmos bucket

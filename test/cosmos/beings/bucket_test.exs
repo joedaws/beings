@@ -15,4 +15,8 @@ defmodule Cosmos.Beings.BucketTest do
     assert Bucket.get(bucket, 234) != nil
     assert Bucket.get(bucket, 234).age |> is_number
   end
+
+  test "are temporary workers" do
+    assert Supervisor.child_spec(Cosmos.Beings.Bucket, []).restart == :temporary
+  end
 end

@@ -26,4 +26,13 @@ defmodule Cosmos.Beings.RegistryTest do
     Agent.stop(bucket)
     assert Cosmos.Beings.Registry.lookup(registry, "monoverse") == :error
   end
+
+  test "remvoes bucket on crash", %{registry: registry} do
+    Cosmos.Beings.Registry.create(registry, "monoverse")
+    {:ok, bucket} = Cosmos.Beings.Registry.lookup(registry, "monoverse")
+
+    # stop the bucket with non-normal reason
+    Agent.stop(bucket, :shutdown)
+    assert Cosmos.Beings.Registry.lookup(registry, "monoverse") == :error
+  end
 end

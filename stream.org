@@ -38,6 +38,11 @@ lookup will also be updated.
 _tl;dr_
 Still use genserver but now we will deal with the buckets once they are created.
 
+** What does =iex -S mix= do?
+Mix projects have a =mix.exs= file which is an elixir script with details of how to start
+an application. The iex command has an -S flag to run a script. So =iex -S mix= runs
+the script that starts the application before returning control to user in the REPL.
+
 * Emacs oddities
 ** What to do when emacs hangs [[https://www.reddit.com/r/emacs/comments/k7cku8/when_emacs_hangs_what_do_you_do/][here]]
 ** Learn to use the eshell better
