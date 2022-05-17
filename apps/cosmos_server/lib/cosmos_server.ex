@@ -1,6 +1,9 @@
 defmodule CosmosServer do
   require Logger
 
+  @doc """
+  Starts accepting connections on the given `port`.
+  """
   def accept(port) do
     # The options below mean:
     #
@@ -24,19 +27,46 @@ defmodule CosmosServer do
   end
 
   defp serve(socket) do
-    socket
-    |> read_line()
-    |> write_line(socket)
+    msg =
+      case read_line(socket) do
+        {:ok, data} ->
+          case CosmosServer.Command.parse(data) do
+            {:ok, command} ->
+              CosmosServer.Command.run(command)
 
+            {:error, _} = err ->
+              err
+          end
+
+        {:error, _} = err ->
+          err
+      end
+
+    write_line(socket, msg)
     serve(socket)
   end
 
   defp read_line(socket) do
-    {:ok, data} = :gen_tcp.recv(socket, 0)
-    data
+    :gen_tcp.recv(socket, 0)
   end
 
-  defp write_line(line, socket) do
-    :gen_tcp.send(socket, line)
+  defp write_line(socket, {:ok, text}) do
+    :gen_tcp.send(socket, text)
+  end
+
+  defp write_line(socket, {:error, :unknown_command}) do
+    # Known error; write to the client
+    :gen_tcp.send(socket, "UNKNOWN COMMAND \r\n")
+  end
+
+  defp write_line(socket, {:error, :closed}) do
+    # the connection was closed, exit politely
+    exit(:shutdown)
+  end
+
+  defp write_line(socket, {:error, error}) do
+    # Unknown error; write to client and exit
+    :gen_tcp.send(socket, "ERROR\r\n")
+    exit(error)
   end
 end
