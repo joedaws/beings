@@ -1,13 +1,16 @@
 #+TITLE: Stream Goals
 
 * Tasks
-** TODO Implement the command parser following[[https://elixir-lang.org/getting-started/mix-otp/docs-tests-and-with.html][this page]].
+** TODO Add functionality to run a simulation
+
 ** TODO Ask people for their weird eldrich beings names.
 These are stored in the [[file:data/being_name_registry.yaml][name registry]] yaml.
 
 ** TODO implement beings function that collects resources
 Probably means that we need a function to look at all beings at a certain node
 and decides who gets what. Does it make sense for a being registry to take care of this?
+
+** DONE Implement the command parser following [[https://elixir-lang.org/getting-started/mix-otp/docs-tests-and-with.html][this page]].
 
 ** DONE Build the server following this [[https://elixir-lang.org/getting-started/mix-otp/dependencies-and-umbrella-projects.html][page]].
 
@@ -53,6 +56,9 @@ overall project more flexible.
 ** Use ets to store some static data
 After the app starts consider loading the =data= in =yamls= into
 the ets table.
+
+* Tech Debt
+** Fix issue with relative path to yaml files required by cosmos.beings and cosmos.nodes
 
 * Emacs oddities
 ** What to do when emacs hangs [[https://www.reddit.com/r/emacs/comments/k7cku8/when_emacs_hangs_what_do_you_do/][here]]

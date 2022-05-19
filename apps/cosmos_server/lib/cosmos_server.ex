@@ -28,19 +28,9 @@ defmodule CosmosServer do
 
   defp serve(socket) do
     msg =
-      case read_line(socket) do
-        {:ok, data} ->
-          case CosmosServer.Command.parse(data) do
-            {:ok, command} ->
-              CosmosServer.Command.run(command)
-
-            {:error, _} = err ->
-              err
-          end
-
-        {:error, _} = err ->
-          err
-      end
+      with {:ok, data} <- read_line(socket),
+           {:ok, command} <- CosmosServer.Command.parse(data),
+           do: CosmosServer.Command.run(command)
 
     write_line(socket, msg)
     serve(socket)

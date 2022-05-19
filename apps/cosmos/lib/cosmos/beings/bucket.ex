@@ -15,4 +15,8 @@ defmodule Cosmos.Beings.Bucket do
   def put(bucket, key, value) do
     Agent.update(bucket, &Map.put(&1, key, value))
   end
+
+  def keys(bucket) do
+    Agent.get(bucket, fn bucket_map -> Map.keys(bucket_map) end)
+  end
 end
