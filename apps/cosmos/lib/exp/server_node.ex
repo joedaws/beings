@@ -1,103 +1,72 @@
 defmodule Exp.ServerNode do
-  # TODO finish adding in the
   use GenServer
-  alias Cosmos.Locations.Node
-  alias Cosmos.Beings.Bucket
+  alias Exp.ServerNode
 
-  @moduledoc """
-  let's use genserver a holder of a resource
-  which differntially gives it out to callers.
+  defstruct [
+    :name,
+    :resource_type,
+    :occupants,
+    # these are other nodes that are connected to this node
+    :neighbors
+  ]
 
-  The client processes call this genserver and try to get ichor
-  """
-
-  # client API
-  @doc """
-  starts the node
-  """
-  def start_link(opts) do
-    GenServer.start_link(__MODULE__, :ok, opts)
+  # CLIENT
+  def start_link(default) when is_list(default) do
+    GenServer.start_link(__MODULE__, default)
   end
 
-  @doc """
-  Extracts a certain commodity from the node if there is availability
-
-  needs to remove some amount of resource from a node if possible.
-
-  Returns `{:ok, commodity_amount}` if successful or `:error` if not
-  note that if there is no more commodity, commodity_amount returned
-  is 0.
-  """
-  def extract(server, commodity_type, amount) do
-    GenServer.call(server, {:extract, commodity_type, amount})
+  def attach(node_pid, being_pid) do
+    GenServer.cast(node_pid, {:attach, being_pid})
   end
 
-  @doc """
-  Reset the amount of the commodities for the node attached to
-  this genserver.
-  """
-  def reset(server, commodity_type) do
-    GenServer.cast(server, {:rest, commodity_type})
-  end
+  # Callbacks
+  @impl true
+  def init([%{name: name, resource_type: rt, neighbors: neighbors}]) do
+    sn = %ServerNode{
+      name: name,
+      resource_type: rt,
+      # this starts as an empty list if no beings are initialized
+      occupants: [],
+      # this is a list, empty if no neighbors
+      neighbors: neighbors
+    }
 
-  @doc """
-  client version to attach a node to this genserver
-  """
-  def attach(server, node) do
-    GenServer.cast(server, {:attach, node})
-  end
+    distribute_resource(sn)
 
-  @doc """
-  gets a base amount of the commdity
-  """
-  def get_commodity_supply(commodity_type) do
-    cond do
-      commodity_type == "ichor" -> 100
-      true -> 3
-    end
+    {:ok, sn}
   end
 
   @impl true
-  def init(:ok) do
-    {:ok, %{}}
+  def handle_cast({:attach, being_pid}, state) do
+    state = %{state | occupants: [being_pid | state.occupants]}
+    {:reply, state}
   end
 
   @impl true
-  def handle_call({:extract, commodity_type, amount}, _from, nodes) do
-    # TODO consider a callback to use a way to update ichor amount in node
-    node_hash = Enum.at(Map.keys(nodes), 0)
-    node = Map.fetch(nodes, node_hash)
-    # update the node
-    old_amount = Map.get(node, commodity_type)
-    new_amount = old_amount - amount
+  def handle_info(:distribute_resource, state) do
+    # TODO change the amount maybe?
+    amount = 1
 
-    if new_amount >= 0 do
-      node = %{node | ichor: new_amount}
-    end
+    # send resources to each being attached using the ServerBeing client API
+    Enum.map(state.occupants, fn pid ->
+      Exp.ServerBeing.receive_resource(pid, state.resource_type, amount)
+    end)
 
-    node_id = Node.generate_id(node)
+    distribute_resource(state)
 
-    # update the nodes map in this server
-    nodes = %{nodes | node_id => node}
-    {:reply, amount, nodes}
+    # nothing to update in the current state
+    {:noreply, state}
   end
 
-  @doc """
-  attach a node to the map of nodes held by this genserver
-  """
-  @impl true
-  def handle_cast({:attach, node}, nodes) do
-    node_hash = Node.generate_id(node)
+  defp distribute_resource(state) do
+    Exp.ServerNode.print_state(state)
 
-    if Map.has_key?(nodes, node_hash) do
-      {:noreply, nodes}
-    else
-      {:noreply, Map.put(nodes, node_hash, node)}
-    end
+    Process.send_after(self(), :distribute_resource, 1 * 1000)
   end
 
-  @impl true
-  def handle_cast({:reset, commodity_type}, commodities) do
-    {:noreply, Map.replace(commodities, commodity_type, get_commodity_supply(commodity_type))}
+  def print_state(state) do
+    IO.puts("name: #{state.name}")
+    IO.puts("resource_type: #{state.resource_type}")
+    IO.puts("number occupants: #{length(state.occupants)}")
   end
 end
