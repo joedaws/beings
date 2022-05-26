@@ -5,11 +5,19 @@ defmodule Exp.ServerBeing do
   resources are used to sustain life
 
   ichor is used to rank up and
+
+  {:ok, sb} =
+  Exp.ServerBeing.start_link(%{
+    name: "Johnson",
+    node: "hello_world_station"
+  })
+
+  :timer.sleep(60 * 1000)
   """
   use GenServer
 
   alias Exp.ServerBeing
-  import Exp.ServerNode
+  alias Exp.ServerNode
 
   defstruct [
     # string to represent the beings name
@@ -37,13 +45,15 @@ defmodule Exp.ServerBeing do
       # find beings to add to friends list
       :discover_beings,
       # must know other being, but ask for food
-      :request_resource_from_being
+      :request_resource_from_being,
+      # move to a random new node
+      :move
     ]
   end
 
-  # Client
-  def start_link(name, default) when is_map(default) and is_bitstring(name) do
-    GenServer.start_link(name, default)
+  # Client ----------------------------------------------------------------
+  def start_link(default) when is_map(default) do
+    GenServer.start_link(__MODULE__, default)
   end
 
   def receive_resource(pid, resource_type, amount) do
@@ -54,6 +64,10 @@ defmodule Exp.ServerBeing do
     GenServer.cast(pid, {:check_resource, resource_type})
   end
 
+  def get_resource_types(pid) do
+    GenServer.call(pid, :get_resource_types)
+  end
+
   @doc """
   Give a resource to the being with the given process id.
 
@@ -61,6 +75,10 @@ defmodule Exp.ServerBeing do
   """
   def give_resource(pid, resource_type, amount) do
     GenServer.call(pid, {:give_resource, resource_type, amount})
+  end
+
+  def add_friend(pid, friend_pid) do
+    GenServer.cast(pid, {:add_friend, friend_pid})
   end
 
   # Callbacks
@@ -93,6 +111,27 @@ defmodule Exp.ServerBeing do
   end
 
   @impl true
+  def handle_cast({:move, node_pid}, state) do
+    # first ask the current node for list of neighbors
+    neighbors = ServerNode.list_neighbors(state.node)
+    new_node = Enum.random(neighbors)
+
+    # remove being from current node
+    ServerNode.remove(state.node, self())
+
+    # add being to new node
+    ServerNode.attach(new_node, self())
+
+    # update the state
+    {:noreply, %{state | node: new_node}}
+  end
+
+  @impl true
+  def handle_cast({:add_friend, friend_pid}, state) do
+    {:noreply, %{state | friends: [friend_pid | state.friends]}}
+  end
+
+  @impl true
   def handle_call({:give_resource, resource_type, amount}, _from, state) do
     old_resource = Map.get(state, resource_type)
 
@@ -111,6 +150,12 @@ defmodule Exp.ServerBeing do
     amount = Map.get(state.resources, resource_type)
     IO.puts("I have #{amount} #{resource_type}")
     {:reply, amount, state}
+  end
+
+  @impl true
+  def handle_call(:get_resource_types, _from, state) do
+    resource_types_list = Map.keys(state.resources)
+    {:reply, resource_types_list, state}
   end
 
   @impl true
@@ -153,7 +198,16 @@ defmodule Exp.ServerBeing do
 
   @impl true
   def handle_info(:discover_beings, state) do
-    IO.puts("looked but discovered no other beings")
+    # look at the occupants of the current node
+    occupants = ServerNode.list_neighbors(state.node)
+
+    # add a random friend if not currently friends
+    random_friend = Enum.random(occupants)
+
+    if random_friend not in state.friends do
+      state = %{state | friends: [random_friend | state.friends]}
+    end
+
     resource_type = Enum.at(Map.keys(state.resources), 0)
     old_resource = Map.get(state.resources, resource_type)
     {:noreply, %{state | resources: %{state.resources | resource_type => old_resource - 1}}}
@@ -161,7 +215,24 @@ defmodule Exp.ServerBeing do
 
   @impl true
   def handle_info(:request_resource_from_being, state) do
-    IO.puts("there was no one to ask for resources")
+    # chose a random friend to ask resources from
+    if length(state.friends) > 0 do
+      random_friend = Enum.random(state.friends)
+      resource_list = ServerBeing.get_resource_types(random_friend)
+      resource_type = Enum.random(resource_list)
+      # TODO replace 1 with a more meaningful amount
+      amount = ServerBeing.give_resource(random_friend, resource_type, 1)
+
+      old_resource = 0
+
+      if Map.get(state.resources, resource_type) do
+        old_resource = Map.get(state.resources, resource_type)
+      end
+
+      state = %{state | resources: %{state.resources | resource_type => old_resource + amount}}
+    end
+
+    # pay the first resource amount to continue existing
     resource_type = Enum.at(Map.keys(state.resources), 0)
     old_resource = Map.get(state.resources, resource_type)
     {:noreply, %{state | resources: %{state.resources | resource_type => old_resource - 1}}}
@@ -180,22 +251,15 @@ defmodule Exp.ServerBeing do
     IO.puts("I have chosen to #{action}")
     Process.send(self(), action, [])
 
-    # in 10 seconds
+    # in 1 second
     Process.send_after(self(), :make_decision, 1 * 1000)
   end
 
   def print_state(state) do
     IO.puts("name: #{state.name}")
+    IO.puts("node: #{ServerNode.get_name(state.node)}")
     resource_list = for {k, v} <- state.resources, do: "#{k}: #{v}"
     resource_str = Enum.join(resource_list, "\n")
     IO.puts(Enum.join(["resources...\n", resource_str]))
   end
 end
-
-{:ok, sb} =
-  GenServer.start_link(Exp.ServerBeing, %{
-    name: "Johnson",
-    node: "hello_world_station"
-  })
-
-:timer.sleep(10 * 1000)

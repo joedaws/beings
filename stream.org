@@ -1,10 +1,11 @@
 #+TITLE: Stream Goals
 
 * Tasks
-** TODO Add functionality to run a simulation
+** TODO complete experimental genserver setup by running one life cycle.
 
-** TODO Ask people for their weird eldrich beings names.
-These are stored in the [[file:data/being_name_registry.yaml][name registry]] yaml.
+** TODO replace some server_being callbacks with handle info
+
+** TODO refactor beings and nodes to be genservers
 
 ** TODO implement beings function that collects resources
 Probably means that we need a function to look at all beings at a certain node
@@ -56,6 +57,13 @@ overall project more flexible.
 ** Use ets to store some static data
 After the app starts consider loading the =data= in =yamls= into
 the ets table.
+
+* Spin up and Spin down tasks
+Things to do while the stream is starting and stopping
+** create weird eldrich beings names.
+These are stored in the [[file:data/being_name_registry.yaml][name registry]] yaml.
+** create node names
+These are stored in the [[file:data/node_name_registry.yaml][node name registry]] yaml.
 
 * Tech Debt
 ** Fix issue with relative path to yaml files required by cosmos.beings and cosmos.nodes
