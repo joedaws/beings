@@ -6,11 +6,21 @@ These are stored in the [[file:data/being_name_registry.yaml][name registry]] ya
 
 ** TODO add resources to Cosmos.Beings.Being
 
-** TODO add attach to node for Being worker
+** TODO add resource to Cosmos.Locations.Node
+
+** TODO add grimiore spells/recipies
+
+** TODO add ability to perform rituals to NodeWorker
+
+** TODO add move to NodeWorker
 
 ** TODO implement beings function that collects resources
 Probably means that we need a function to look at all beings at a certain node
 and decides who gets what. Does it make sense for a being registry to take care of this?
+
+** DONE add attach to node for Being worker
+
+** DONE create node worker similar to being worker.
 
 ** DONE resolve deadlock of processes in exp
 I won't solve this because I want to take a completly different approach

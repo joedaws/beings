@@ -15,7 +15,7 @@ defmodule Cosmos.Locations.Node do
     :name,
     :type,
     :ichor_supply,
-    occupancy: 0,
+    occupants: [],
     occupancy_limit: @default_limit
   ]
 
@@ -60,7 +60,7 @@ defmodule Cosmos.Locations.Node do
     node = %Node{
       name: name,
       type: type,
-      occupancy: 0,
+      occupants: [],
       occupancy_limit: @default_limit
     }
 
@@ -71,15 +71,11 @@ defmodule Cosmos.Locations.Node do
     node = %Node{
       name: name,
       type: get_random_node_type(),
-      occupancy: 0,
+      occupants: [],
       occupancy_limit: @default_limit
     }
 
     set_ichor_supply(node)
-  end
-
-  def change_occupancy(node, n \\ 1) do
-    %{node | occupancy: n}
   end
 
   def generate_id(node) do

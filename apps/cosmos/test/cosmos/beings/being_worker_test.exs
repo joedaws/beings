@@ -2,12 +2,16 @@ defmodule Cosmos.Beings.BeingWorkerTest do
   use ExUnit.Case, async: true
   alias Cosmos.Beings.Being
   alias Cosmos.Beings.BeingWorker
+  alias Cosmos.Locations.Node
+  alias Cosmos.Locations.NodeWorker
 
   setup do
     registry = start_supervised!(Cosmos.Beings.Registry)
     Cosmos.Beings.Registry.create(registry, "beings")
+    Cosmos.Beings.Registry.create(registry, "nodes")
 
     {:ok, beings} = Cosmos.Beings.Registry.lookup(registry, "beings")
+    {:ok, nodes} = Cosmos.Beings.Registry.lookup(registry, "nodes")
 
     b = Being.get_random_being()
     # alive false prevents the cycle logic from running while testing
@@ -16,9 +20,16 @@ defmodule Cosmos.Beings.BeingWorkerTest do
 
     Cosmos.Beings.Bucket.put(beings, b_id, b)
 
+    n = Node.generate_random_node()
+    n_id = Node.generate_id(n)
+
+    Cosmos.Beings.Bucket.put(nodes, n_id, n)
+
     {:ok, worker} = BeingWorker.start_link([beings, b_id])
 
-    %{beings: beings, worker: worker}
+    {:ok, node_worker} = NodeWorker.start_link([nodes, n_id])
+
+    %{beings: beings, worker: worker, node_worker: node_worker}
   end
 
   test "get being state", %{beings: _beings, worker: worker} do
@@ -37,7 +48,12 @@ defmodule Cosmos.Beings.BeingWorkerTest do
     BeingWorker.revive(worker)
     BeingWorker.hibernate(worker)
     new_ichor = BeingWorker.get(worker, :ichor)
-
     assert new_ichor == old_ichor - 1
+  end
+
+  test "attach being to node", %{worker: worker, node_worker: node_worker} do
+    assert BeingWorker.get(worker, :node) == nil
+    BeingWorker.attach(worker, node_worker)
+    assert BeingWorker.get(worker, :node) == node_worker
   end
 end

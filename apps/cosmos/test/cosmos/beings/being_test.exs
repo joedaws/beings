@@ -41,19 +41,6 @@ defmodule Cosmos.Beings.BeingTest do
     assert Being.get_location_node_name_and_type(b) == "Lost in Space"
   end
 
-  test "set being node", %{test_being: b} do
-    node = %Node{
-      name: "here",
-      type: Node.get_random_node_type(),
-      occupancy: 1,
-      occupancy_limit: 10
-    }
-
-    b = %{b | node: node}
-
-    assert Node.get_name(node) == Node.get_name(b.node)
-  end
-
   test "generate random being" do
     b = Being.get_random_being()
     name = Being.get_full_name(b)

@@ -5,6 +5,7 @@ defmodule Cosmos.Beings.BeingWorker do
   use GenServer
   require Logger
   alias Cosmos.Beings.Bucket
+  alias Cosmos.Locations.NodeWorker
 
   defstruct [
     :bucket_pid,
@@ -30,6 +31,10 @@ defmodule Cosmos.Beings.BeingWorker do
 
   def hibernate(pid) do
     GenServer.cast(pid, :hibernate)
+  end
+
+  def attach(pid, node) do
+    GenServer.cast(pid, {:attach, node})
   end
 
   # callbacks ------------------------------
@@ -74,6 +79,15 @@ defmodule Cosmos.Beings.BeingWorker do
     being = Bucket.get(state.bucket_pid, state.being_id)
     new_being = %{being | alive: false}
     Bucket.put(state.bucket_pid, state.being_id, new_being)
+    {:noreply, state}
+  end
+
+  @impl true
+  def handle_cast({:attach, node}, state) do
+    being = Bucket.get(state.bucket_pid, state.being_id)
+    new_being = %{being | node: node}
+    Bucket.put(state.bucket_pid, state.being_id, new_being)
+    NodeWorker.attach(node, self())
     {:noreply, state}
   end
 
