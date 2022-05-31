@@ -1,4 +1,6 @@
 defmodule Cosmos.Beings.Being do
+  require Logger
+
   @moduledoc """
   Beings have:
     - shell_name
@@ -8,7 +10,6 @@ defmodule Cosmos.Beings.Being do
     - rank
     - node
     - age
-
   """
   alias Cosmos.Beings.Being
   alias Cosmos.Beings.Rank

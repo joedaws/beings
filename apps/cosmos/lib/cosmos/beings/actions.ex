@@ -1,4 +1,6 @@
 defmodule Cosmos.Beings.Actions do
+  require Logger
+
   @moduledoc """
   Definitions of basic actions
   """
@@ -14,8 +16,8 @@ defmodule Cosmos.Beings.Actions do
     b2_says =
       "#{Cosmos.Beings.Being.get_full_name(b2)}: Greetins fellow being, I'm #{b2.shell_name}"
 
-    IO.puts(b1_says)
-    IO.puts(b2_says)
+    Logger.info(b1_says)
+    Logger.info(b2_says)
     b1_says <> "\n" <> b2_says
   end
 

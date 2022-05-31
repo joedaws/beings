@@ -1,5 +1,6 @@
 defmodule Cosmos.Beings.BeingTest do
   use ExUnit.Case
+  require Logger
   alias Cosmos.Beings.Being
   alias Cosmos.Beings.Rank
   alias Cosmos.Locations.Node
@@ -55,7 +56,8 @@ defmodule Cosmos.Beings.BeingTest do
 
   test "generate random being" do
     b = Being.get_random_being()
-    IO.puts("#{Being.get_full_name(b)} was randomly generated")
+    name = Being.get_full_name(b)
+    Logger.info("#{name} was randomly genereated")
   end
 
   test "generate id from being", %{test_being: b} do

@@ -1,5 +1,6 @@
 defmodule Exp.ServerNode do
   use GenServer
+  require Logger
   alias Exp.ServerNode
 
   defstruct [
@@ -10,8 +11,9 @@ defmodule Exp.ServerNode do
     :neighbors
   ]
 
-  # CLIENT
-  def start_link(default) when is_list(default) do
+  # CLIENT ---------------------------------------------------------------------
+  # default should be map like the input to init below
+  def start_link(default) when is_map(default) do
     GenServer.start_link(__MODULE__, default)
   end
 
@@ -19,15 +21,31 @@ defmodule Exp.ServerNode do
     GenServer.cast(node_pid, {:attach, being_pid})
   end
 
-  # Callbacks
+  def remove(node_pid, being_pid) do
+    GenServer.cast(node_pid, {:remove, being_pid})
+  end
+
+  def list_neighbors(node_pid) do
+    GenServer.call(node_pid, :list_neighbors)
+  end
+
+  def add_neighbor(node_pid, neighbor_pid) do
+    GenServer.cast(node_pid, {:add_neighbor, neighbor_pid})
+  end
+
+  def get_name(node_pid) do
+    GenServer.call(node_pid, :get_name)
+  end
+
+  # Callbacks -------------------------------------------------------------------
   @impl true
-  def init([%{name: name, resource_type: rt, neighbors: neighbors}]) do
+  def init(%{name: name, resource_type: rt, neighbors: neighbors}) do
     sn = %ServerNode{
       name: name,
       resource_type: rt,
       # this starts as an empty list if no beings are initialized
       occupants: [],
-      # this is a list, empty if no neighbors
+      # this is a list of process ids, empty if no neighbors
       neighbors: neighbors
     }
 
@@ -39,7 +57,31 @@ defmodule Exp.ServerNode do
   @impl true
   def handle_cast({:attach, being_pid}, state) do
     state = %{state | occupants: [being_pid | state.occupants]}
-    {:reply, state}
+    {:noreply, state}
+  end
+
+  @impl true
+  def handle_cast({:remove, being_pid}, state) do
+    # delete the being pid if it is an occupant
+    new_occupants = List.delete(state.occupants, being_pid)
+    state = %{state | occupants: new_occupants}
+    {:noreply, state}
+  end
+
+  @impl true
+  def handle_cast({:add_neighbor, neighbor_pid}, state) do
+    state = %{state | neighbors: [neighbor_pid | state.neighbors]}
+    {:noreply, state}
+  end
+
+  @impl true
+  def handle_call(:get_name, _from, state) do
+    {:reply, state.name, state}
+  end
+
+  @impl true
+  def handle_call(:list_neighbors, _from, state) do
+    {:reply, state.neighbors, state}
   end
 
   @impl true
@@ -65,8 +107,7 @@ defmodule Exp.ServerNode do
   end
 
   def print_state(state) do
-    IO.puts("name: #{state.name}")
-    IO.puts("resource_type: #{state.resource_type}")
-    IO.puts("number occupants: #{length(state.occupants)}")
+    logger_str = ["name: #{state.name}", "occupants: #{length(state.occupants)}"]
+    Logger.info(Enum.join(logger_str, " "))
   end
 end
