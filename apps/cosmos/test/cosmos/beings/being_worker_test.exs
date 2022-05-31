@@ -10,7 +10,8 @@ defmodule Cosmos.Beings.BeingWorkerTest do
     {:ok, beings} = Cosmos.Beings.Registry.lookup(registry, "beings")
 
     b = Being.get_random_being()
-    b = %{b | ichor: 100}
+    # alive false prevents the cycle logic from running while testing
+    b = %{b | ichor: 100, alive: false}
     b_id = Being.generate_id(b)
 
     Cosmos.Beings.Bucket.put(beings, b_id, b)
@@ -29,5 +30,14 @@ defmodule Cosmos.Beings.BeingWorkerTest do
     BeingWorker.update(worker, :ichor, new_ichor_amount)
     ichor = BeingWorker.get(worker, :ichor)
     assert new_ichor_amount == ichor
+  end
+
+  test "ichor decrease each cycle", %{beings: _beings, worker: worker} do
+    old_ichor = BeingWorker.get(worker, :ichor)
+    BeingWorker.revive(worker)
+    BeingWorker.hibernate(worker)
+    new_ichor = BeingWorker.get(worker, :ichor)
+
+    assert new_ichor == old_ichor - 1
   end
 end

@@ -1,8 +1,12 @@
 #+TITLE: Stream Goals
 
 * Tasks
-** TODO Ask people for their weird eldrich beings names.
+** TODO update weird eldrich beings names.
 These are stored in the [[file:data/being_name_registry.yaml][name registry]] yaml.
+
+** TODO add resources to Cosmos.Beings.Being
+
+** TODO add attach to node for Being worker
 
 ** TODO implement beings function that collects resources
 Probably means that we need a function to look at all beings at a certain node

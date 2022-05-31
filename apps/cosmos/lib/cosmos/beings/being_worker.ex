@@ -3,6 +3,7 @@ defmodule Cosmos.Beings.BeingWorker do
   Updates the being state held in the bucket
   """
   use GenServer
+  require Logger
   alias Cosmos.Beings.Bucket
 
   defstruct [
@@ -23,10 +24,25 @@ defmodule Cosmos.Beings.BeingWorker do
     GenServer.cast(pid, {:update, attribute_type, new_value})
   end
 
+  def revive(pid) do
+    GenServer.cast(pid, :revive)
+  end
+
+  def hibernate(pid) do
+    GenServer.cast(pid, :hibernate)
+  end
+
   # callbacks ------------------------------
   @impl true
   def init([bucket_pid, being_id]) do
-    {:ok, %{bucket_pid: bucket_pid, being_id: being_id}}
+    bw = %Cosmos.Beings.BeingWorker{
+      bucket_pid: bucket_pid,
+      being_id: being_id
+    }
+
+    cycle(bw)
+
+    {:ok, bw}
   end
 
   @impl true
@@ -42,5 +58,57 @@ defmodule Cosmos.Beings.BeingWorker do
     new_being = %{being | attribute_type => new_value}
     Bucket.put(state.bucket_pid, state.being_id, new_being)
     {:noreply, state}
+  end
+
+  @impl true
+  def handle_cast(:revive, state) do
+    being = Bucket.get(state.bucket_pid, state.being_id)
+    new_being = %{being | alive: true}
+    Bucket.put(state.bucket_pid, state.being_id, new_being)
+    cycle(state)
+    {:noreply, state}
+  end
+
+  @impl true
+  def handle_cast(:hibernate, state) do
+    being = Bucket.get(state.bucket_pid, state.being_id)
+    new_being = %{being | alive: false}
+    Bucket.put(state.bucket_pid, state.being_id, new_being)
+    {:noreply, state}
+  end
+
+  @impl true
+  def handle_info(:cycle, state) do
+    cycle(state)
+    {:noreply, state}
+  end
+
+  defp cycle(bw) do
+    being = Bucket.get(bw.bucket_pid, bw.being_id)
+
+    if being.alive do
+      Logger.info("#{inspect(self())} is updating being #{inspect(bw.being_id)}")
+      # perform updates required each cycle
+      pay_ichor(bw.bucket_pid, bw.being_id)
+
+      Process.send_after(self(), :cycle, 1 * 1000)
+    end
+  end
+
+  defp pay_ichor(bucket_pid, being_id) do
+    being = Bucket.get(bucket_pid, being_id)
+    old_amount = Map.get(being, :ichor)
+    new_amount = old_amount - 1
+
+    being =
+      if new_amount <= 0 do
+        Logger.info("#{inspect(being_id)} will cease to exist")
+        being = %{being | alive: false}
+      else
+        being
+      end
+
+    new_being = %{being | ichor: new_amount}
+    Bucket.put(bucket_pid, being_id, new_being)
   end
 end
