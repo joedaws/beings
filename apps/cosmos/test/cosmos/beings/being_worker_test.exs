@@ -1,5 +1,5 @@
 defmodule Cosmos.Beings.BeingWorkerTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case
   alias Cosmos.Beings.Being
   alias Cosmos.Beings.BeingWorker
   alias Cosmos.Locations.Node
@@ -32,18 +32,24 @@ defmodule Cosmos.Beings.BeingWorkerTest do
     %{beings: beings, worker: worker, node_worker: node_worker}
   end
 
-  test "get being state", %{beings: _beings, worker: worker} do
+  test "get being state", %{worker: worker} do
     assert 100 == BeingWorker.get(worker, :ichor)
   end
 
-  test "update being state", %{beings: _beings, worker: worker} do
+  test "update being state", %{worker: worker} do
     new_ichor_amount = 300
     BeingWorker.update(worker, :ichor, new_ichor_amount)
     ichor = BeingWorker.get(worker, :ichor)
     assert new_ichor_amount == ichor
   end
 
-  test "ichor decrease each cycle", %{beings: _beings, worker: worker} do
+  test "attach being to node", %{worker: worker, node_worker: node_worker} do
+    assert BeingWorker.get(worker, :node) == nil
+    BeingWorker.attach(worker, node_worker)
+    assert BeingWorker.get(worker, :node) == node_worker
+  end
+
+  test "ichor decrease each cycle", %{worker: worker} do
     old_ichor = BeingWorker.get(worker, :ichor)
     BeingWorker.revive(worker)
     BeingWorker.hibernate(worker)
@@ -51,9 +57,18 @@ defmodule Cosmos.Beings.BeingWorkerTest do
     assert new_ichor == old_ichor - 1
   end
 
-  test "attach being to node", %{worker: worker, node_worker: node_worker} do
-    assert BeingWorker.get(worker, :node) == nil
+  test "harvest resources", %{worker: worker, node_worker: node_worker} do
     BeingWorker.attach(worker, node_worker)
-    assert BeingWorker.get(worker, :node) == node_worker
+    assert BeingWorker.get(worker, :node) != nil
+    resource_type = NodeWorker.get(node_worker, :resource_type)
+    resource_yeild = NodeWorker.get(node_worker, :resource_yeild)
+    old_resource = Map.get(BeingWorker.get(worker, :resources), resource_type)
+    # nil because we did a cycle without the being attached to a node
+    assert old_resource == nil
+
+    BeingWorker.harvest(worker)
+
+    new_resource = Map.get(BeingWorker.get(worker, :resources), resource_type)
+    assert new_resource == resource_yeild
   end
 end
