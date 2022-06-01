@@ -7,7 +7,6 @@ defmodule Cosmos.Locations.Node do
   alias Cosmos.Locations.Node
 
   @default_limit 10
-  @data_path "./data"
   # TODO there might be a better way to store constants
   @node_types [:meeting_place, :resting_place, :ichor_place]
 
@@ -38,7 +37,8 @@ defmodule Cosmos.Locations.Node do
   end
 
   def get_random_node_name() do
-    path = Path.join(Path.expand(@data_path), "node_name_registry.yaml")
+    data_path = Application.fetch_env!(:cosmos, :data_path)
+    path = Path.join(data_path, "node_name_registry.yaml")
 
     {:ok, types} = YamlElixir.read_from_file(path)
 

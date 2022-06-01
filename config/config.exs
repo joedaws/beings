@@ -9,6 +9,9 @@
 # move said applications out of the umbrella.
 import Config
 
+config :cosmos,
+  data_path: System.get_env("COSMOS_BEING_DATA_PATH")
+
 # Sample configuration:
 #
 #     config :logger, :console,

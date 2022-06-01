@@ -15,7 +15,6 @@ defmodule Cosmos.Beings.Being do
   alias Cosmos.Beings.Rank
   alias Cosmos.Locations.Node
 
-  @data_path "./data"
   @max_age 99999
   @max_ichor 99999
   @max_starting_ichor 88
@@ -44,8 +43,8 @@ defmodule Cosmos.Beings.Being do
   end
 
   def get_random_being() do
-    # Path.expand tries to convert relative paths
-    path = Path.join(Path.expand(@data_path), "being_name_registry.yaml")
+    data_path = Application.fetch_env!(:cosmos, :data_path)
+    path = Path.join(data_path, "being_name_registry.yaml")
 
     {:ok, names} = YamlElixir.read_from_file(path)
 
