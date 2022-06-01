@@ -41,6 +41,10 @@ defmodule Cosmos.Beings.BeingWorker do
     GenServer.cast(pid, :harvest)
   end
 
+  def give_resource(pid, other_pid, resource_type, amount) do
+    GenServer.cast(pid, {:give_resource, other_pid, resource_type, amount})
+  end
+
   # callbacks ------------------------------
   @impl true
   def init([bucket_pid, being_id]) do
@@ -115,6 +119,29 @@ defmodule Cosmos.Beings.BeingWorker do
   end
 
   @impl true
+  def handle_cast({:give_resource, other_pid, resource_type, amount}, state) do
+    being = Bucket.get(state.bucket_pid, state.being_id)
+    # check to make sure that this being has enough resource to give
+    old_resource = Map.get(being.resources, resource_type)
+
+    {give_amount, new_amount} =
+      cond do
+        old_resource == 0 -> {0, 0}
+        old_resource - amount < 0 -> {old_resource, 0}
+        true -> {amount, old_resource - amount}
+      end
+
+    # update being state
+    new_being = %{being | resources: Map.put(being.resources, resource_type, new_amount)}
+    Bucket.put(state.bucket_pid, state.being_id, new_being)
+    # send resource to other being
+    old_other_resources = Cosmos.Beings.BeingWorker.get(other_pid, :resources)
+    new_other_resources = Map.put(old_other_resources, resource_type, give_amount)
+    Cosmos.Beings.BeingWorker.update(other_pid, :resources, new_other_resources)
+    {:noreply, state}
+  end
+
+  @impl true
   def handle_info(:cycle, state) do
     cycle(state)
     {:noreply, state}
@@ -128,6 +155,7 @@ defmodule Cosmos.Beings.BeingWorker do
       # perform updates required each cycle
       {bw.bucket_pid, bw.being_id}
       |> pay_ichor()
+      |> make_decision()
 
       Process.send_after(self(), :cycle, 1 * 1000)
     end
@@ -152,7 +180,7 @@ defmodule Cosmos.Beings.BeingWorker do
   end
 
   defp make_decision({bucket_pid, being_id}) do
-    Logger.info("#{inspect(self)} will make a decision")
+    Logger.info("#{inspect(self())} will make a decision")
     # chose among actions that this being is capable of
   end
 end

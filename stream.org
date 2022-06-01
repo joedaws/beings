@@ -55,7 +55,7 @@ follow the path laid out in the [[https://elixir-lang.org/getting-started/mix-ot
 Originally, I had planned to use the genserver to hold the data for beings.
 However following the [[https://elixir-lang.org/getting-started/mix-otp/genserver.html][tutorial]] The genserver holds the buckets which will
 store the data. When updating the buckets using the Buckets implemented API,
-since we are using the Agent behaviour, the bucket retrived from the GenServer API
+Since we are using the Agent behaviour, the bucket retrived from the GenServer API
 lookup will also be updated.
 
 _tl;dr_

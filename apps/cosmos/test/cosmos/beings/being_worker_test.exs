@@ -71,4 +71,25 @@ defmodule Cosmos.Beings.BeingWorkerTest do
     new_resource = Map.get(BeingWorker.get(worker, :resources), resource_type)
     assert new_resource == resource_yeild
   end
+
+  test "give resource", %{worker: worker, beings: beings} do
+    b = Being.get_random_being()
+    # alive false prevents the cycle logic from running while testing
+    b = %{b | ichor: 100, alive: false}
+    b_id = Being.generate_id(b)
+    Cosmos.Beings.Bucket.put(beings, b_id, b)
+    {:ok, other_worker} = BeingWorker.start_link([beings, b_id])
+
+    # we expect that the new other being has no resources
+    assert BeingWorker.get(other_worker, :resources) == %{}
+
+    # the original being should have bones
+    BeingWorker.update(worker, :resources, %{bones: 10})
+    amount = 5
+
+    BeingWorker.give_resource(worker, other_worker, :bones, amount)
+
+    assert BeingWorker.get(worker, :resources) == %{bones: 5}
+    assert BeingWorker.get(other_worker, :resources) == %{bones: 5}
+  end
 end
