@@ -3,6 +3,9 @@ shell_name:
   - "Cryk"
   - "Jhuftoo"
   - "Ghulop"
+  - "Triangle"
+  - "MAL-1984"
+  - "REDACTED"
 
 core_name:
   - "Gyla"
@@ -10,6 +13,8 @@ core_name:
   - "Motz"
   - "Jorsa"
   - "Chiu"
+  - "Strange"
+  - "Xo"
 
 core_prefix:
   - "L'"
@@ -17,3 +22,6 @@ core_prefix:
   - "U'"
   - "Gy'"
   - "K'"
+  - "Mc"
+  - "Mus"
+  - "Q-"

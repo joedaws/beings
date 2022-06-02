@@ -29,7 +29,7 @@ defmodule Cosmos.Beings.BeingWorkerTest do
 
     {:ok, node_worker} = NodeWorker.start_link([nodes, n_id])
 
-    %{beings: beings, worker: worker, node_worker: node_worker}
+    %{beings: beings, worker: worker, nodes: nodes, node_worker: node_worker}
   end
 
   test "get being state", %{worker: worker} do
@@ -91,5 +91,33 @@ defmodule Cosmos.Beings.BeingWorkerTest do
 
     assert BeingWorker.get(worker, :resources) == %{bones: 5}
     assert BeingWorker.get(other_worker, :resources) == %{bones: 5}
+  end
+
+  test "receive resource", %{worker: worker, beings: beings} do
+    # we expect that the new other being has no resources
+    old_amount = Map.get(BeingWorker.get(worker, :resources), :papyrus, 0)
+
+    # the original being should have bones
+    BeingWorker.receive_resource(worker, :papyrus, 10)
+
+    new_amount = Map.get(BeingWorker.get(worker, :resources), :papyrus, 0)
+
+    assert new_amount == old_amount + 10
+  end
+
+  test "move to node", %{worker: worker, nodes: nodes} do
+    # create new node and worker
+    n = Node.generate_random_node()
+    n_id = Node.generate_id(n)
+    Cosmos.Beings.Bucket.put(nodes, n_id, n)
+    {:ok, node_worker} = NodeWorker.start_link([nodes, n_id])
+
+    old_node = BeingWorker.get(worker, :node)
+
+    # move being to new node
+    BeingWorker.move(worker, node_worker)
+
+    assert old_node != node_worker
+    assert BeingWorker.get(worker, :node) == node_worker
   end
 end

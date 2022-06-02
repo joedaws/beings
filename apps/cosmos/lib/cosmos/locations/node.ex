@@ -15,6 +15,7 @@ defmodule Cosmos.Locations.Node do
     :type,
     :resource_yeild,
     :resource_type,
+    neighbors: [],
     occupants: [],
     occupancy_limit: @default_limit
   ]

@@ -1,56 +1,90 @@
 #+TITLE: Stream Goals
 
 * Tasks
-** TODO update weird eldrich beings names.
-These are stored in the [[file:data/being_name_registry.yaml][name registry]] yaml.
+** Once Per Stream
+be sure to reset these each stream.
+*** TODO update weird eldrich beings names and location names.
+These are stored in the [[file:apps/cosmos/data/node_name_registry.yaml][being names]] yaml.
+Also update the node places [[file:apps/cosmos/data/node_name_registry.yaml][node names]] yaml.
 
-** TODO add resources to Cosmos.Beings.Being
 
-** TODO add resource to Cosmos.Locations.Node
+** Cosmos Application
+*** TODO add grimiore spells/recipies
 
-** TODO add grimiore spells/recipies
+*** TODO add knowledge to beings
+Beings store the spells/recipies they know in
+their knowledge map
+*** TODO add ability to perform rituals to BeingWorker
 
-** TODO add ability to perform rituals to NodeWorker
+*** TODO add observations to beings
 
-** TODO add move to NodeWorker
+*** TODO implement ranks
+*** TODO investigate using Mutex to enforce sequential updates to beings
 
-** TODO implement beings function that collects resources
+*** DONE add move to BeingWorker
+
+*** DONE add neighbors to Node
+
+*** DONE remove call to other worker being in give resources
+
+*** DONE implement beings function that collects resources
 Probably means that we need a function to look at all beings at a certain node
 and decides who gets what. Does it make sense for a being registry to take care of this?
 
-** DONE add attach to node for Being worker
+*** DONE add resource to Cosmos.Locations.Node
 
-** DONE create node worker similar to being worker.
+*** DONE add resources to Cosmos.Beings.Being
 
-** DONE resolve deadlock of processes in exp
+*** DONE add attach to node for Being worker
+
+*** DONE create node worker similar to being worker.
+
+*** DONE resolve deadlock of processes in exp
 I won't solve this because I want to take a completly different approach
 to modifying existing beings. The exp approach will always have the
 chance that two beingserver processes will call each other and dead lock.
 
-** DONE Implement the command parser following [[https://elixir-lang.org/getting-started/mix-otp/docs-tests-and-with.html][this page]].
 
-** DONE Build the server following this [[https://elixir-lang.org/getting-started/mix-otp/dependencies-and-umbrella-projects.html][page]].
+** Cosmos Server Application
+*** DONE Implement the command parser following [[https://elixir-lang.org/getting-started/mix-otp/docs-tests-and-with.html][this page]].
 
-** DONE Work on [[https://elixir-lang.org/getting-started/mix-otp/supervisor-and-application.html#our-first-supervisor][adding application start up customization]]
-** DONE add supervision to the genserver and it's child processes.
+*** DONE Build the server following this [[https://elixir-lang.org/getting-started/mix-otp/dependencies-and-umbrella-projects.html][page]].
+
+*** DONE Work on [[https://elixir-lang.org/getting-started/mix-otp/supervisor-and-application.html#our-first-supervisor][adding application start up customization]]
+*** DONE add supervision to the genserver and it's child processes.
 Working on this starting 5/4
 
-** DONE GenServer to hold nodes and beings
-The idea is to use a genserver which holds a node struct
-and handles calls to udpate that node.
-Work in progress
-see [[file:lib/exp/server_node.ex][server_node.ex]]
 
-follow the path laid out in the [[https://elixir-lang.org/getting-started/mix-otp/genserver.html][tutorial]]
+** Cosmos Web Application
+*** TODO go througgh a Phoenix tutorial
+*** TODO find out what livebook is about
 
-** DONE simple script to run
-** DONE implement ichor generation from node
-*** DONE nodes have ichor_supply
-*** DONE beings have location
-*** DONE change node occupancy when visited by a being
-** DONE implement ranks
+
+** Cosmos art
+This section is for todos related to getting visuals related to
+the beings.
+
+Right now I want to explore using 1-bit character forms
+
+*** TODO create tempalte for being avatars
+*** TODO create 2 frame animations for each part of tempalte
+
 
 * Learnings
+** Focus on single being behavior first
+Before working on the multi-being behavior too much I think
+I will focus more on single being behavior and flush-out
+how it will make decisions based on its observations.
+
+** About concurrent being workers
+Many of the BeingWorker functions need to pull a being state,
+do a computation and return a new updated being state to the
+bucekt. I think the restriction that there is a one to one
+relationship between being states and being workers means
+that I don't need to use a Mutex when updating the being state.
+
+I need to think of a test to make sure this assumption is safe.
+
 ** How to use genserver
 Originally, I had planned to use the genserver to hold the data for beings.
 However following the [[https://elixir-lang.org/getting-started/mix-otp/genserver.html][tutorial]] The genserver holds the buckets which will

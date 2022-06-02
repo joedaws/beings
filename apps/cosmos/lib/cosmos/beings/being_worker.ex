@@ -45,6 +45,14 @@ defmodule Cosmos.Beings.BeingWorker do
     GenServer.cast(pid, {:give_resource, other_pid, resource_type, amount})
   end
 
+  def receive_resource(pid, resource_type, amount) do
+    GenServer.cast(pid, {:receive_resource, resource_type, amount})
+  end
+
+  def move(pid, new_node_pid) do
+    GenServer.cast(pid, {:move, new_node_pid})
+  end
+
   # callbacks ------------------------------
   @impl true
   def init([bucket_pid, being_id]) do
@@ -135,9 +143,25 @@ defmodule Cosmos.Beings.BeingWorker do
     new_being = %{being | resources: Map.put(being.resources, resource_type, new_amount)}
     Bucket.put(state.bucket_pid, state.being_id, new_being)
     # send resource to other being
-    old_other_resources = Cosmos.Beings.BeingWorker.get(other_pid, :resources)
-    new_other_resources = Map.put(old_other_resources, resource_type, give_amount)
-    Cosmos.Beings.BeingWorker.update(other_pid, :resources, new_other_resources)
+    Cosmos.Beings.BeingWorker.receive_resource(other_pid, resource_type, amount)
+
+    {:noreply, state}
+  end
+
+  @impl true
+  def handle_cast({:receive_resource, resource_type, amount}, state) do
+    being = Bucket.get(state.bucket_pid, state.being_id)
+    new_amount = Map.get(being.resources, resource_type, 0) + amount
+    new_being = %{being | resources: Map.put(being.resources, resource_type, new_amount)}
+    Bucket.put(state.bucket_pid, state.being_id, new_being)
+    {:noreply, state}
+  end
+
+  @impl true
+  def handle_cast({:move, new_node_pid}, state) do
+    being = Bucket.get(state.bucket_pid, state.being_id)
+    new_being = %{being | node: new_node_pid}
+    Bucket.put(state.bucket_pid, state.being_id, new_being)
     {:noreply, state}
   end
 
@@ -146,6 +170,8 @@ defmodule Cosmos.Beings.BeingWorker do
     cycle(state)
     {:noreply, state}
   end
+
+  # Private function ----------------------------------------------------------------------
 
   defp cycle(bw) do
     being = Bucket.get(bw.bucket_pid, bw.being_id)
