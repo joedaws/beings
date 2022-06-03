@@ -17,6 +17,10 @@ defmodule Cosmos.Locations.NodeWorker do
     GenServer.call(pid, {:get, attribute_type})
   end
 
+  def connect(pid, new_neighbor_pid) do
+    GenServer.cast(pid, {:connect, new_neighbor_pid})
+  end
+
   def attach(pid, being_worker_pid) do
     GenServer.cast(pid, {:attach, being_worker_pid})
   end
@@ -34,6 +38,22 @@ defmodule Cosmos.Locations.NodeWorker do
     }
 
     {:ok, nw}
+  end
+
+  @impl true
+  def handle_cast({:connect, new_neighbor_pid}, state) do
+    node = Bucket.get(state.bucket_pid, state.node_id)
+    old_neighbors = node.neighbors
+
+    new_node =
+      if new_neighbor_pid not in old_neighbors do
+        %{node | neighbors: [new_neighbor_pid | old_neighbors]}
+      else
+        node
+      end
+
+    Bucket.put(state.bucket_pid, state.node_id, new_node)
+    {:noreply, state}
   end
 
   @impl true

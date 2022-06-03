@@ -9,7 +9,14 @@ Also update the node places [[file:apps/cosmos/data/node_name_registry.yaml][nod
 
 
 ** Cosmos Application
-*** TODO add grimiore spells/recipies
+*** TODO add graph generator function which spawns and connects nodes.
+Will create a Cosmos.Create context to put some useful functions
+for creating a registry with the appropriate pieces for testing
+and for trying out different configurations.
+
+Need to figure out where to put this function of functions,
+consider the advice [[https://stackoverflow.com/questions/34623694/run-code-on-application-startup-phoenix-framework-elixir][here]] using something like the function
+found in [[file:apps/cosmos/create/simple.exs][the create simple module]].
 
 *** TODO add knowledge to beings
 Beings store the spells/recipies they know in
@@ -19,7 +26,10 @@ their knowledge map
 *** TODO add observations to beings
 
 *** TODO implement ranks
+
 *** TODO investigate using Mutex to enforce sequential updates to beings
+
+*** DONE add grimiore rituals/recipies
 
 *** DONE add move to BeingWorker
 
