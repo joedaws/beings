@@ -53,6 +53,10 @@ defmodule Cosmos.Beings.BeingWorker do
     GenServer.cast(pid, {:move, new_node_pid})
   end
 
+  def perform_ritual(pid, ritual_index \\ 0) do
+    Genserver.cast(pid, {:perform_ritual, ritual_index})
+  end
+
   # callbacks ------------------------------
   @impl true
   def init([bucket_pid, being_id]) do
@@ -165,13 +169,33 @@ defmodule Cosmos.Beings.BeingWorker do
     {:noreply, state}
   end
 
+  # already assumes that being has sufficient resources to perform this
+  @impl true
+  def handle_cast({:perform_ritual, ritual_index}, state) do
+    being = Bucket.get(state.bucket_pid, state.being_id)
+    resources = being.resources
+    ritual = Enum.get(being.rituals, ritual_index)
+
+    new_resources =
+      for {k, v} <- resources,
+          into: %{},
+          do:
+            if(k in Map.keys(ritual.requirements),
+              do: {k, Map.get(resources, k) - Map.get(ritual.requirements, k)},
+              else: {k, v}
+            )
+
+    new_being = %{being | resources: new_resources}
+    Bucket.put(state.bucket_pid, state.being_id, new_being)
+  end
+
   @impl true
   def handle_info(:cycle, state) do
     cycle(state)
     {:noreply, state}
   end
 
-  # Private function ----------------------------------------------------------------------
+  # Private functions ---------------------------------------------------------------------
 
   defp cycle(bw) do
     being = Bucket.get(bw.bucket_pid, bw.being_id)
@@ -181,7 +205,10 @@ defmodule Cosmos.Beings.BeingWorker do
       # perform updates required each cycle
       {bw.bucket_pid, bw.being_id}
       |> pay_ichor()
-      |> make_decision()
+
+      # |> observe()
+
+      # |> make_decision()
 
       Process.send_after(self(), :cycle, 1 * 1000)
     end
@@ -205,8 +232,32 @@ defmodule Cosmos.Beings.BeingWorker do
     {bucket_pid, being_id}
   end
 
-  defp make_decision({bucket_pid, being_id}) do
+  @doc """
+  This function let's the being collect whatever information it might
+  want and is capable of obtaining.
+  """
+  defp observe({bucket_pid, being_id}) do
+    being = Bucket.get(bucket_pid, being_id)
+    node_worker = being.node
+
+    observation = %{
+      owned_resources: being.resources,
+      node_resource_type: NodeWorker.get(node_worker, :resource_type),
+      node_resource_yeild: NodeWorker.get(node_worker, :resource_yeild),
+      nearby_beings: NodeWorker.get(node_worker, :occupants),
+      neighbor_nodes: NodeWorker.get(node_worker, :neighbors)
+    }
+
+    {bucket_pid, being_id, observation}
+  end
+
+  defp make_decision({bucket_pid, being_id, observation}) do
     Logger.info("#{inspect(self())} will make a decision")
     # chose among actions that this being is capable of
+    action = :harvest
+  end
+
+  defp choose_action(policy, observations) do
+    # implement
   end
 end

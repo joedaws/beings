@@ -28,7 +28,8 @@ defmodule Cosmos.Beings.Being do
     ichor: 0,
     alive: true,
     rank: Rank.get_lowest_rank(),
-    resources: %{}
+    resources: %{},
+    rituals: []
   ]
 
   def get_full_name(b) do

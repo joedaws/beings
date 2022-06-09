@@ -9,6 +9,32 @@ Also update the node places [[file:apps/cosmos/data/node_name_registry.yaml][nod
 
 
 ** Cosmos Application
+*** TODO create decision tree
+should the decision tree spawn task processes what send commands to
+the original worker process?
+
+Or should the worker process receive the returned value and then generate
+a task which allows itself to use the client api?
+*** TODO consider creating a decision maker process
+this would replace part of the being worker functionality
+
+instead a decision maker process puts actions in a queue which
+it sends to the beingworker to execute.
+
+This would allow external storage of how to make a decision.
+
+Should also consider using a decision tree to make decisions,
+with specific cut off values being unique to beings.
+
+*** TODO add knowledge to beings
+Beings store the spells/recipies they know in
+their knowledge map
+
+*** TODO add observations to beings
+
+*** TODO add ability to perform rituals to BeingWorker
+Add a new function to [[file:apps/cosmos/lib/cosmos/beings/being_worker.ex][being worker]]
+
 *** TODO add graph generator function which spawns and connects nodes.
 Will create a Cosmos.Create context to put some useful functions
 for creating a registry with the appropriate pieces for testing
@@ -17,13 +43,6 @@ and for trying out different configurations.
 Need to figure out where to put this function of functions,
 consider the advice [[https://stackoverflow.com/questions/34623694/run-code-on-application-startup-phoenix-framework-elixir][here]] using something like the function
 found in [[file:apps/cosmos/create/simple.exs][the create simple module]].
-
-*** TODO add knowledge to beings
-Beings store the spells/recipies they know in
-their knowledge map
-*** TODO add ability to perform rituals to BeingWorker
-
-*** TODO add observations to beings
 
 *** TODO implement ranks
 
@@ -40,6 +59,7 @@ their knowledge map
 *** DONE implement beings function that collects resources
 Probably means that we need a function to look at all beings at a certain node
 and decides who gets what. Does it make sense for a being registry to take care of this?
+
 
 *** DONE add resource to Cosmos.Locations.Node
 
@@ -61,12 +81,14 @@ chance that two beingserver processes will call each other and dead lock.
 *** DONE Build the server following this [[https://elixir-lang.org/getting-started/mix-otp/dependencies-and-umbrella-projects.html][page]].
 
 *** DONE Work on [[https://elixir-lang.org/getting-started/mix-otp/supervisor-and-application.html#our-first-supervisor][adding application start up customization]]
+
 *** DONE add supervision to the genserver and it's child processes.
 Working on this starting 5/4
 
 
 ** Cosmos Web Application
 *** TODO go througgh a Phoenix tutorial
+
 *** TODO find out what livebook is about
 
 
@@ -77,10 +99,18 @@ the beings.
 Right now I want to explore using 1-bit character forms
 
 *** TODO create tempalte for being avatars
-*** TODO create 2 frame animations for each part of tempalte
+
+*** TODO create 4 frame animations for each part of tempalte
 
 
 * Learnings
+** Build a system first, then figure out more complicated behavior later.
+In the first pass, I'll just build beings that make observaitons
+of their environment and don't store a history of interactions other
+than possibly their friends. Based on this observation they will make
+decisions. Later iterations can include more complex traditional AI
+systems. And much later reinforcement learning can be used.
+
 ** Focus on single being behavior first
 Before working on the multi-being behavior too much I think
 I will focus more on single being behavior and flush-out

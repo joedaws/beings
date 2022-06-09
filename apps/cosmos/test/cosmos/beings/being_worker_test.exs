@@ -4,6 +4,7 @@ defmodule Cosmos.Beings.BeingWorkerTest do
   alias Cosmos.Beings.BeingWorker
   alias Cosmos.Locations.Node
   alias Cosmos.Locations.NodeWorker
+  alias Cosmos.Magic.Ritual
 
   setup do
     registry = start_supervised!(Cosmos.Beings.Registry)
@@ -49,7 +50,13 @@ defmodule Cosmos.Beings.BeingWorkerTest do
     assert BeingWorker.get(worker, :node) == node_worker
   end
 
-  test "ichor decrease each cycle", %{worker: worker} do
+  test "ichor decrease each cycle", %{worker: worker, node_worker: node_worker} do
+    # must be attached to node in order to cycle at the moment
+    # tests don't always run in the same order
+    BeingWorker.attach(worker, node_worker)
+    assert node != nil
+
+    # ichor should decrease after 1 cycle
     old_ichor = BeingWorker.get(worker, :ichor)
     BeingWorker.revive(worker)
     BeingWorker.hibernate(worker)
@@ -63,7 +70,7 @@ defmodule Cosmos.Beings.BeingWorkerTest do
     resource_type = NodeWorker.get(node_worker, :resource_type)
     resource_yeild = NodeWorker.get(node_worker, :resource_yeild)
     old_resource = Map.get(BeingWorker.get(worker, :resources), resource_type)
-    # nil because we did a cycle without the being attached to a node
+    # nil because we did a cycle without havesting
     assert old_resource == nil
 
     BeingWorker.harvest(worker)
@@ -119,5 +126,37 @@ defmodule Cosmos.Beings.BeingWorkerTest do
 
     assert old_node != node_worker
     assert BeingWorker.get(worker, :node) == node_worker
+  end
+
+  test "make decision", %{worker: worker} do
+    old_ichor = BeingWorker.get(worker, :ichor)
+    BeingWorker.revive(worker)
+    BeingWorker.hibernate(worker)
+    new_ichor = BeingWorker.get(worker, :ichor)
+    assert new_ichor == old_ichor - 1
+  end
+
+  test "perform ritual", %{worker: worker} do
+    # add ritual to being
+    ritual = Ritual.generate_random_ritual()
+    BeingWorker.update(worker, :rituals, [ritual])
+    old_ichor = BeingWorker.get(worker, :ichor)
+
+    resources = BeingWorker.get(worker, :resources)
+    # give being sufficient resources to perform a ritual
+    new_resources =
+      for {k, v} <- resources,
+          into: %{},
+          do:
+            if(k in Map.keys(ritual.requirements),
+              do: {k, Map.get(ritual.requirements, k)},
+              else: {k, v}
+            )
+
+    BeingWorker.update(worker, :resources, new_resources)
+
+    new_ichor = BeingWorker.get(worker, :ichor)
+
+    assert new_ichor = old_ichor + ritual.ichor_yeild
   end
 end

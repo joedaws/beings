@@ -46,4 +46,39 @@ defmodule Cosmos.Magic.Ritual do
   def get_min_ichor_yeild() do
     @min_ichor_yeild
   end
+
+  @doc """
+  returns :can_perform if the ritual can be performed with
+  the current resources, and {:insufficient_resource, resource_type} otherwise.
+
+  when there aren't enough resources of a certian type, then this function
+  returns that type.
+  """
+  def sufficient_resources?(resources, ritual) do
+    resource_type_to_bool =
+      for {k, v} <- ritual.requirements, into: %{}, do: {k, Map.get(resources, k) >= v}
+
+    output =
+      case Enum.all?(Map.values(resource_type_to_bool)) do
+        true ->
+          :can_perform
+
+        false ->
+          {:insufficient_resource,
+           insufficient_resource_type(Map.keys(resource_type_to_bool), resources, ritual)}
+      end
+  end
+
+  def insufficient_resource_type([head | tail], resources, ritual) do
+    output =
+      if Map.get(ritual.requirements, head) >= Map.get(resources, head) do
+        head
+      else
+        insufficient_resource_type(tail, resources, ritual)
+      end
+  end
+
+  def insufficient_resource_type([], resources, ritual) do
+    :something_weird
+  end
 end
