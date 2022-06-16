@@ -57,9 +57,18 @@ defmodule Cosmos.Beings.Brains.DecisionTree do
   def make_choice(:can_perform_ritual, observations, parameters) do
     valid_rituals =
       for ritual <- observations.being.rituals,
-          do: sufficient_resources?(observations.being.resources, ritual)
+          do: Ritual.sufficient_resources?(observations.being.resources, ritual)
 
-    check = Ritual.sufficient_resources?(observations.being.resources, ritual)
+    # can use this index later
+    idx = Enum.find_index(valid_rituals, true)
+
+    check =
+      if idx == nil do
+        false
+      else
+        true
+      end
+
     make_choice({:can_perform_ritual, check}, observations, parameters)
   end
 
