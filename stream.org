@@ -9,28 +9,21 @@ Also update the node places [[file:apps/cosmos/data/node_name_registry.yaml][nod
 
 
 ** Cosmos Application
-*** TODO create decision tree
-should the decision tree spawn task processes what send commands to
-the original worker process?
+*** TODO add observations to beings
+Add observe method to the being worker API
 
-Or should the worker process receive the returned value and then generate
-a task which allows itself to use the client api?
-*** TODO consider creating a decision maker process
-this would replace part of the being worker functionality
+Build a observations struct
 
-instead a decision maker process puts actions in a queue which
-it sends to the beingworker to execute.
+*** TODO clean up the decision tree code
+      This means using correct names and updating
+      so that beings use their rituals list
+      and with correct observations members.
 
-This would allow external storage of how to make a decision.
-
-Should also consider using a decision tree to make decisions,
-with specific cut off values being unique to beings.
+*** TODO launch basic simulation.
 
 *** TODO add knowledge to beings
 Beings store the spells/recipies they know in
 their knowledge map
-
-*** TODO add observations to beings
 
 *** TODO add ability to perform rituals to BeingWorker
 Add a new function to [[file:apps/cosmos/lib/cosmos/beings/being_worker.ex][being worker]]
@@ -47,6 +40,28 @@ found in [[file:apps/cosmos/create/simple.exs][the create simple module]].
 *** TODO implement ranks
 
 *** TODO investigate using Mutex to enforce sequential updates to beings
+
+*** DONE consider creating a decision maker process
+-- don't build this
+this would replace part of the being worker functionality
+
+instead a decision maker process puts actions in a queue which
+it sends to the beingworker to execute.
+
+This would allow external storage of how to make a decision.
+
+Should also consider using a decision tree to make decisions,
+with specific cut off values being unique to beings.
+
+*** DONE create decision tree
+should the decision tree spawn task processes what send commands to
+the original worker process?
+
+I think yes
+
+Or should the worker process receive the returned value and then generate
+a task which allows itself to use the client api?
+
 
 *** DONE add grimiore rituals/recipies
 
@@ -159,3 +174,20 @@ the ets table.
 ** Viz libraries
 *** [[https://github.com/mindok/contex][contex]] library in elixir for making SVG
 *** [[https://d3js.org/][d3]] js library for awesome visualizations
+
+** decision trees
+*** Survival Tree
+#+begin_src mermaid
+graph TD
+    A[SurvivalTree] --> B(low_on_ichor?)
+    B -->|ichor >= ichor_thresh| C(collect_ritual_resources)
+    B -->|ichor < ichor_thresh| D(can_perform_ritual?)
+    D -->|Yes| E[action: perform_ritual]
+    D -->|No| F(find_necessary_resources)
+    F -->|current node has needed resource| G[action: harvest]
+    F -->|current node does not have needed resources| H[action: move]
+    C -->|current node does not have needed resources| H
+    C -->|current node has needed resource| I[have sufficient amount of resource at node]
+    I -->|Yes| H
+    I -->|No| G
+#+end_src

@@ -185,7 +185,9 @@ defmodule Cosmos.Beings.BeingWorker do
               else: {k, v}
             )
 
-    new_being = %{being | resources: new_resources}
+    new_ichor = being.ichor + ritual.ichor_yeild
+
+    new_being = %{being | resources: new_resources, ichor: new_ichor}
     Bucket.put(state.bucket_pid, state.being_id, new_being)
   end
 
@@ -241,6 +243,7 @@ defmodule Cosmos.Beings.BeingWorker do
     node_worker = being.node
 
     observation = %{
+      ichor: being.ichor,
       owned_resources: being.resources,
       node_resource_type: NodeWorker.get(node_worker, :resource_type),
       node_resource_yeild: NodeWorker.get(node_worker, :resource_yeild),
