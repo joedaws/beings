@@ -22,13 +22,14 @@ defmodule Cosmos.Beings.Brains.DecisionTree do
   - look for resourcdes
   - if not low on ichor then search for
   """
+  require Logger
   alias Cosmos.Magic.Ritual
   alias Cosmos.Beings.BeingWorker
 
   defstruct ichor_threshold: 10
 
   # first function called by the being worker
-  def get_action(root_function, observations, parameters) do
+  def take_action(root_function, observations, parameters) do
     make_choice(root_function, observations, parameters)
   end
 
@@ -45,7 +46,7 @@ defmodule Cosmos.Beings.Brains.DecisionTree do
   end
 
   def make_choice({:low_on_ichor, false}, observations, parameters) do
-    make_choice(:find_necessary_resource, observations, parameters)
+    make_choice(:find_necessary_resources, observations, parameters)
   end
 
   # need to perform a ritual as soon as possible
@@ -82,9 +83,9 @@ defmodule Cosmos.Beings.Brains.DecisionTree do
     make_choice(:find_necessary_resources, observations, parameters)
   end
 
-  def make_choice(:find_necessary_resouces, observations, parameters) do
+  def make_choice(:find_necessary_resources, observations, parameters) do
     # find out if current node has a desired resource
-    check = Map.keys(observations.node.resource_type) in Map.keys(observations.being.resources)
+    check = observations.node.resource_type in Map.keys(observations.being.resources)
     make_choice({:find_necessary_resources, check}, observations, parameters)
   end
 
@@ -97,6 +98,7 @@ defmodule Cosmos.Beings.Brains.DecisionTree do
   # LEAF!
   def make_choice({:find_necessary_resources, false}, observations, parameters) do
     new_node_pid = Enum.random(observations.node.neighbors)
+    Logger.info("#{observations.being.shell_name} moving to new node #{inspect(new_node_pid)}")
     Task.async(fn -> BeingWorker.move(observations.worker_pid, new_node_pid) end)
   end
 end

@@ -6,6 +6,9 @@ defmodule Cosmos.Beings.BeingWorker do
   require Logger
   alias Cosmos.Beings.Bucket
   alias Cosmos.Locations.NodeWorker
+  alias Cosmos.Beings.Brains.Observations
+  alias Cosmos.Beings.Brains.Parameters
+  alias Cosmos.Beings.Brains.DecisionTree
 
   defstruct [
     :bucket_pid,
@@ -207,10 +210,8 @@ defmodule Cosmos.Beings.BeingWorker do
       # perform updates required each cycle
       {bw.bucket_pid, bw.being_id}
       |> pay_ichor()
-
-      # |> observe()
-
-      # |> make_decision()
+      |> observe()
+      |> make_decision()
 
       Process.send_after(self(), :cycle, 1 * 1000)
     end
@@ -240,24 +241,25 @@ defmodule Cosmos.Beings.BeingWorker do
   """
   defp observe({bucket_pid, being_id}) do
     being = Bucket.get(bucket_pid, being_id)
-    node_worker = being.node
+    node = NodeWorker.get(being.node)
 
-    observation = %{
-      ichor: being.ichor,
-      owned_resources: being.resources,
-      node_resource_type: NodeWorker.get(node_worker, :resource_type),
-      node_resource_yeild: NodeWorker.get(node_worker, :resource_yeild),
-      nearby_beings: NodeWorker.get(node_worker, :occupants),
-      neighbor_nodes: NodeWorker.get(node_worker, :neighbors)
+    observations = %Observations{
+      worker_pid: self(),
+      being: being,
+      node: node
     }
 
-    {bucket_pid, being_id, observation}
+    {bucket_pid, being_id, observations}
   end
 
-  defp make_decision({bucket_pid, being_id, observation}) do
+  defp make_decision({bucket_pid, being_id, observations}) do
     Logger.info("#{inspect(self())} will make a decision")
-    # chose among actions that this being is capable of
-    action = :harvest
+
+    parameters = %Parameters{
+      ichor_threshold: 10
+    }
+
+    DecisionTree.take_action(:survival_tree, observations, parameters)
   end
 
   defp choose_action(policy, observations) do

@@ -23,12 +23,18 @@ defmodule Cosmos.Beings.BeingWorkerTest do
 
     n = Node.generate_random_node()
     n_id = Node.generate_id(n)
+    m = Node.generate_random_node()
+    m_id = Node.generate_id(m)
 
     Cosmos.Beings.Bucket.put(nodes, n_id, n)
+    Cosmos.Beings.Bucket.put(nodes, m_id, m)
 
     {:ok, worker} = BeingWorker.start_link([beings, b_id])
 
     {:ok, node_worker} = NodeWorker.start_link([nodes, n_id])
+    {:ok, node_worker_2} = NodeWorker.start_link([nodes, m_id])
+
+    NodeWorker.connect(node_worker, node_worker_2)
 
     %{beings: beings, worker: worker, nodes: nodes, node_worker: node_worker}
   end
@@ -128,7 +134,11 @@ defmodule Cosmos.Beings.BeingWorkerTest do
     assert BeingWorker.get(worker, :node) == node_worker
   end
 
-  test "make decision", %{worker: worker} do
+  test "make decision", %{worker: worker, node_worker: node_worker} do
+    # being should be attached to a node
+    BeingWorker.attach(worker, node_worker)
+    assert node != nil
+
     old_ichor = BeingWorker.get(worker, :ichor)
     BeingWorker.revive(worker)
     BeingWorker.hibernate(worker)

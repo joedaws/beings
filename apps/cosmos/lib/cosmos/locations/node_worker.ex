@@ -13,7 +13,7 @@ defmodule Cosmos.Locations.NodeWorker do
     GenServer.start_link(__MODULE__, init_args)
   end
 
-  def get(pid, attribute_type) do
+  def get(pid, attribute_type \\ nil) do
     GenServer.call(pid, {:get, attribute_type})
   end
 
@@ -63,6 +63,12 @@ defmodule Cosmos.Locations.NodeWorker do
     new_node = %{node | occupants: [being_worker_pid | old_occupants]}
     Bucket.put(state.bucket_pid, state.node_id, new_node)
     {:noreply, state}
+  end
+
+  @impl true
+  def handle_call({:get, nil}, _from, state) do
+    node = Bucket.get(state.bucket_pid, state.node_id)
+    {:reply, node, state}
   end
 
   @impl true
