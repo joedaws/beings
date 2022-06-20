@@ -1,5 +1,8 @@
 defmodule Cosmos.Magic.RitualTest do
   use ExUnit.Case
+
+  @moduletag :capture_log
+
   alias Cosmos.Locations.Node
   alias Cosmos.Magic.Ritual
 

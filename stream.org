@@ -9,24 +9,17 @@ Also update the node places [[file:apps/cosmos/data/node_name_registry.yaml][nod
 
 
 ** Cosmos Application
-*** TODO add observations to beings
-Add observe method to the being worker API
+*** TODO add automatic generation of node and being workers when they are created.
 
-Build a observations struct
+*** TODO add graph setup to application start
 
-*** TODO clean up the decision tree code
-      This means using correct names and updating
-      so that beings use their rituals list
-      and with correct observations members.
+*** TODO add additional commands to configure newly created beings and nodes
 
 *** TODO launch basic simulation.
 
 *** TODO add knowledge to beings
 Beings store the spells/recipies they know in
 their knowledge map
-
-*** TODO add ability to perform rituals to BeingWorker
-Add a new function to [[file:apps/cosmos/lib/cosmos/beings/being_worker.ex][being worker]]
 
 *** TODO add graph generator function which spawns and connects nodes.
 Will create a Cosmos.Create context to put some useful functions
@@ -40,6 +33,19 @@ found in [[file:apps/cosmos/create/simple.exs][the create simple module]].
 *** TODO implement ranks
 
 *** TODO investigate using Mutex to enforce sequential updates to beings
+
+*** DONE add ability to perform rituals to BeingWorker
+Add a new function to [[file:apps/cosmos/lib/cosmos/beings/being_worker.ex][being worker]]
+
+*** DONE clean up the decision tree code
+      This means using correct names and updating
+      so that beings use their rituals list
+      and with correct observations members.
+
+*** DONE add observations to beings
+Add observe method to the being worker API
+
+Build a observations struct
 
 *** DONE consider creating a decision maker process
 -- don't build this

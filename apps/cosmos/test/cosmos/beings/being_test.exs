@@ -1,5 +1,8 @@
 defmodule Cosmos.Beings.BeingTest do
   use ExUnit.Case
+
+  @moduletag :capture_log
+
   require Logger
   alias Cosmos.Beings.Being
   alias Cosmos.Beings.Rank

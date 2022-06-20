@@ -26,7 +26,7 @@ defmodule Cosmos.Beings.Being do
     :node,
     age: 0,
     ichor: 0,
-    alive: true,
+    alive: false,
     rank: Rank.get_lowest_rank(),
     resources: %{},
     rituals: []

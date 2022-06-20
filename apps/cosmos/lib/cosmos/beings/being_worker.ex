@@ -10,6 +10,9 @@ defmodule Cosmos.Beings.BeingWorker do
   alias Cosmos.Beings.Brains.Parameters
   alias Cosmos.Beings.Brains.DecisionTree
 
+  # defines the length of time a cycle takes
+  @cycle_duration 1 * 1000
+
   defstruct [
     :bucket_pid,
     :being_id
@@ -192,6 +195,7 @@ defmodule Cosmos.Beings.BeingWorker do
 
     new_being = %{being | resources: new_resources, ichor: new_ichor}
     Bucket.put(state.bucket_pid, state.being_id, new_being)
+    {:noreply, state}
   end
 
   @impl true
@@ -213,7 +217,7 @@ defmodule Cosmos.Beings.BeingWorker do
       |> observe()
       |> make_decision()
 
-      Process.send_after(self(), :cycle, 1 * 1000)
+      Process.send_after(self(), :cycle, @cycle_duration)
     end
   end
 

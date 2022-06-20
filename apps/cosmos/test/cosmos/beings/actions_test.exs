@@ -2,6 +2,8 @@ defmodule Cosmos.Beings.ActionsTest do
   use ExUnit.Case
   doctest Cosmos.Beings.Actions
 
+  @moduletag :capture_log
+
   alias Cosmos.Beings.Being
   alias Cosmos.Beings.Actions
 

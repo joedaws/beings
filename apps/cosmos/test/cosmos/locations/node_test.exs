@@ -1,5 +1,8 @@
 defmodule Cosmos.Locations.NodeTest do
   use ExUnit.Case
+
+  @moduletag :capture_log
+
   alias Cosmos.Locations.Node
 
   setup do

@@ -1,5 +1,8 @@
 defmodule Cosmos.Beings.BucketTest do
   use ExUnit.Case, async: true
+
+  @moduletag :capture_log
+
   alias Cosmos.Beings.Bucket
 
   setup do

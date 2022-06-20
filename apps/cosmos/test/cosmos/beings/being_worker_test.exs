@@ -1,5 +1,8 @@
 defmodule Cosmos.Beings.BeingWorkerTest do
   use ExUnit.Case
+
+  @moduletag :capture_log
+
   alias Cosmos.Beings.Being
   alias Cosmos.Beings.BeingWorker
   alias Cosmos.Locations.Node
