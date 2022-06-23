@@ -9,9 +9,9 @@ Also update the node places [[file:apps/cosmos/data/node_name_registry.yaml][nod
 
 
 ** Cosmos Application
-*** TODO add automatic generation of node and being workers when they are created.
+*** TODO fix recursion in [[file:apps/cosmos/lib/cosmos.ex][cosmos app]] to use Enum.reduce_while
 
-*** TODO add graph setup to application start
+*** TODO add automatic generation of node and being workers when they are created.
 
 *** TODO add additional commands to configure newly created beings and nodes
 
@@ -33,6 +33,8 @@ found in [[file:apps/cosmos/create/simple.exs][the create simple module]].
 *** TODO implement ranks
 
 *** TODO investigate using Mutex to enforce sequential updates to beings
+
+*** DONE add graph setup to application start
 
 *** DONE add ability to perform rituals to BeingWorker
 Add a new function to [[file:apps/cosmos/lib/cosmos/beings/being_worker.ex][being worker]]
@@ -110,7 +112,7 @@ Working on this starting 5/4
 ** Cosmos Web Application
 *** TODO go througgh a Phoenix tutorial
 
-*** TODO find out what livebook is about
+*** TODO find out what liveview is about
 
 
 ** Cosmos art
@@ -123,6 +125,13 @@ Right now I want to explore using 1-bit character forms
 
 *** TODO create 4 frame animations for each part of tempalte
 
+*** TODO create evolution of beings upon rank up
+
+** Cosmos Music
+
+*** TODO make a sound for each being
+
+*** TODO make ambient music to play at each location
 
 * Learnings
 ** Build a system first, then figure out more complicated behavior later.

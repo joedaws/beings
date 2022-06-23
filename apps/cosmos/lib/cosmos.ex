@@ -21,13 +21,14 @@ defmodule Cosmos do
 
   # setup a collection of nodes at start up
   def setup_graph(:basic) do
-    # get names of the nodes
     data_path = Application.fetch_env!(:cosmos, :data_path)
     path = Path.join(data_path, "node_name_registry.yaml")
     {:ok, node_info} = YamlElixir.read_from_file(path)
     names = Map.get(node_info, "node_name")
 
     generate_nodes(names)
+    # in the future different options can be used
+    connect_nodes(:random_lookahead)
   end
 
   defp generate_nodes([]) do
@@ -52,5 +53,97 @@ defmodule Cosmos do
       Cosmos.Beings.Registry.lookup(Cosmos.Beings.Registry, "basic_node_worker")
 
     Cosmos.Beings.Bucket.put(basic_node_worker, node_id, node_worker)
+  end
+
+  @doc """
+  Each node is randomly connected to 0 or 3 of the nodes ahead
+  of it as they are ordered in a list of nodes.
+
+  For example, if the list of node names is
+  [A, B, C, D]
+  Then on the first step, The edges A -- B
+  A -- C and A -- D.
+  Edges are bidirectional.
+  There is only one step in this case
+
+  When there are 4 nodes the graph looks like
+  A-B
+  |\
+  C D
+
+  Note well:
+  There should be 4 or more nodes for this to work.
+  """
+  defp connect_nodes(:random_lookahead) do
+    {:ok, node_bucket} = Cosmos.Beings.Registry.lookup(Cosmos.Beings.Registry, "basic_node")
+    node_ids = Cosmos.Beings.Bucket.keys(node_bucket)
+
+    build_edges(node_ids)
+  end
+
+  defp build_edges([start | tail]) do
+    four_nodes = [start] ++ Enum.slice(tail, 0, 3)
+
+    {:ok, basic_node_worker_bucket} =
+      Cosmos.Beings.Registry.lookup(Cosmos.Beings.Registry, "basic_node_worker")
+
+    # get node workers associated with next three nodes
+    four_node_workers =
+      for k <- four_nodes, do: Cosmos.Beings.Bucket.get(basic_node_worker_bucket, k)
+
+    connect(four_node_workers)
+
+    build_edges(tail)
+  end
+
+  @doc """
+  The last two nodes don't need to be connected to anything
+  Since they will have already been taken care of
+  """
+  defp build_edges([]) do
+    Logger.info("Basic nodes have been connected")
+  end
+
+  @doc """
+  Given 10 nodes there will be 7 calls to connect
+
+  XXXX______
+  _XXXX_____
+  __XXXX____
+  ___XXXX___
+  ____XXXX__
+  _____XXXX_
+  ______XXXX
+
+  In general, if there are n nodes and k connections
+  there will be n - k + 1 of calls to connect
+  """
+  defp connect([w1, w2, w3, w4]) do
+    primary_node = NodeWorker.get(w1, :name)
+    Logger.info("Connecting #{primary_node}")
+    NodeWorker.connect(w1, w2)
+    NodeWorker.connect(w2, w1)
+
+    NodeWorker.connect(w1, w3)
+    NodeWorker.connect(w3, w1)
+
+    NodeWorker.connect(w1, w4)
+    NodeWorker.connect(w4, w1)
+  end
+
+  defp connect([w1, w2, w3]) do
+    :ok
+  end
+
+  defp connect([w1, w2]) do
+    :ok
+  end
+
+  defp connect([w1]) do
+    :ok
+  end
+
+  defp connect([]) do
+    :ok
   end
 end
