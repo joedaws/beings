@@ -25,6 +25,7 @@ defmodule CosmosServer.Command do
   """
   def parse(line) do
     case String.split(line) do
+      ["ACTIVATE", "BEING", being_id] -> {:ok, {:activate, :being, being_id}}
       ["CREATE", "BUCKET", bucket] -> {:ok, {:create, :bucket, bucket}}
       ["CREATE", "BEING", bucket] -> {:ok, {:create, :being, bucket}}
       ["CREATE", "NODE"] -> {:ok, {:create, :node}}
@@ -37,6 +38,10 @@ defmodule CosmosServer.Command do
   Runs the given command
   """
   def run(command)
+
+  def run({:activate, :being, being_id}) do
+    # get being worker pid associated with name
+  end
 
   def run({:create, :bucket, bucket}) do
     Cosmos.Beings.Registry.create(Cosmos.Beings.Registry, bucket)

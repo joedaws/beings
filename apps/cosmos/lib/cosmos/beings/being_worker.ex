@@ -10,7 +10,7 @@ defmodule Cosmos.Beings.BeingWorker do
   alias Cosmos.Beings.Brains.Parameters
   alias Cosmos.Beings.Brains.DecisionTree
 
-  # defines the length of time a cycle takes
+  # defines the length of time a cycle takes in milliseconds
   @cycle_duration 1 * 1000
 
   defstruct [

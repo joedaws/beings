@@ -9,11 +9,27 @@ Also update the node places [[file:apps/cosmos/data/node_name_registry.yaml][nod
 
 
 ** Cosmos Application
-*** TODO fix recursion in [[file:apps/cosmos/lib/cosmos.ex][cosmos app]] to use Enum.reduce_while
+*** TODO name generation for millions of beings.
+*** TODO create being worker cache
+This cache will return the pid of a being worker given the being_id
 
-*** TODO add automatic generation of node and being workers when they are created.
+Follow the example in Sasa Juric book.
+
+*** TODO create node worker cache
+This cache will return the pid of a node worker given the node_id
+
+*** TODO update nodes and beings to store ids instead of process ids
+process ids may change over time, they should store ids of nodes
+and beings instead in their neighbor properties since these are
+not expected to change over time.
+
+*** TODO add database to the backend
+- [ ] beings
+- [ ] nodes
+- [ ] events
 
 *** TODO add additional commands to configure newly created beings and nodes
+Update CosmosServer application
 
 *** TODO launch basic simulation.
 
@@ -21,7 +37,11 @@ Also update the node places [[file:apps/cosmos/data/node_name_registry.yaml][nod
 Beings store the spells/recipies they know in
 their knowledge map
 
-*** TODO add graph generator function which spawns and connects nodes.
+*** TODO add memories to beings
+
+*** TODO implement ranks
+
+*** DONE add graph generator function which spawns and connects nodes.
 Will create a Cosmos.Create context to put some useful functions
 for creating a registry with the appropriate pieces for testing
 and for trying out different configurations.
@@ -29,10 +49,6 @@ and for trying out different configurations.
 Need to figure out where to put this function of functions,
 consider the advice [[https://stackoverflow.com/questions/34623694/run-code-on-application-startup-phoenix-framework-elixir][here]] using something like the function
 found in [[file:apps/cosmos/create/simple.exs][the create simple module]].
-
-*** TODO implement ranks
-
-*** TODO investigate using Mutex to enforce sequential updates to beings
 
 *** DONE add graph setup to application start
 
