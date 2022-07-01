@@ -10,6 +10,13 @@ Also update the node places [[file:apps/cosmos/data/node_name_registry.yaml][nod
 
 ** Cosmos Application
 *** TODO name generation for millions of beings.
+How can we generate unique or nearly unique names
+for millions or billions of being?
+
+Still need to write tests
+
+*** TODO name generate for millions of node locations
+
 *** TODO create being worker cache
 This cache will return the pid of a being worker given the being_id
 

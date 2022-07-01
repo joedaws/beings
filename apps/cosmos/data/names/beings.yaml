@@ -1,18 +1,30 @@
 weird_science:
   model_name:
-    - "aslkdkhj"
+    - "malFus"
+    - "striker"
+    - "droit"
+    - "caster"
+    - "trie-harvester"
 
   signifier:
-    - "hello"
+    - "mark 3"
+    - "alpha"
+    - "beta"
+    - "omicron"
+    - "burst ver. 3"
+    - "1"
 
 dream_realm:
   shell_name:
     - "shu"
     - "glyn"
-    - "cth"
+    - "pti"
     - "jhu"
     - "ftoo"
     - "cryk"
+    - "hy"
+    - "ptu"
+    - "my"
 
   core_name:
     - "gyla"
@@ -28,6 +40,40 @@ dream_realm:
     - "u'"
     - "gy'"
     - "k'"
-    - "mc"
-    - "mus"
-    - "q-"
+    - "fa-"
+    - "mus-"
+    - "qy-"
+
+deep_denizen:
+  epithet:
+    - "broken"
+    - "preseved"
+    - "sullen"
+    - "shattered"
+    - "lambent"
+    - "effulgent"
+    - "abyssal"
+    - "seething"
+    - "ascetic"
+    - "baleful"
+    - "adroit"
+    - "gustatory"
+
+  deep_name:
+    - "has"
+    - "tur"
+    - "itha"
+    - "qua"
+    - "nyar"
+    - "tep"
+    - "da"
+    - "gon"
+    - "zhar"
+    - "gor"
+    - "thu"
+    - "hu"
+    - "yog"
+    - "so"
+    - "gua"
+    - "om"
+    - "mog"

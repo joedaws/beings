@@ -1,10 +1,15 @@
 defmodule Cosmos.Beings.Name do
   @moduledoc """
-
+  name struct
   - template
     A list of keys which defines the order of the name parts.
-  - name
+  - parts
+    A map whose keys are name parts and whose values are the name values
 
+  When ading new templates:
+  - add template list to @templates by adding part types
+  - udpate the names yaml with additional section for new template
+  - add key to @max_syllabes for each new part type.
   """
   require Logger
   alias Cosmos.Beings.Name
@@ -14,7 +19,8 @@ defmodule Cosmos.Beings.Name do
 
   @templates %{
     "weird_science" => ["model_name", "signifier"],
-    "dream_realm" => ["shell_name", "core_prefix", "core_name"]
+    "dream_realm" => ["shell_name", "core_prefix", "core_name"],
+    "deep_denizen" => ["epithet", "deep_name"]
   }
 
   @default_part "z"
@@ -23,11 +29,19 @@ defmodule Cosmos.Beings.Name do
     "signifier" => 1,
     "shell_name" => 2,
     "core_prefix" => 1,
-    "core_name" => 3
+    "core_name" => 3,
+    "epithet" => 1,
+    "deep_name" => 3
   }
 
   @name_syllables_path "names/beings.yaml"
 
+  @doc """
+  Template types
+  - "weird_science"
+  - "dream_realm"
+  - "deep_denizen"
+  """
   def generate_name(template_type) do
     data_path = Application.fetch_env!(:cosmos, :data_path)
     path = Path.join(data_path, @name_syllables_path)
@@ -70,13 +84,27 @@ defmodule Cosmos.Beings.Name do
   end
 
   @doc """
-  Dream realm beings have a
+  Dream realm beings have names with template
   - shell name
   - core prefix
   - core name
   """
   def show(["shell_name", "core_prefix", "core_name"], name) do
-    "#{String.capitalize(Map.get(name.parts, "shell_name", @default_part))}\s#{String.capitalize(Map.get(name.parts, "core_prefix", @default_part))}#{Map.get(name.parts, "core_name", @default_part)}"
+    shell = "#{String.capitalize(Map.get(name.parts, "shell_name", @default_part))}"
+    prefix = "#{String.capitalize(Map.get(name.parts, "core_prefix", @default_part))}"
+    core = "#{Map.get(name.parts, "core_name", @default_part)}"
+    shell <> "\s" <> prefix <> core
+  end
+
+  @doc """
+  Deep denizen beings have names with template
+  - epithet
+  - deep_name
+  """
+  def show(["epithet", "deep_name"], name) do
+    epithet = "#{String.capitalize(Map.get(name.parts, "epithet", @default_part))}"
+    deep_name = "#{String.capitalize(Map.get(name.parts, "deep_name", @default_part))}"
+    epithet <> "\s" <> deep_name
   end
 
   @doc """
