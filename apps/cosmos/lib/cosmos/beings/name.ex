@@ -9,7 +9,7 @@ defmodule Cosmos.Beings.Name do
   When ading new templates:
   - add template list to @templates by adding part types
   - udpate the names yaml with additional section for new template
-  - add key to @max_syllabes for each new part type.
+  - add key to @max_syllables for each new part type.
   """
   require Logger
   alias Cosmos.Beings.Name
@@ -24,7 +24,8 @@ defmodule Cosmos.Beings.Name do
   }
 
   @default_part "z"
-  @max_syllabes %{
+
+  @max_syllables %{
     "model_name" => 1,
     "signifier" => 1,
     "shell_name" => 2,
@@ -37,20 +38,28 @@ defmodule Cosmos.Beings.Name do
   @name_syllables_path "names/beings.yaml"
 
   @doc """
+  retrieve syllables parts from the name file
+  """
+  def name_syllables() do
+    data_path = Application.fetch_env!(:cosmos, :data_path)
+    path = Path.join(data_path, @name_syllables_path)
+
+    Logger.info("Pulling name data from #{path}")
+
+    {:ok, all_syllables} = YamlElixir.read_from_file(path)
+    all_syllables
+  end
+
+  @doc """
   Template types
   - "weird_science"
   - "dream_realm"
   - "deep_denizen"
   """
   def generate_name(template_type) do
-    data_path = Application.fetch_env!(:cosmos, :data_path)
-    path = Path.join(data_path, @name_syllables_path)
+    all_syllables = name_syllables()
 
-    Logger.info("Pulling name data from #{path}")
-
-    {:ok, all_syllabes} = YamlElixir.read_from_file(path)
-
-    syllabes = Map.get(all_syllabes, template_type)
+    syllables = Map.get(all_syllables, template_type)
     template = Map.get(@templates, template_type)
 
     Logger.info("Creating a #{template_type} random name with")
@@ -62,8 +71,8 @@ defmodule Cosmos.Beings.Name do
           do:
             {part,
              create_name_part(
-               Map.get(syllabes, part),
-               :rand.uniform(Map.get(@max_syllabes, part))
+               Map.get(syllables, part),
+               :rand.uniform(Map.get(@max_syllables, part))
              )}
 
     %Name{
@@ -73,14 +82,14 @@ defmodule Cosmos.Beings.Name do
   end
 
   @doc """
-  Creates a name part using n syllabes from the given list of syllabes
+  Creates a name part using n syllables from the given list of syllables
   """
-  def create_name_part(syllabes_list, n) do
-    Enum.join(for _ <- 1..n, do: Enum.random(syllabes_list))
+  def create_name_part(syllables_list, n) do
+    Enum.join(for _ <- 1..n, do: Enum.random(syllables_list))
   end
 
-  def show(name) do
-    show(name.template, name)
+  def string(name) do
+    string(name.template, name)
   end
 
   @doc """
@@ -89,10 +98,10 @@ defmodule Cosmos.Beings.Name do
   - core prefix
   - core name
   """
-  def show(["shell_name", "core_prefix", "core_name"], name) do
+  def string(["shell_name", "core_prefix", "core_name"], name) do
     shell = "#{String.capitalize(Map.get(name.parts, "shell_name", @default_part))}"
     prefix = "#{String.capitalize(Map.get(name.parts, "core_prefix", @default_part))}"
-    core = "#{Map.get(name.parts, "core_name", @default_part)}"
+    core = "#{String.capitalize(Map.get(name.parts, "core_name", @default_part))}"
     shell <> "\s" <> prefix <> core
   end
 
@@ -101,10 +110,16 @@ defmodule Cosmos.Beings.Name do
   - epithet
   - deep_name
   """
-  def show(["epithet", "deep_name"], name) do
+  def string(["epithet", "deep_name"], name) do
     epithet = "#{String.capitalize(Map.get(name.parts, "epithet", @default_part))}"
     deep_name = "#{String.capitalize(Map.get(name.parts, "deep_name", @default_part))}"
     epithet <> "\s" <> deep_name
+  end
+
+  def string(["model_name", "signifier"], name) do
+    model = "#{String.capitalize(Map.get(name.parts, "model_name", @default_part))}"
+    signifier = "#{String.capitalize(Map.get(name.parts, "signifier", @default_part))}"
+    model <> "\s" <> signifier
   end
 
   @doc """
@@ -113,4 +128,45 @@ defmodule Cosmos.Beings.Name do
   def get_descendent_name(name) do
     :not_implemented
   end
+
+  @doc """
+  Given a template type count the number of unique names of that type.
+
+  Let $k$ be the number of parts in a template
+  Let $n_i$ for $i=1,...,k$ be the max number of syllables for
+  that part.
+  Let $m_i$ for $i=1,...k$ be the number of syllabes from the
+  name file for the part associated with index i.
+  Then for a single part, the number of unique
+  possible names is
+
+  \prod_{i=1}^k \sum_{j=1}^{n_i} m_i^j
+
+  TODO implemenation is slightly off, return to it later.
+  I think that parts may not guarenteed to be in the
+  same order for those in template and those in syllabes length.
+  """
+  def count_unique_names(template_type) do
+    template = Map.fetch!(@templates, template_type)
+    k = length(template)
+
+    # elements of n correspond to n_i in doc string
+    n = for part <- template, do: Map.get(@max_syllables, part)
+
+    all_syllables = name_syllables()
+    syllables = Map.get(all_syllables, template_type)
+    # elements of m correspond to m_i in doc string
+    m = for {part, syllables_list} <- syllables, do: length(syllables_list)
+
+    Enum.reduce(1..k, 1, fn i, acc ->
+      acc *
+        Enum.reduce(1..Enum.at(n, i - 1), 0, fn j, acc2 ->
+          pow(Enum.at(m, i - 1), j) + acc2
+        end)
+    end)
+  end
+
+  def pow(n, k), do: pow(n, k, 1)
+  defp pow(_, 0, acc), do: acc
+  defp pow(n, k, acc), do: pow(n, k - 1, n * acc)
 end

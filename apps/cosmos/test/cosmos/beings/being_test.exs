@@ -7,17 +7,20 @@ defmodule Cosmos.Beings.BeingTest do
   alias Cosmos.Beings.Being
   alias Cosmos.Beings.Rank
   alias Cosmos.Locations.Node
+  alias Cosmos.Beings.Name
 
   setup do
     # setup a test being
     n1 = "Ghulop"
     n2 = "Jorsa"
     np = "L'"
+    name_template = ["shell_name", "core_prefix", "core_name"]
+    parts = %{"shell_name" => n1, "core_prefix" => np, "core_name" => n2}
+
+    name = %Name{template: name_template, parts: parts}
 
     test_being = %Being{
-      shell_name: n1,
-      core_prefix: np,
-      core_name: n2,
+      name: name,
       age: 666,
       node: nil,
       ichor: 7,
@@ -30,13 +33,11 @@ defmodule Cosmos.Beings.BeingTest do
   test "being nil defaults" do
     b = %Being{}
     # test for default nils
-    assert b.shell_name == nil
-    assert b.core_prefix == nil
-    assert b.core_name == nil
+    assert b.name == nil
+    assert b.node == nil
   end
 
   test "say full name", %{test_being: test_being, n1: n1} do
-    assert test_being.shell_name == n1
     assert Being.get_full_name(test_being) |> is_bitstring
   end
 

@@ -6,25 +6,38 @@ defmodule Cosmos.Beings.ActionsTest do
 
   alias Cosmos.Beings.Being
   alias Cosmos.Beings.Actions
+  alias Cosmos.Beings.Name
+  alias Cosmos.Beings.Rank
 
   setup do
-    # add some being instances
+    # setup a test being
     n1 = "Ghulop"
     n2 = "Jorsa"
     np = "L'"
+    name_template = ["shell_name", "core_prefix", "core_name"]
+    parts = %{"shell_name" => n1, "core_prefix" => np, "core_name" => n2}
+
+    name = %Name{template: name_template, parts: parts}
 
     test_being_1 = %Being{
-      shell_name: n1,
-      core_prefix: np,
-      core_name: n2,
+      name: name,
       age: 666,
-      ichor: 7
+      node: nil,
+      ichor: 7,
+      rank: Rank.get_lowest_rank()
     }
 
+    # setup a test being
+    n1 = "Shaptuwy"
+    n2 = "Fe"
+    np = "L'"
+    name_template = ["shell_name", "core_prefix", "core_name"]
+    parts = %{"shell_name" => n1, "core_prefix" => np, "core_name" => n2}
+
+    name = %Name{template: name_template, parts: parts}
+
     test_being_2 = %Being{
-      shell_name: "Shaptuwy",
-      core_prefix: np,
-      core_name: "Fe",
+      name: name,
       age: 3,
       ichor: 111
     }

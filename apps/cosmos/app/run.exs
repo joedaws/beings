@@ -19,13 +19,6 @@ defmodule SimulationRunner do
     beings = setup_beings()
     node = generate_single_node()
 
-    # round one
-    # ---------------------------------
-    # the all attach to the single node
-    IO.puts("attaching beings to node")
-    {beings, node} = Being.occupy_node(beings, [], node)
-    IO.puts(node.occupancy)
-
     # round two
     # ---------------------------------
     IO.puts("Each being collects ichor from node")

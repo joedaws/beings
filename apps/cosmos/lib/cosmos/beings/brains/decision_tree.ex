@@ -25,6 +25,7 @@ defmodule Cosmos.Beings.Brains.DecisionTree do
   require Logger
   alias Cosmos.Magic.Ritual
   alias Cosmos.Beings.BeingWorker
+  alias Cosmos.Beings.Being
 
   defstruct ichor_threshold: 10
 
@@ -98,7 +99,11 @@ defmodule Cosmos.Beings.Brains.DecisionTree do
   # LEAF!
   def make_choice({:find_necessary_resources, false}, observations, parameters) do
     new_node_pid = Enum.random(observations.node.neighbors)
-    Logger.info("#{observations.being.shell_name} moving to new node #{inspect(new_node_pid)}")
+
+    Logger.info(
+      "#{Being.get_full_name(observations.being)} moving to new node #{inspect(new_node_pid)}"
+    )
+
     Task.async(fn -> BeingWorker.move(observations.worker_pid, new_node_pid) end)
   end
 end

@@ -6,7 +6,7 @@ defmodule Cosmos.Beings.NameTest do
 
   test "generate dream_realm name" do
     name = Name.generate_name("dream_realm")
-    Logger.info("#{Name.show(name)}")
+    Logger.info("#{Name.string(name)}")
     assert is_map(name.parts)
     assert is_list(name.template)
     assert is_bitstring(Enum.at(Map.keys(name.parts), 0))
@@ -15,7 +15,7 @@ defmodule Cosmos.Beings.NameTest do
 
   test "generate deep_denizen name" do
     name = Name.generate_name("deep_denizen")
-    Logger.info("#{Name.show(name)}")
+    Logger.info("#{Name.string(name)}")
     assert is_map(name.parts)
     assert is_list(name.template)
     assert is_bitstring(Enum.at(Map.keys(name.parts), 0))
