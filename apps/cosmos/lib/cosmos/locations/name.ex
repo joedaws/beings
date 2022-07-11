@@ -1,41 +1,43 @@
-defmodule Cosmos.Beings.Name do
+defmodule Cosmos.Locations.Name do
   @moduledoc """
-  name struct for beings
+  name struct for locations
   - template
-    A list of keys which defines the order of the name parts.
+    A list of keys which define the order of the name parts.
+    The templates for the different location types are
+    found in the templates module map below.
   - parts
     A map whose keys are name parts and whose values are the name values
-
-  When ading new templates:
-  - add template list to @templates by adding part types
-  - udpate the names yaml with additional section for new template
-  - add key to @max_syllables for each new part type.
   """
   require Logger
-  alias Cosmos.Beings.Name
+  alias Cosmos.Locations.Name
 
   defstruct template: [],
             parts: %{}
 
+  @default_part "y"
+
   @templates %{
-    "weird_science" => ["model_name", "signifier"],
-    "dream_realm" => ["shell_name", "core_prefix", "core_name"],
-    "deep_denizen" => ["epithet", "deep_name"]
+    "warped_nature" => ["adjective", "proper_noun_nature", "ecosystem"],
+    "human_built" => ["structure_type", "room_in_structure"],
+    "dream_place" => ["proper_noun_dream_place", "dream_modifier"],
+    "deep_dimension" => ["deep_adjective", "proper_noun_deep_place"],
+    "lost_in_time" => ["adjective", "verb"]
   }
 
-  @default_part "z"
+  @name_syllables_path "names/nodes.yaml"
 
   @max_syllables %{
-    "model_name" => 1,
-    "signifier" => 1,
-    "shell_name" => 2,
-    "core_prefix" => 1,
-    "core_name" => 3,
-    "epithet" => 1,
-    "deep_name" => 3
+    "adjective" => 1,
+    "proper_noun_nature" => 1,
+    "ecosystem" => 1,
+    "structure_type" => 1,
+    "room_in_structure" => 1,
+    "proper_noun_dream_place" => 1,
+    "dream_modifier" => 1,
+    "deep_adjective" => 1,
+    "proper_noun_deep_place" => 1,
+    "verb" => 1
   }
-
-  @name_syllables_path "names/beings.yaml"
 
   @doc """
   retrieve syllables parts from the name file
@@ -51,10 +53,7 @@ defmodule Cosmos.Beings.Name do
   end
 
   @doc """
-  Template types
-  - "weird_science"
-  - "dream_realm"
-  - "deep_denizen"
+  Template types are the keys of the module variable templates
   """
   def generate_name(template_type) do
     all_syllables = name_syllables()
@@ -93,40 +92,13 @@ defmodule Cosmos.Beings.Name do
   end
 
   @doc """
-  Dream realm beings have names with template
-  - shell name
-  - core prefix
-  - core name
+  "warped_nature" => ["adjective", "proper_noun_nature", "ecosystem"]
   """
-  def string(["shell_name", "core_prefix", "core_name"], name) do
-    shell = "#{String.capitalize(Map.get(name.parts, "shell_name", @default_part))}"
-    prefix = "#{String.capitalize(Map.get(name.parts, "core_prefix", @default_part))}"
-    core = "#{String.capitalize(Map.get(name.parts, "core_name", @default_part))}"
-    shell <> "\s" <> prefix <> core
-  end
-
-  @doc """
-  Deep denizen beings have names with template
-  - epithet
-  - deep_name
-  """
-  def string(["epithet", "deep_name"], name) do
-    epithet = "#{String.capitalize(Map.get(name.parts, "epithet", @default_part))}"
-    deep_name = "#{String.capitalize(Map.get(name.parts, "deep_name", @default_part))}"
-    epithet <> "\s" <> deep_name
-  end
-
-  def string(["model_name", "signifier"], name) do
-    model = "#{String.capitalize(Map.get(name.parts, "model_name", @default_part))}"
-    signifier = "#{String.capitalize(Map.get(name.parts, "signifier", @default_part))}"
-    model <> "\s" <> signifier
-  end
-
-  @doc """
-  Generate a name of a descendant of the given being name.
-  """
-  def get_descendent_name(name) do
-    :not_implemented
+  def string(["adjective", "proper_noun_nature", "ecosystem"], name) do
+    adjective = "#{String.capitalize(Map.get(name.parts, "adjective", @default_part))}"
+    proper_noun = "#{String.capitalize(Map.get(name.parts, "proper_noun_nature", @default_part))}"
+    ecosystem = "#{String.capitalize(Map.get(name.parts, "ecosystem", @default_part))}"
+    adjective <> "\s" <> proper_noun <> "\s" <> ecosystem
   end
 
   @doc """

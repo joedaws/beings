@@ -1,0 +1,25 @@
+warped_nature:
+  adjective:
+    - "sunlit"
+    - "moonlit"
+    - "twilit"
+    - "worn"
+
+  proper_noun_nature:
+    - "gorst"
+    - "chmoot"
+
+  ecosystem:
+    - "bay"
+    - "forest"
+    - "ocean"
+    - "dell"
+    - "moor"
+    - "cavern"
+    - "cave"
+    - "hillside"
+    - "cliff"
+    - "shore"
+    - "beach"
+    - "creek"
+    - "glade"
