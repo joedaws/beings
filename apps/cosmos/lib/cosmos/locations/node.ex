@@ -5,6 +5,7 @@ defmodule Cosmos.Locations.Node do
   The node types determine what kinds of behavior can occur
   """
   alias Cosmos.Locations.Node
+  alias Cosmos.Locations.Name
 
   @default_limit 10
   # TODO there might be a better way to store constants

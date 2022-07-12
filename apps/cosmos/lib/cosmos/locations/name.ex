@@ -28,11 +28,11 @@ defmodule Cosmos.Locations.Name do
 
   @max_syllables %{
     "adjective" => 1,
-    "proper_noun_nature" => 1,
+    "proper_noun_nature" => 3,
     "ecosystem" => 1,
     "structure_type" => 1,
     "room_in_structure" => 1,
-    "proper_noun_dream_place" => 1,
+    "proper_noun_dream_place" => 2,
     "dream_modifier" => 1,
     "deep_adjective" => 1,
     "proper_noun_deep_place" => 1,
@@ -99,6 +99,24 @@ defmodule Cosmos.Locations.Name do
     proper_noun = "#{String.capitalize(Map.get(name.parts, "proper_noun_nature", @default_part))}"
     ecosystem = "#{String.capitalize(Map.get(name.parts, "ecosystem", @default_part))}"
     adjective <> "\s" <> proper_noun <> "\s" <> ecosystem
+  end
+
+  @doc """
+  "human_built" => ["structure_type", "room_in_structure"]
+  """
+  def string(["structure_type", "room_in_structure"], name) do
+    structure = "#{String.capitalize(Map.get(name.parts, "structure_type", @default_part))}"
+    room = "#{String.capitalize(Map.get(name.parts, "room_in_structure", @default_part))}"
+    structure <> "\s" <> room
+  end
+
+  @doc """
+  "dream_place" => ["proper_noun_dream_place", "dream_modifier"]
+  """
+  def string(["proper_noun_dream_place", "dream_modifier"], name) do
+    place = "#{String.capitalize(Map.get(name.parts, "proper_noun_dream_place", @default_part))}"
+    modifier = "#{String.capitalize(Map.get(name.parts, "dream_modifier", @default_part))}"
+    modifier <> "\s" <> place
   end
 
   @doc """
