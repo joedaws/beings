@@ -1,8 +1,6 @@
 defmodule Cosmos.Beings.BeingWorkerTest do
   use ExUnit.Case
 
-  @moduletag :capture_log
-
   alias Cosmos.Beings.Being
   alias Cosmos.Beings.BeingWorker
   alias Cosmos.Locations.Node
@@ -10,6 +8,8 @@ defmodule Cosmos.Beings.BeingWorkerTest do
   alias Cosmos.Magic.Ritual
 
   setup do
+    # TODO be double sure that the application registry has been started.
+    #      I think this registry has a different name
     registry = start_supervised!(Cosmos.Beings.Registry)
     Cosmos.Beings.Registry.create(registry, "beings")
     Cosmos.Beings.Registry.create(registry, "nodes")
@@ -32,7 +32,7 @@ defmodule Cosmos.Beings.BeingWorkerTest do
     Cosmos.Beings.Bucket.put(nodes, n_id, n)
     Cosmos.Beings.Bucket.put(nodes, m_id, m)
 
-    {:ok, worker} = BeingWorker.start_link([beings, b_id])
+    {:ok, worker} = BeingWorker.start_link(["beings", b_id])
 
     {:ok, node_worker} = NodeWorker.start_link([nodes, n_id])
     {:ok, node_worker_2} = NodeWorker.start_link([nodes, m_id])
