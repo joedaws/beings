@@ -3,14 +3,14 @@ defmodule Cosmos.Magic.RitualTest do
 
   @moduletag :capture_log
 
-  alias Cosmos.Locations.Node
+  alias Cosmos.Locations.Resource
   alias Cosmos.Magic.Ritual
 
   test "generate random ritual" do
     ritual = Ritual.generate_random_ritual()
     assert ritual.ichor_yeild != 0
     assert length(Map.keys(ritual.requirements)) > 0
-    assert Enum.at(Map.keys(ritual.requirements), 0) in Node.get_resource_types()
+    assert Enum.at(Map.keys(ritual.requirements), 0) in Resource.get_resource_types()
   end
 
   test "generate startin ritual" do

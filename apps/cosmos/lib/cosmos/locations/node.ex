@@ -6,10 +6,9 @@ defmodule Cosmos.Locations.Node do
   """
   alias Cosmos.Locations.Node
   alias Cosmos.Locations.Name
+  alias Cosmos.Locations.Resource
 
   @default_limit 10
-  # TODO there might be a better way to store constants
-  @node_types [:meeting_place, :resting_place, :ichor_place]
 
   defstruct [
     :name,
@@ -22,24 +21,16 @@ defmodule Cosmos.Locations.Node do
   ]
 
   def get_name(node) do
-    "#{node.name}"
-  end
-
-  def get_random_node_name() do
-    data_path = Application.fetch_env!(:cosmos, :data_path)
-    path = Path.join(data_path, "node_name_registry.yaml")
-
-    {:ok, types} = YamlElixir.read_from_file(path)
-
-    Enum.random(Map.get(types, "node_name"))
+    Name.string(node.name)
   end
 
   def get_random_node_type() do
-    Enum.random(@node_types)
+    node_types = Map.keys(Name.name_syllables())
   end
 
   def generate_random_node() do
-    name = get_random_node_name()
+    node_type = Enum.random(get_random_node_type())
+    name = Name.generate_name(node_type)
     generate_node(name)
   end
 
@@ -50,7 +41,7 @@ defmodule Cosmos.Locations.Node do
       name: name,
       type: type,
       resource_yeild: :rand.uniform(10),
-      resource_type: get_random_resource_type(),
+      resource_type: Resource.get_random_resource_type(),
       occupants: [],
       occupancy_limit: @default_limit
     }
@@ -61,31 +52,10 @@ defmodule Cosmos.Locations.Node do
       name: name,
       type: get_random_node_type(),
       resource_yeild: :rand.uniform(10),
-      resource_type: get_random_resource_type(),
+      resource_type: Resource.get_random_resource_type(),
       occupants: [],
       occupancy_limit: @default_limit
     }
-  end
-
-  def get_resource_types() do
-    [
-      :bones,
-      :blood,
-      :peat_moss,
-      :tomb_mold,
-      :sea_foam,
-      :obsidian,
-      :papyrus,
-      :lotus_root,
-      :soap_stone,
-      :birch_bark,
-      :uncanny_coal
-    ]
-  end
-
-  def get_random_resource_type() do
-    resources = get_resource_types()
-    Enum.random(resources)
   end
 
   def generate_id(node) do

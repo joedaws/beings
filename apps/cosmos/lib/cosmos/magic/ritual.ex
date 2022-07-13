@@ -3,7 +3,7 @@ defmodule Cosmos.Magic.Ritual do
   rituals struct and functions to create them
   """
   alias Cosmos.Magic.Ritual
-  alias Cosmos.Locations.Node
+  alias Cosmos.Locations.Resource
 
   @min_ichor_yeild 10
 
@@ -12,7 +12,7 @@ defmodule Cosmos.Magic.Ritual do
 
   def generate_random_ritual() do
     num_requirements = :rand.uniform(2) + 1
-    resource_types = for _ <- 1..num_requirements, do: Node.get_random_resource_type()
+    resource_types = for _ <- 1..num_requirements, do: Resource.get_random_resource_type()
 
     requirements =
       for resource_type <- resource_types, into: %{}, do: {resource_type, :rand.uniform(10) + 1}

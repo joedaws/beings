@@ -60,7 +60,7 @@ defmodule Cosmos.Beings.BeingWorker do
   end
 
   def perform_ritual(pid, ritual_index \\ 0) do
-    Genserver.cast(pid, {:perform_ritual, ritual_index})
+    GenServer.cast(pid, {:perform_ritual, ritual_index})
   end
 
   # callbacks ------------------------------
@@ -180,7 +180,7 @@ defmodule Cosmos.Beings.BeingWorker do
   def handle_cast({:perform_ritual, ritual_index}, state) do
     being = Bucket.get(state.bucket_pid, state.being_id)
     resources = being.resources
-    ritual = Enum.get(being.rituals, ritual_index)
+    ritual = Enum.at(being.rituals, ritual_index)
 
     new_resources =
       for {k, v} <- resources,

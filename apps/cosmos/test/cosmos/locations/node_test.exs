@@ -4,11 +4,12 @@ defmodule Cosmos.Locations.NodeTest do
   @moduletag :capture_log
 
   alias Cosmos.Locations.Node
+  alias Cosmos.Locations.Name
 
   setup do
     # make a simple node
     test_node = %Node{
-      name: "test_node",
+      name: Name.generate_name("warped_nature"),
       type: Node.get_random_node_type(),
       occupants: [],
       occupancy_limit: 10
@@ -18,18 +19,18 @@ defmodule Cosmos.Locations.NodeTest do
   end
 
   test "node attributes", %{test_node: test_node} do
-    assert test_node.name |> is_bitstring
-    assert test_node.name |> is_bitstring
+    assert Name.string(test_node.name) |> is_bitstring
     assert length(test_node.occupants) < test_node.occupancy_limit
   end
 
-  test "test generate node with given name" do
-    node = Node.generate_node("The hello Cafe")
+  test "generate node with given name" do
+    name = Name.generate_name("warped_nature")
+    node = Node.generate_node(name)
     assert length(node.occupants) == 0
   end
 
-  test "test generate random node" do
+  test "generate random node" do
     node = Node.generate_random_node()
-    assert node.name |> is_bitstring
+    assert Node.get_name(node) |> is_bitstring
   end
 end

@@ -63,7 +63,6 @@ defmodule Cosmos.Beings.BeingWorkerTest do
     # must be attached to node in order to cycle at the moment
     # tests don't always run in the same order
     BeingWorker.attach(worker, node_worker)
-    assert node != nil
 
     # ichor should decrease after 1 cycle
     old_ichor = BeingWorker.get(worker, :ichor)
@@ -109,7 +108,7 @@ defmodule Cosmos.Beings.BeingWorkerTest do
     assert BeingWorker.get(other_worker, :resources) == %{bones: 5}
   end
 
-  test "receive resource", %{worker: worker, beings: beings} do
+  test "receive resource", %{worker: worker} do
     # we expect that the new other being has no resources
     old_amount = Map.get(BeingWorker.get(worker, :resources), :papyrus, 0)
 
@@ -140,7 +139,6 @@ defmodule Cosmos.Beings.BeingWorkerTest do
   test "make decision", %{worker: worker, node_worker: node_worker} do
     # being should be attached to a node
     BeingWorker.attach(worker, node_worker)
-    assert node != nil
 
     old_ichor = BeingWorker.get(worker, :ichor)
     BeingWorker.revive(worker)
@@ -168,8 +166,12 @@ defmodule Cosmos.Beings.BeingWorkerTest do
 
     BeingWorker.update(worker, :resources, new_resources)
 
+    # To change both the ichor and resources of the being, the worker performs the ritual
+    BeingWorker.perform_ritual(worker)
+
+    # upon successful completion of the ritual the ichor should have increased.
     new_ichor = BeingWorker.get(worker, :ichor)
 
-    assert new_ichor = old_ichor + ritual.ichor_yeild
+    assert new_ichor == old_ichor + ritual.ichor_yeild
   end
 end

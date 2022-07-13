@@ -6,7 +6,6 @@ defmodule Cosmos.Beings.BeingTest do
   require Logger
   alias Cosmos.Beings.Being
   alias Cosmos.Beings.Rank
-  alias Cosmos.Locations.Node
   alias Cosmos.Beings.Name
 
   setup do
@@ -37,7 +36,7 @@ defmodule Cosmos.Beings.BeingTest do
     assert b.node == nil
   end
 
-  test "say full name", %{test_being: test_being, n1: n1} do
+  test "say full name", %{test_being: test_being} do
     assert Being.get_full_name(test_being) |> is_bitstring
   end
 
@@ -55,7 +54,7 @@ defmodule Cosmos.Beings.BeingTest do
     assert Being.generate_id(b) != nil
   end
 
-  test "test changes of rank", %{test_being: test_being} do
+  test "changes of rank", %{test_being: test_being} do
     # starting rank should be the lowest
     assert test_being.rank == Rank.get_lowest_rank()
     test_being = %{test_being | ichor: 222}

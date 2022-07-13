@@ -3,6 +3,7 @@ defmodule Cosmos do
   require Logger
 
   alias Cosmos.Locations.Node
+  alias Cosmos.Locations.Name
   alias Cosmos.Locations.NodeWorker
 
   @impl true
@@ -21,10 +22,8 @@ defmodule Cosmos do
 
   # setup a collection of nodes at start up
   def setup_graph(:basic) do
-    data_path = Application.fetch_env!(:cosmos, :data_path)
-    path = Path.join(data_path, "node_name_registry.yaml")
-    {:ok, node_info} = YamlElixir.read_from_file(path)
-    names = Map.get(node_info, "node_name")
+    node_types = Map.keys(Name.name_syllables())
+    names = for x <- 1..12, do: Name.generate_name(Enum.random(node_types))
 
     generate_nodes(names)
     # in the future different options can be used
@@ -36,7 +35,7 @@ defmodule Cosmos do
   end
 
   defp generate_nodes([name | tail]) do
-    Logger.info("Generating node #{name}")
+    Logger.info("Generating node #{Name.string(name)}")
     create_node(name)
     generate_nodes(tail)
   end
@@ -120,7 +119,7 @@ defmodule Cosmos do
   """
   defp connect([w1, w2, w3, w4]) do
     primary_node = NodeWorker.get(w1, :name)
-    Logger.info("Connecting #{primary_node}")
+    Logger.info("Connecting #{Name.string(primary_node)}")
     NodeWorker.connect(w1, w2)
     NodeWorker.connect(w2, w1)
 

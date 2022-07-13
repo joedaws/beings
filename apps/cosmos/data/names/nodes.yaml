@@ -5,7 +5,7 @@ warped_nature:
     - "twilit"
     - "worn"
     - "refulgent"
-    - "jet black"
+    - "jet Black"
     - "dire"
     - "mossy"
     - "moldy"
@@ -60,13 +60,13 @@ human_built:
   structure_type:
     - "bio-lab"
     - "tavern"
-    - "bath house"
+    - "bath House"
     - "mausoleum"
-    - "university museum"
-    - "artist atelier"
-    - "black stone church"
-    - "sun tower"
-    - "wooden cabin"
+    - "university Museum"
+    - "fabric Atelier"
+    - "black Stone Church"
+    - "sun Tower"
+    - "wooden Cabin"
     - "library"
 
   room_in_structure:
@@ -102,6 +102,8 @@ dream_place:
     - "fu"
     - "zar"
     - "ki"
+    - "ur"
+    - "rok"
 
   dream_modifier:
     - "silty"
