@@ -44,11 +44,6 @@ asserted property ownership.
 
 
 ** Cosmos Application
-*** TODO name generate for millions of node locations
-Need to create generate function instances for the rest of the node template types
-
-Need to create name generator tests
-
 *** TODO create being worker cache
 This cache will return the pid of a being worker given the being_id
 
@@ -61,6 +56,8 @@ This cache will return the pid of a node worker given the node_id
 process ids may change over time, they should store ids of nodes
 and beings instead in their neighbor properties since these are
 not expected to change over time.
+
+*** TODO create name generator that won't repeat names and is quick
 
 *** TODO add database to the backend
 - [ ] beings
@@ -79,6 +76,11 @@ their knowledge map
 *** TODO add memories to beings
 
 *** TODO implement ranks
+
+*** DONE name generate for millions of node locations
+Need to create generate function instances for the rest of the node template types
+
+Need to create name generator tests
 
 *** DONE name generation for millions of beings.
 How can we generate unique or nearly unique names
