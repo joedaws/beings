@@ -9,13 +9,13 @@ Also update the node places [[file:apps/cosmos/data/node_name_registry.yaml][nod
 
 ** Lore
 *** Taxonomy of beings
-There are three classes of eldrich beings in the simulation
+There are three classes of Eldrich beings in the simulation
 - ichor machines (weird science)
 
   After a group of international researchers discovered
   the existence of ichor in the universe, they used its power
   to bring into being autonomous machines.
-  These machines quickly leanred to escape the laboratories of their
+  These machines quickly learned to escape the laboratories of their
   creators. Now they scour the world for resources to perform rituals
   to build more of the ichor that powers them.
 

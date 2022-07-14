@@ -2,7 +2,7 @@ defmodule Cosmos.Beings.BeingWorker do
   @moduledoc """
   Updates the being state held in the bucket
   """
-  use GenServer
+  use GenServer, restart: :temporary
   require Logger
   alias Cosmos.Beings.Bucket
   alias Cosmos.Locations.NodeWorker
@@ -47,8 +47,8 @@ defmodule Cosmos.Beings.BeingWorker do
     GenServer.cast(pid, :harvest)
   end
 
-  def give_resource(pid, other_pid, resource_type, amount) do
-    GenServer.cast(pid, {:give_resource, other_pid, resource_type, amount})
+  def give_resource(pid, other_id, resource_type, amount) do
+    GenServer.cast(pid, {:give_resource, other_id, resource_type, amount})
   end
 
   def receive_resource(pid, resource_type, amount) do
@@ -137,7 +137,7 @@ defmodule Cosmos.Beings.BeingWorker do
   end
 
   @impl true
-  def handle_cast({:give_resource, other_pid, resource_type, amount}, state) do
+  def handle_cast({:give_resource, other_being_id, resource_type, amount}, state) do
     being = get_being(state.bucket_name, state.being_id)
     # check to make sure that this being has enough resource to give
     old_resource = Map.get(being.resources, resource_type)
@@ -153,7 +153,8 @@ defmodule Cosmos.Beings.BeingWorker do
     new_being = %{being | resources: Map.put(being.resources, resource_type, new_amount)}
     put_being(state.bucket_name, state.being_id, new_being)
     # send resource to other being
-    # TODO replace with lookup of other_pid from cache or registry
+    # TODO change so that no need to assume that they are in the same bucket
+    other_pid = Cosmos.Beings.BeingWorkerCache.worker_process(state.bucket_name, other_being_id)
     Cosmos.Beings.BeingWorker.receive_resource(other_pid, resource_type, amount)
 
     {:noreply, state}
@@ -214,13 +215,14 @@ defmodule Cosmos.Beings.BeingWorker do
   end
 
   defp put_being(bucket_name, being_id, being) do
-    {:ok, bucket_pid} = Registry.lookup(Cosmos.Beings.Registry, bucket_name)
+    {:ok, bucket_pid} = Cosmos.Beings.Registry.lookup(Cosmos.Beings.Registry, bucket_name)
     Bucket.put(bucket_pid, being_id, being)
   end
 
   defp cycle(bucket_name, being_id) do
     being = get_being(bucket_name, being_id)
 
+    # TODO revisit this
     # if being.alive do
     if 1 == 0 do
       Logger.info("#{inspect(self())} is updating being #{Cosmos.Beings.Name.string(being.name)}")

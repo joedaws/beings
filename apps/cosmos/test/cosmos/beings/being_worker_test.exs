@@ -8,14 +8,11 @@ defmodule Cosmos.Beings.BeingWorkerTest do
   alias Cosmos.Magic.Ritual
 
   setup do
-    # TODO be double sure that the application registry has been started.
-    #      I think this registry has a different name
-    registry = start_supervised!(Cosmos.Beings.Registry)
-    Cosmos.Beings.Registry.create(registry, "beings")
-    Cosmos.Beings.Registry.create(registry, "nodes")
+    Cosmos.Beings.Registry.create(Cosmos.Beings.Registry, "nodes")
+    Cosmos.Beings.Registry.create(Cosmos.Beings.Registry, "beings")
 
-    {:ok, beings} = Cosmos.Beings.Registry.lookup(registry, "beings")
-    {:ok, nodes} = Cosmos.Beings.Registry.lookup(registry, "nodes")
+    {:ok, beings} = Cosmos.Beings.Registry.lookup(Cosmos.Beings.Registry, "beings")
+    {:ok, nodes} = Cosmos.Beings.Registry.lookup(Cosmos.Beings.Registry, "nodes")
 
     b = Being.get_random_being()
     # alive false prevents the cycle logic from running while testing
@@ -32,7 +29,7 @@ defmodule Cosmos.Beings.BeingWorkerTest do
     Cosmos.Beings.Bucket.put(nodes, n_id, n)
     Cosmos.Beings.Bucket.put(nodes, m_id, m)
 
-    {:ok, worker} = BeingWorker.start_link(["beings", b_id])
+    worker = Cosmos.Beings.BeingWorkerCache.worker_process("beings", b_id)
 
     {:ok, node_worker} = NodeWorker.start_link([nodes, n_id])
     {:ok, node_worker_2} = NodeWorker.start_link([nodes, m_id])
@@ -93,7 +90,8 @@ defmodule Cosmos.Beings.BeingWorkerTest do
     b = %{b | ichor: 100, alive: false}
     b_id = Being.generate_id(b)
     Cosmos.Beings.Bucket.put(beings, b_id, b)
-    {:ok, other_worker} = BeingWorker.start_link([beings, b_id])
+
+    other_worker = Cosmos.Beings.BeingWorkerCache.worker_process("beings", b_id)
 
     # we expect that the new other being has no resources
     assert BeingWorker.get(other_worker, :resources) == %{}
@@ -102,7 +100,7 @@ defmodule Cosmos.Beings.BeingWorkerTest do
     BeingWorker.update(worker, :resources, %{bones: 10})
     amount = 5
 
-    BeingWorker.give_resource(worker, other_worker, :bones, amount)
+    BeingWorker.give_resource(worker, b_id, :bones, amount)
 
     assert BeingWorker.get(worker, :resources) == %{bones: 5}
     assert BeingWorker.get(other_worker, :resources) == %{bones: 5}
