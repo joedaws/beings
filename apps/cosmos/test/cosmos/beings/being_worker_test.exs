@@ -17,9 +17,8 @@ defmodule Cosmos.Beings.BeingWorkerTest do
     b = Being.get_random_being()
     # alive false prevents the cycle logic from running while testing
     b = %{b | ichor: 100, alive: false}
-    b_id = Being.generate_id(b)
 
-    Cosmos.Beings.Bucket.put(beings, b_id, b)
+    Cosmos.Beings.Bucket.put(beings, b.id, b)
 
     n = Node.generate_random_node()
     n_id = Node.generate_id(n)
@@ -29,7 +28,7 @@ defmodule Cosmos.Beings.BeingWorkerTest do
     Cosmos.Beings.Bucket.put(nodes, n_id, n)
     Cosmos.Beings.Bucket.put(nodes, m_id, m)
 
-    worker = Cosmos.Beings.BeingWorkerCache.worker_process("beings", b_id)
+    worker = Cosmos.Beings.BeingWorkerCache.worker_process("beings", b.id)
 
     {:ok, node_worker} = NodeWorker.start_link([nodes, n_id])
     {:ok, node_worker_2} = NodeWorker.start_link([nodes, m_id])
@@ -88,10 +87,9 @@ defmodule Cosmos.Beings.BeingWorkerTest do
     b = Being.get_random_being()
     # alive false prevents the cycle logic from running while testing
     b = %{b | ichor: 100, alive: false}
-    b_id = Being.generate_id(b)
-    Cosmos.Beings.Bucket.put(beings, b_id, b)
+    Cosmos.Beings.Bucket.put(beings, b.id, b)
 
-    other_worker = Cosmos.Beings.BeingWorkerCache.worker_process("beings", b_id)
+    other_worker = Cosmos.Beings.BeingWorkerCache.worker_process("beings", b.id)
 
     # we expect that the new other being has no resources
     assert BeingWorker.get(other_worker, :resources) == %{}
@@ -100,7 +98,7 @@ defmodule Cosmos.Beings.BeingWorkerTest do
     BeingWorker.update(worker, :resources, %{bones: 10})
     amount = 5
 
-    BeingWorker.give_resource(worker, b_id, :bones, amount)
+    BeingWorker.give_resource(worker, b.id, :bones, amount)
 
     assert BeingWorker.get(worker, :resources) == %{bones: 5}
     assert BeingWorker.get(other_worker, :resources) == %{bones: 5}

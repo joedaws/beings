@@ -39,8 +39,8 @@ defmodule Cosmos.Beings.BeingWorker do
     GenServer.cast(pid, :hibernate)
   end
 
-  def attach(pid, node) do
-    GenServer.cast(pid, {:attach, node})
+  def attach(pid, node_id) do
+    GenServer.cast(pid, {:attach, node_id})
   end
 
   def harvest(pid) do
@@ -71,7 +71,7 @@ defmodule Cosmos.Beings.BeingWorker do
       being_id: being_id
     }
 
-    # cycle(bucket_name, being_id)
+    cycle(bucket_name, being_id)
 
     {:ok, bw}
   end
@@ -109,11 +109,11 @@ defmodule Cosmos.Beings.BeingWorker do
   end
 
   @impl true
-  def handle_cast({:attach, node}, state) do
+  def handle_cast({:attach, node_id}, state) do
     being = get_being(state.bucket_name, state.being_id)
-    new_being = %{being | node: node}
+    new_being = %{being | node: node_id}
     put_being(state.bucket_name, state.being_id, new_being)
-    NodeWorker.attach(node, self())
+    NodeWorker.attach(node, new_being.id)
     {:noreply, state}
   end
 
@@ -153,7 +153,6 @@ defmodule Cosmos.Beings.BeingWorker do
     new_being = %{being | resources: Map.put(being.resources, resource_type, new_amount)}
     put_being(state.bucket_name, state.being_id, new_being)
     # send resource to other being
-    # TODO change so that no need to assume that they are in the same bucket
     other_pid = Cosmos.Beings.BeingWorkerCache.worker_process(state.bucket_name, other_being_id)
     Cosmos.Beings.BeingWorker.receive_resource(other_pid, resource_type, amount)
 
@@ -222,15 +221,12 @@ defmodule Cosmos.Beings.BeingWorker do
   defp cycle(bucket_name, being_id) do
     being = get_being(bucket_name, being_id)
 
-    # TODO revisit this
-    # if being.alive do
-    if 1 == 0 do
+    if being.alive do
       Logger.info("#{inspect(self())} is updating being #{Cosmos.Beings.Name.string(being.name)}")
       # perform updates required each cycle
-      new_being =
-        pay_ichor({bucket_name, being_id, being})
-        |> observe()
-        |> make_decision()
+      {bucket_name, being_id, new_being} = pay_ichor({bucket_name, being_id, being})
+      # |> observe()
+      # |> make_decision()
 
       # store updated being
       put_being(bucket_name, being_id, new_being)

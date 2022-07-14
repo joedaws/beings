@@ -44,18 +44,13 @@ asserted property ownership.
 
 
 ** Cosmos Application
-*** TODO create being worker cache
-This cache will return the pid of a being worker given the being_id
-
-Follow the example in Sasa Juric book.
-
-*** TODO create node worker cache
-This cache will return the pid of a node worker given the node_id
-
 *** TODO update nodes and beings to store ids instead of process ids
 process ids may change over time, they should store ids of nodes
 and beings instead in their neighbor properties since these are
 not expected to change over time.
+
+*** TODO create node worker cache
+This cache will return the pid of a node worker given the node_id
 
 *** TODO create name generator that won't repeat names and is quick
 
@@ -76,6 +71,11 @@ their knowledge map
 *** TODO add memories to beings
 
 *** TODO implement ranks
+
+*** DONE create being worker cache
+This cache will return the pid of a being worker given the being_id
+
+Follow the example in Sasa Juric book.
 
 *** DONE name generate for millions of node locations
 Need to create generate function instances for the rest of the node template types
