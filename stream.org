@@ -44,6 +44,22 @@ asserted property ownership.
 
 
 ** Cosmos Application
+*** TODO update worker Caches to remove dependence on bucket name
+Store another registry that updates what bucket name a worker process is in
+or hard code the name of the bucket for use by the simulation. One for beings,
+another for nodes
+
+For the sake of moving on, I'll hard code the bucket name into
+the application. In the future I might to refactor this if it
+becomes apparent that multiple buckets for beings are required.
+
+*** TODO create an enumeration of all unique names
+This way we can sequentially create all possible being and node names.
+
+*** TODO what to do when worker processes crash
+It's fine if they crash but I need to restart them
+so that they continue to update appropriately.
+
 *** TODO update nodes and beings to store ids instead of process ids
 process ids may change over time, they should store ids of nodes
 and beings instead in their neighbor properties since these are
@@ -65,7 +81,7 @@ Update CosmosServer application
 *** TODO launch basic simulation.
 
 *** TODO add knowledge to beings
-Beings store the spells/recipies they know in
+Beings store the spells/recipes they know in
 their knowledge map
 
 *** TODO add memories to beings
@@ -196,6 +212,35 @@ Right now I want to explore using 1-bit character forms
 
 *** TODO make ambient music to play at each location
 
+* Releases
+** Release Boron
+Run simulation with:
+- 100k beings
+- 10k nodes
+- preference for survival
+
+We won't implement:
+- generations
+- Social interactions
+
+** Release Radon
+- 100k beings
+- 10k nodes
+- different personalities of beings
+  - explorers
+  - survivalists
+  - resource hoarders
+- generations of beings
+
+We will not implement:
+- Social interactions
+
+** Release Bismuth
+- 200k beings
+- 30k nodes
+- generations
+- social interactions
+
 * Learnings
 ** Build a system first, then figure out more complicated behavior later.
 In the first pass, I'll just build beings that make observaitons
@@ -247,11 +292,14 @@ the ets table.
 * Emacs oddities
 ** What to do when emacs hangs [[https://www.reddit.com/r/emacs/comments/k7cku8/when_emacs_hangs_what_do_you_do/][here]]
 ** Learn to use the eshell better
+** Learn to use vterm in emacs better
 
 * Resources
 ** Viz libraries
 *** [[https://github.com/mindok/contex][contex]] library in elixir for making SVG
 *** [[https://d3js.org/][d3]] js library for awesome visualizations
+*** Build a Godot client?
+Consider this.
 
 ** decision trees
 *** Survival Tree

@@ -22,20 +22,23 @@ defmodule Cosmos.Beings.BeingWorkerTest do
 
     n = Node.generate_random_node()
     n_id = Node.generate_id(n)
+    n = %{n | id: n_id}
     m = Node.generate_random_node()
     m_id = Node.generate_id(m)
+    m = %{m | id: m_id}
 
     Cosmos.Beings.Bucket.put(nodes, n_id, n)
     Cosmos.Beings.Bucket.put(nodes, m_id, m)
 
     worker = Cosmos.Beings.BeingWorkerCache.worker_process("beings", b.id)
 
-    {:ok, node_worker} = NodeWorker.start_link([nodes, n_id])
-    {:ok, node_worker_2} = NodeWorker.start_link([nodes, m_id])
+    node_worker = Cosmos.Locations.NodeWorkerCache.worker_process("nodes", n.id)
+    node_worker_2 = Cosmos.Locations.NodeWorkerCache.worker_process("nodes", m.id)
 
-    NodeWorker.connect(node_worker, node_worker_2)
+    NodeWorker.connect(node_worker, m.id)
+    NodeWorker.connect(node_worker_2, n.id)
 
-    %{beings: beings, worker: worker, nodes: nodes, node_worker: node_worker}
+    %{beings: beings, worker: worker, nodes: nodes, node_worker: node_worker, n: n}
   end
 
   test "get being state", %{worker: worker} do
@@ -49,16 +52,16 @@ defmodule Cosmos.Beings.BeingWorkerTest do
     assert new_ichor_amount == ichor
   end
 
-  test "attach being to node", %{worker: worker, node_worker: node_worker} do
+  test "attach being to node", %{worker: worker, n: n} do
     assert BeingWorker.get(worker, :node) == nil
-    BeingWorker.attach(worker, node_worker)
-    assert BeingWorker.get(worker, :node) == node_worker
+    BeingWorker.attach(worker, n.id)
+    assert BeingWorker.get(worker, :node) == n.id
   end
 
-  test "ichor decrease each cycle", %{worker: worker, node_worker: node_worker} do
+  test "ichor decrease each cycle", %{worker: worker, n: n} do
     # must be attached to node in order to cycle at the moment
     # tests don't always run in the same order
-    BeingWorker.attach(worker, node_worker)
+    BeingWorker.attach(worker, n.id)
 
     # ichor should decrease after 1 cycle
     old_ichor = BeingWorker.get(worker, :ichor)
@@ -68,8 +71,8 @@ defmodule Cosmos.Beings.BeingWorkerTest do
     assert new_ichor == old_ichor - 1
   end
 
-  test "harvest resources", %{worker: worker, node_worker: node_worker} do
-    BeingWorker.attach(worker, node_worker)
+  test "harvest resources", %{worker: worker, n: n, node_worker: node_worker} do
+    BeingWorker.attach(worker, n.id)
     assert BeingWorker.get(worker, :node) != nil
     resource_type = NodeWorker.get(node_worker, :resource_type)
     resource_yeild = NodeWorker.get(node_worker, :resource_yeild)
@@ -98,7 +101,7 @@ defmodule Cosmos.Beings.BeingWorkerTest do
     BeingWorker.update(worker, :resources, %{bones: 10})
     amount = 5
 
-    BeingWorker.give_resource(worker, b.id, :bones, amount)
+    BeingWorker.give_resource(worker, "beings", b.id, :bones, amount)
 
     assert BeingWorker.get(worker, :resources) == %{bones: 5}
     assert BeingWorker.get(other_worker, :resources) == %{bones: 5}
@@ -120,21 +123,23 @@ defmodule Cosmos.Beings.BeingWorkerTest do
     # create new node and worker
     n = Node.generate_random_node()
     n_id = Node.generate_id(n)
-    Cosmos.Beings.Bucket.put(nodes, n_id, n)
-    {:ok, node_worker} = NodeWorker.start_link([nodes, n_id])
+    n = %{n | id: n_id}
+    Cosmos.Beings.Bucket.put(nodes, n.id, n)
+
+    node_worker = Cosmos.Locations.NodeWorkerCache.worker_process("nodes", n.id)
 
     old_node = BeingWorker.get(worker, :node)
 
     # move being to new node
-    BeingWorker.move(worker, node_worker)
+    BeingWorker.move(worker, n.id)
 
-    assert old_node != node_worker
-    assert BeingWorker.get(worker, :node) == node_worker
+    assert old_node != n.id
+    assert BeingWorker.get(worker, :node) == n.id
   end
 
-  test "make decision", %{worker: worker, node_worker: node_worker} do
+  test "make decision", %{worker: worker, n: n} do
     # being should be attached to a node
-    BeingWorker.attach(worker, node_worker)
+    BeingWorker.attach(worker, n.id)
 
     old_ichor = BeingWorker.get(worker, :ichor)
     BeingWorker.revive(worker)

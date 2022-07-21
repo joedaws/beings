@@ -77,7 +77,13 @@ defmodule Cosmos.Beings.Brains.DecisionTree do
   # LEAF!
   # actual performs the ritual
   def make_choice({:can_perform_ritual, true}, observations, parameters) do
-    Task.async(fn -> BeingWorker.perform_ritual(observations.worker_pid) end)
+    worker_pid =
+      Cosmos.Beings.BeingWorkerCache.worker_process(
+        observations.bucket_name,
+        observations.being.id
+      )
+
+    Task.async(fn -> BeingWorker.perform_ritual(worker_pid) end)
   end
 
   def make_choice({:can_perform_ritual, false}, observations, parameters) do
@@ -93,7 +99,13 @@ defmodule Cosmos.Beings.Brains.DecisionTree do
   # LEAF!
   # being harvests from it's current node
   def make_choice({:find_necessary_resources, true}, observations, parameters) do
-    Task.async(fn -> BeingWorker.harvest(observations.worker_pid) end)
+    worker_pid =
+      Cosmos.Beings.BeingWorkerCache.worker_process(
+        observations.bucket_name,
+        observations.being.id
+      )
+
+    Task.async(fn -> BeingWorker.harvest(worker_pid) end)
   end
 
   # LEAF!
@@ -104,6 +116,12 @@ defmodule Cosmos.Beings.Brains.DecisionTree do
       "#{Being.get_full_name(observations.being)} moving to new node #{inspect(new_node_pid)}"
     )
 
-    Task.async(fn -> BeingWorker.move(observations.worker_pid, new_node_pid) end)
+    worker_pid =
+      Cosmos.Beings.BeingWorkerCache.worker_process(
+        observations.bucket_name,
+        observations.being.id
+      )
+
+    Task.async(fn -> BeingWorker.move(worker_pid, new_node_pid) end)
   end
 end

@@ -10,6 +10,9 @@ defmodule Cosmos.Beings.BeingWorker do
   alias Cosmos.Beings.Brains.Parameters
   alias Cosmos.Beings.Brains.DecisionTree
 
+  # defines the default being bucket name
+  @default_being_bucket_name "beings"
+
   # defines the length of time a cycle takes in milliseconds
   @cycle_duration 1 * 1000
 
@@ -47,8 +50,8 @@ defmodule Cosmos.Beings.BeingWorker do
     GenServer.cast(pid, :harvest)
   end
 
-  def give_resource(pid, other_id, resource_type, amount) do
-    GenServer.cast(pid, {:give_resource, other_id, resource_type, amount})
+  def give_resource(pid, other_bucket_name, other_id, resource_type, amount) do
+    GenServer.cast(pid, {:give_resource, other_bucket_name, other_id, resource_type, amount})
   end
 
   def receive_resource(pid, resource_type, amount) do
@@ -70,6 +73,28 @@ defmodule Cosmos.Beings.BeingWorker do
       bucket_name: bucket_name,
       being_id: being_id
     }
+
+    # this allows other processes to find the bucket
+    # given only the id
+    Cosmos.BucketNameRegistry.register(being_id, bucket_name)
+
+    cycle(bucket_name, being_id)
+
+    {:ok, bw}
+  end
+
+  @impl true
+  def init([being_id]) do
+    bucket_name = @default_being_bucket_name
+
+    bw = %Cosmos.Beings.BeingWorker{
+      bucket_name: bucket_name,
+      being_id: being_id
+    }
+
+    # this allows other processes to find the bucket
+    # given only the id
+    Cosmos.BucketNameRegistry.register(being_id, bucket_name)
 
     cycle(bucket_name, being_id)
 
@@ -110,10 +135,15 @@ defmodule Cosmos.Beings.BeingWorker do
 
   @impl true
   def handle_cast({:attach, node_id}, state) do
+    # update the being
     being = get_being(state.bucket_name, state.being_id)
     new_being = %{being | node: node_id}
     put_being(state.bucket_name, state.being_id, new_being)
-    NodeWorker.attach(node, new_being.id)
+
+    # update the node
+    node_bucket_name = Cosmos.BucketNameRegistry.get(node_id)
+    node_pid = Cosmos.Locations.NodeWorkerCache.worker_process(node_bucket_name, node_id)
+    NodeWorker.attach(node_pid, new_being.id)
     {:noreply, state}
   end
 
@@ -122,7 +152,8 @@ defmodule Cosmos.Beings.BeingWorker do
     being = get_being(state.bucket_name, state.being_id)
 
     if being.node do
-      {:ok, resource_type, amount} = NodeWorker.yeild_resource(being.node)
+      node_pid = Cosmos.BucketNameRegistry.get(being.node)
+      {:ok, resource_type, amount} = NodeWorker.yeild_resource(node_pid)
       old_resource = Map.get(being.resources, resource_type, 0)
 
       new_being = %{
@@ -137,7 +168,10 @@ defmodule Cosmos.Beings.BeingWorker do
   end
 
   @impl true
-  def handle_cast({:give_resource, other_being_id, resource_type, amount}, state) do
+  def handle_cast(
+        {:give_resource, other_bucket_name, other_being_id, resource_type, amount},
+        state
+      ) do
     being = get_being(state.bucket_name, state.being_id)
     # check to make sure that this being has enough resource to give
     old_resource = Map.get(being.resources, resource_type)
@@ -152,8 +186,9 @@ defmodule Cosmos.Beings.BeingWorker do
     # update being state
     new_being = %{being | resources: Map.put(being.resources, resource_type, new_amount)}
     put_being(state.bucket_name, state.being_id, new_being)
+
     # send resource to other being
-    other_pid = Cosmos.Beings.BeingWorkerCache.worker_process(state.bucket_name, other_being_id)
+    other_pid = Cosmos.Beings.BeingWorkerCache.worker_process(other_bucket_name, other_being_id)
     Cosmos.Beings.BeingWorker.receive_resource(other_pid, resource_type, amount)
 
     {:noreply, state}
@@ -206,6 +241,11 @@ defmodule Cosmos.Beings.BeingWorker do
     {:noreply, state}
   end
 
+  # public helpers ------------------------------------------------------------------------
+  def get_default_being_bucket_name() do
+    @default_being_bucket_name
+  end
+
   # Private functions ---------------------------------------------------------------------
   defp get_being(bucket_name, being_id) do
     {:ok, bucket_pid} = Cosmos.Beings.Registry.lookup(Cosmos.Beings.Registry, bucket_name)
@@ -224,62 +264,51 @@ defmodule Cosmos.Beings.BeingWorker do
     if being.alive do
       Logger.info("#{inspect(self())} is updating being #{Cosmos.Beings.Name.string(being.name)}")
       # perform updates required each cycle
-      {bucket_name, being_id, new_being} = pay_ichor({bucket_name, being_id, being})
-      # |> observe()
-      # |> make_decision()
+      # ---
+      # first pay the ichor to continue living
+      pay_ichor(bucket_name, being)
 
-      # store updated being
-      put_being(bucket_name, being_id, new_being)
+      # make a decision
+      make_decision(bucket_name, being)
+
+      # to simulate passage of time
       Process.send_after(self(), :cycle, @cycle_duration)
     end
   end
 
-  defp pay_ichor({bucket_name, being_id, being}) do
+  defp pay_ichor(bucket_name, being) do
     old_amount = Map.get(being, :ichor)
     new_amount = old_amount - 1
 
     being =
       if new_amount <= 0 do
-        Logger.info("#{inspect(being_id)} will cease to exist")
+        Logger.info("#{inspect(being.id)} will cease to exist")
         being = %{being | alive: false}
       else
         being
       end
 
     new_being = %{being | ichor: new_amount}
-    put_being(bucket_name, being_id, new_being)
-    {bucket_name, being_id, new_being}
+    put_being(bucket_name, being.id, new_being)
   end
 
-  @doc """
-  This function let's the being collect whatever information it might
-  want and is capable of obtaining.
-  """
-  defp observe({bucket_name, being_id, being}) do
-    # TODO change to use node worker PID instead
-    node = NodeWorker.get(being.node)
-
-    # TODO change this to not use PID
-    observations = %Observations{
-      worker_pid: self(),
-      being: being,
-      node: node
-    }
-
-    {bucket_name, being_id, observations, being}
-  end
-
-  defp make_decision({bucket_name, being_id, observations, being}) do
+  defp make_decision(bucket_name, being) do
     Logger.info("#{Cosmos.Beings.Name.string(being.name)} will make a decision")
 
-    # update to load parameters from being instance
+    # TODO update to load parameters from being instance
     parameters = %Parameters{
       ichor_threshold: 10
     }
 
-    DecisionTree.take_action(:survival_tree, observations, parameters)
+    node = NodeWorker.get(being.node)
 
-    being
+    observations = %Observations{
+      bucket_name: bucket_name,
+      being: being,
+      node: node
+    }
+
+    DecisionTree.take_action(:survival_tree, observations, parameters)
   end
 
   defp choose_action(policy, observations) do

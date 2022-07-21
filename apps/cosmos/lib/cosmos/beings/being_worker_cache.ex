@@ -53,11 +53,7 @@ defmodule Cosmos.Beings.BeingWorkerCache do
         refs = Map.put(refs, ref, being_id)
         being_ids = Map.put(being_ids, being_id, new_worker_pid)
 
-        {
-          :reply,
-          new_worker_pid,
-          {being_ids, refs}
-        }
+        {:reply, new_worker_pid, {being_ids, refs}}
     end
   end
 
