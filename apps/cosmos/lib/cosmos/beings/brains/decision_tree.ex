@@ -3,11 +3,8 @@ defmodule Cosmos.Beings.Brains.DecisionTree do
   observations:
     - resources
     - ritual
-    observations:
-      - resources
-      - ritual
-      - ichor
-      - worker_pid
+    - ichor
+    - worker_pid
 
   This module implements parameterized decision tree
   which being instances can use to make decisions.
@@ -77,7 +74,15 @@ defmodule Cosmos.Beings.Brains.DecisionTree do
   # LEAF!
   # actual performs the ritual
   def make_choice({:can_perform_ritual, true}, observations, parameters) do
-    Task.async(fn -> BeingWorker.perform_ritual(observations.worker_pid) end)
+    worker_pid =
+      Cosmos.Beings.BeingWorkerCache.worker_process(
+        observations.bucket_name,
+        observations.being.id
+      )
+
+    Logger.info("Decision: #{Being.get_full_name(observations.being)} will perform a ritual")
+
+    Task.async(fn -> BeingWorker.perform_ritual(worker_pid) end)
   end
 
   def make_choice({:can_perform_ritual, false}, observations, parameters) do
@@ -93,17 +98,33 @@ defmodule Cosmos.Beings.Brains.DecisionTree do
   # LEAF!
   # being harvests from it's current node
   def make_choice({:find_necessary_resources, true}, observations, parameters) do
-    Task.async(fn -> BeingWorker.harvest(observations.worker_pid) end)
+    worker_pid =
+      Cosmos.Beings.BeingWorkerCache.worker_process(
+        observations.bucket_name,
+        observations.being.id
+      )
+
+    Logger.info(
+      "Decision: #{Being.get_full_name(observations.being)} will harvest from its current"
+    )
+
+    Task.async(fn -> BeingWorker.harvest(worker_pid) end)
   end
 
   # LEAF!
   def make_choice({:find_necessary_resources, false}, observations, parameters) do
-    new_node_pid = Enum.random(observations.node.neighbors)
+    new_node_id = Enum.random(observations.node.neighbors)
 
     Logger.info(
-      "#{Being.get_full_name(observations.being)} moving to new node #{inspect(new_node_pid)}"
+      "Decision: #{Being.get_full_name(observations.being)} moving to new node #{inspect(new_node_id)}"
     )
 
-    Task.async(fn -> BeingWorker.move(observations.worker_pid, new_node_pid) end)
+    worker_pid =
+      Cosmos.Beings.BeingWorkerCache.worker_process(
+        observations.bucket_name,
+        observations.being.id
+      )
+
+    Task.async(fn -> BeingWorker.attach(worker_pid, new_node_id) end)
   end
 end

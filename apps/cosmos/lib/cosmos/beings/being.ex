@@ -26,7 +26,8 @@ defmodule Cosmos.Beings.Being do
     alive: false,
     rank: Rank.get_lowest_rank(),
     resources: %{},
-    rituals: []
+    rituals: [],
+    id: nil
   ]
 
   def get_full_name(b) do
@@ -36,8 +37,34 @@ defmodule Cosmos.Beings.Being do
   def get_location_node_name_and_type(b) do
     case b.node do
       nil -> "Lost in Space"
-      _ -> "#{Name.string(b.node.name)}: #{b.node.type}"
+      _ -> "#{Name.string(b.node.name)}: #{node.id}"
     end
+  end
+
+  def new(
+        name,
+        node,
+        age \\ 0,
+        ichor \\ 0,
+        alive \\ false,
+        rank \\ Rank.get_lowest_rank(),
+        resources \\ %{},
+        rituals \\ []
+      ) do
+    being = %Being{
+      name: name,
+      node: node,
+      age: age,
+      ichor: ichor,
+      alive: alive,
+      rank: rank,
+      resources: resources,
+      rituals: rituals
+    }
+
+    being_id = generate_id(being)
+
+    being = %{being | id: being_id}
   end
 
   def get_random_being() do
@@ -45,12 +72,16 @@ defmodule Cosmos.Beings.Being do
     being_cultures = Map.keys(Name.name_syllables())
     name = Name.generate_name(Enum.random(being_cultures))
 
-    %Being{
+    being = %Being{
       name: name,
       age: :rand.uniform(@max_age),
       ichor: :rand.uniform(@max_starting_ichor),
       node: nil
     }
+
+    being_id = generate_id(being)
+
+    being = %{being | id: being_id}
   end
 
   @doc """

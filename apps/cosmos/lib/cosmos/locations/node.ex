@@ -17,7 +17,8 @@ defmodule Cosmos.Locations.Node do
     :resource_type,
     neighbors: [],
     occupants: [],
-    occupancy_limit: @default_limit
+    occupancy_limit: @default_limit,
+    id: nil
   ]
 
   def get_name(node) do

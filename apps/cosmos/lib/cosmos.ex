@@ -5,6 +5,7 @@ defmodule Cosmos do
   alias Cosmos.Locations.Node
   alias Cosmos.Locations.Name
   alias Cosmos.Locations.NodeWorker
+  alias Cosmos.Locations.NodeWorkerCache
 
   @impl true
   def start(_type, _args) do
@@ -12,8 +13,11 @@ defmodule Cosmos do
     # it can be useful when debugging or introspecting the system.
     {:ok, sup_pid} = Cosmos.Beings.Supervisor.start_link(name: Cosmos.Beings.Supervisor)
 
-    Cosmos.Beings.Registry.create(Cosmos.Beings.Registry, "basic_node")
-    Cosmos.Beings.Registry.create(Cosmos.Beings.Registry, "basic_node_worker")
+    # This bucket will hold the map between entity ids and
+    # the buck in which they are currently held.
+    Cosmos.Beings.Registry.create(Cosmos.Beings.Registry, "bucket_names")
+    # In order for the graph to be setup we need a place to hold nodes.
+    Cosmos.Beings.Registry.create(Cosmos.Beings.Registry, "nodes")
 
     setup_graph(:basic)
 
@@ -43,15 +47,11 @@ defmodule Cosmos do
   defp create_node(name) do
     node = Node.generate_node(name)
     node_id = Node.generate_id(node)
-    {:ok, basic_node} = Cosmos.Beings.Registry.lookup(Cosmos.Beings.Registry, "basic_node")
-    Cosmos.Beings.Bucket.put(basic_node, node_id, node)
+    node = %{node | id: node_id}
+    {:ok, nodes} = Cosmos.Beings.Registry.lookup(Cosmos.Beings.Registry, "nodes")
+    Cosmos.Beings.Bucket.put(nodes, node.id, node)
 
-    {:ok, node_worker} = NodeWorker.start_link([basic_node, node_id])
-
-    {:ok, basic_node_worker} =
-      Cosmos.Beings.Registry.lookup(Cosmos.Beings.Registry, "basic_node_worker")
-
-    Cosmos.Beings.Bucket.put(basic_node_worker, node_id, node_worker)
+    node_worker = Cosmos.Locations.NodeWorkerCache.worker_process("nodes", node.id)
   end
 
   @doc """
@@ -74,7 +74,7 @@ defmodule Cosmos do
   There should be 4 or more nodes for this to work.
   """
   defp connect_nodes(:random_lookahead) do
-    {:ok, node_bucket} = Cosmos.Beings.Registry.lookup(Cosmos.Beings.Registry, "basic_node")
+    {:ok, node_bucket} = Cosmos.Beings.Registry.lookup(Cosmos.Beings.Registry, "nodes")
     node_ids = Cosmos.Beings.Bucket.keys(node_bucket)
 
     build_edges(node_ids)
@@ -83,12 +83,9 @@ defmodule Cosmos do
   defp build_edges([start | tail]) do
     four_nodes = [start] ++ Enum.slice(tail, 0, 3)
 
-    {:ok, basic_node_worker_bucket} =
-      Cosmos.Beings.Registry.lookup(Cosmos.Beings.Registry, "basic_node_worker")
-
     # get node workers associated with next three nodes
     four_node_workers =
-      for k <- four_nodes, do: Cosmos.Beings.Bucket.get(basic_node_worker_bucket, k)
+      for k <- four_nodes, do: Cosmos.Locations.NodeWorkerCache.worker_process("nodes", k)
 
     connect(four_node_workers)
 

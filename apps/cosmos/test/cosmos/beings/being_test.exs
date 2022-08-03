@@ -29,6 +29,15 @@ defmodule Cosmos.Beings.BeingTest do
     %{test_being: test_being, n1: n1, n2: n2}
   end
 
+  test "new being" do
+    name = Name.generate_name("deep_denizen")
+    node = Cosmos.Locations.Name.generate_name("warped_nature")
+
+    b = Being.new(name, node)
+
+    assert b.id != nil
+  end
+
   test "being nil defaults" do
     b = %Being{}
     # test for default nils

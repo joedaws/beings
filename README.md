@@ -5,7 +5,7 @@ lives that eldrich beings appearently have.
 
 ## Goals 
 
-- [-] Define a suitable cosmos where these beings can live and roam.
+- [ ] Define a suitable cosmos where these beings can live and roam.
 - [x] Define the data and functions the beings. 
 - [ ] parameterize the social connections of beings.
 - [ ] Build a visualizaiton tool for the simulation.

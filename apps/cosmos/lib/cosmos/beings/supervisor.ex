@@ -9,7 +9,11 @@ defmodule Cosmos.Beings.Supervisor do
   def init(:ok) do
     children = [
       {DynamicSupervisor, name: Cosmos.Beings.BucketSupervisor, strategy: :one_for_one},
-      {Cosmos.Beings.Registry, name: Cosmos.Beings.Registry}
+      {DynamicSupervisor, name: Cosmos.Beings.BeingWorkerSupervisor, strategy: :one_for_one},
+      {DynamicSupervisor, name: Cosmos.Locations.NodeWorkerSupervisor, strategy: :one_for_one},
+      {Cosmos.Beings.Registry, name: Cosmos.Beings.Registry},
+      {Cosmos.Beings.BeingWorkerCache, name: Cosmos.Beings.BeingWorkerCache},
+      {Cosmos.Locations.NodeWorkerCache, name: Cosmos.Locations.NodeWorkerCache}
     ]
 
     # :one_for_one means that if a child dies,

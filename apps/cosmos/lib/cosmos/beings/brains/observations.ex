@@ -1,6 +1,6 @@
 defmodule Cosmos.Beings.Brains.Observations do
   defstruct [
-    :worker_pid,
+    :bucket_name,
     :being,
     :node
   ]

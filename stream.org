@@ -9,29 +9,31 @@ Also update the node places [[file:apps/cosmos/data/node_name_registry.yaml][nod
 
 ** Lore
 *** Taxonomy of beings
-There are three classes of eldrich beings in the simulation
+There are three classes of Eldrich beings in the simulation
 - ichor machines (weird science)
 
   After a group of international researchers discovered
   the existence of ichor in the universe, they used its power
   to bring into being autonomous machines.
-  These machines quickly leanred to escape the laboratories of their
+  These machines quickly learned to escape the laboratories of their
   creators. Now they scour the world for resources to perform rituals
   to build more of the ichor that powers them.
 
-- dream realm
+- citizens of the dream realm
 
   An emergent property of a universe with sentient beings is a
   realm of mirrored consciousness and echos of sentient thought.
   Humans interact with this realm during their sleep and some call
   it the dream realm. The beings of this realm phase into and out of
-  the physical world with differening appearence and collect resources.
+  the physical world with different appearances while collect resources
+  from the physical realm.
   Their realm is tightly tied to our own and there continued existence
   depends on obtaining more ichor.
 
 - deep denizen
 
-  Those that dwell in the vast voids between the starts.
+  Fiercely independent and
+  Those that dwell in the vast voids between the stars.
 
 *** Property Ownership
 Beings can own nodes and prevent other beings from fully utilizing the
@@ -44,18 +46,30 @@ asserted property ownership.
 
 
 ** Cosmos Application
-*** TODO create being worker cache
-This cache will return the pid of a being worker given the being_id
+*** TODO update being_worker_test to not use the worker pid generated at the beginning.
+*** DONE update worker Caches to remove dependence on bucket name
+Store another registry that updates what bucket name a worker process is in
+or hard code the name of the bucket for use by the simulation. One for beings,
+another for nodes
 
-Follow the example in Sasa Juric book.
+For the sake of moving on, I'll hard code the bucket name into
+the application. In the future I might to refactor this if it
+becomes apparent that multiple buckets for beings are required.
 
-*** TODO create node worker cache
-This cache will return the pid of a node worker given the node_id
+*** TODO create an enumeration of all unique names
+This way we can sequentially create all possible being and node names.
+
+*** TODO what to do when worker processes crash
+It's fine if they crash but I need to restart them
+so that they continue to update appropriately.
 
 *** TODO update nodes and beings to store ids instead of process ids
 process ids may change over time, they should store ids of nodes
 and beings instead in their neighbor properties since these are
 not expected to change over time.
+
+*** TODO create node worker cache
+This cache will return the pid of a node worker given the node_id
 
 *** TODO create name generator that won't repeat names and is quick
 
@@ -70,12 +84,17 @@ Update CosmosServer application
 *** TODO launch basic simulation.
 
 *** TODO add knowledge to beings
-Beings store the spells/recipies they know in
+Beings store the spells/recipes they know in
 their knowledge map
 
 *** TODO add memories to beings
 
 *** TODO implement ranks
+
+*** DONE create being worker cache
+This cache will return the pid of a being worker given the being_id
+
+Follow the example in Sasa Juric book.
 
 *** DONE name generate for millions of node locations
 Need to create generate function instances for the rest of the node template types
@@ -196,6 +215,35 @@ Right now I want to explore using 1-bit character forms
 
 *** TODO make ambient music to play at each location
 
+* Releases
+** Release Boron
+Run simulation with:
+- 100k beings
+- 10k nodes
+- preference for survival
+
+We won't implement:
+- generations
+- Social interactions
+
+** Release Radon
+- 100k beings
+- 10k nodes
+- different personalities of beings
+  - explorers
+  - survivalists
+  - resource hoarders
+- generations of beings
+
+We will not implement:
+- Social interactions
+
+** Release Bismuth
+- 200k beings
+- 30k nodes
+- generations
+- social interactions
+
 * Learnings
 ** Build a system first, then figure out more complicated behavior later.
 In the first pass, I'll just build beings that make observaitons
@@ -247,11 +295,14 @@ the ets table.
 * Emacs oddities
 ** What to do when emacs hangs [[https://www.reddit.com/r/emacs/comments/k7cku8/when_emacs_hangs_what_do_you_do/][here]]
 ** Learn to use the eshell better
+** Learn to use vterm in emacs better
 
 * Resources
 ** Viz libraries
 *** [[https://github.com/mindok/contex][contex]] library in elixir for making SVG
 *** [[https://d3js.org/][d3]] js library for awesome visualizations
+*** Build a Godot client?
+Consider this.
 
 ** decision trees
 *** Survival Tree

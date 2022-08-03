@@ -46,7 +46,7 @@ defmodule Cosmos.Locations.Name do
     data_path = Application.fetch_env!(:cosmos, :data_path)
     path = Path.join(data_path, @name_syllables_path)
 
-    Logger.info("Pulling name data from #{path}")
+    # Logger.info("Pulling name data from #{path}")
 
     {:ok, all_syllables} = YamlElixir.read_from_file(path)
     all_syllables
@@ -61,8 +61,9 @@ defmodule Cosmos.Locations.Name do
     syllables = Map.get(all_syllables, template_type)
     template = Map.get(@templates, template_type)
 
-    Logger.info("Creating a #{template_type} random name with")
-    Logger.info("tempalte: #{Enum.join(template, " ")}")
+    Logger.info(
+      "Creating a #{template_type} random name with tempalte: #{Enum.join(template, " ")}"
+    )
 
     parts =
       for part <- template,
