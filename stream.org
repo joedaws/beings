@@ -19,19 +19,21 @@ There are three classes of Eldrich beings in the simulation
   creators. Now they scour the world for resources to perform rituals
   to build more of the ichor that powers them.
 
-- dream realm
+- citizens of the dream realm
 
   An emergent property of a universe with sentient beings is a
   realm of mirrored consciousness and echos of sentient thought.
   Humans interact with this realm during their sleep and some call
   it the dream realm. The beings of this realm phase into and out of
-  the physical world with differening appearence and collect resources.
+  the physical world with different appearances while collect resources
+  from the physical realm.
   Their realm is tightly tied to our own and there continued existence
   depends on obtaining more ichor.
 
 - deep denizen
 
-  Those that dwell in the vast voids between the starts.
+  Fiercely independent and
+  Those that dwell in the vast voids between the stars.
 
 *** Property Ownership
 Beings can own nodes and prevent other beings from fully utilizing the
@@ -44,7 +46,8 @@ asserted property ownership.
 
 
 ** Cosmos Application
-*** TODO update worker Caches to remove dependence on bucket name
+*** TODO update being_worker_test to not use the worker pid generated at the beginning.
+*** DONE update worker Caches to remove dependence on bucket name
 Store another registry that updates what bucket name a worker process is in
 or hard code the name of the bucket for use by the simulation. One for beings,
 another for nodes

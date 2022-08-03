@@ -30,6 +30,10 @@ defmodule Cosmos.Beings.BeingWorker do
     GenServer.call(pid, {:get, attribute_type})
   end
 
+  def harvest(pid) do
+    GenServer.cast(pid, {:harvest})
+  end
+
   def update(pid, attribute_type, new_value) do
     GenServer.cast(pid, {:update, attribute_type, new_value})
   end
@@ -46,20 +50,12 @@ defmodule Cosmos.Beings.BeingWorker do
     GenServer.cast(pid, {:attach, node_id})
   end
 
-  def harvest(pid) do
-    GenServer.cast(pid, :harvest)
-  end
-
   def give_resource(pid, other_bucket_name, other_id, resource_type, amount) do
     GenServer.cast(pid, {:give_resource, other_bucket_name, other_id, resource_type, amount})
   end
 
   def receive_resource(pid, resource_type, amount) do
     GenServer.cast(pid, {:receive_resource, resource_type, amount})
-  end
-
-  def move(pid, new_node_pid) do
-    GenServer.cast(pid, {:move, new_node_pid})
   end
 
   def perform_ritual(pid, ritual_index \\ 0) do
@@ -109,6 +105,34 @@ defmodule Cosmos.Beings.BeingWorker do
   end
 
   @impl true
+  def handle_cast({:harvest}, state) do
+    being = get_being(state.bucket_name, state.being_id)
+
+    if being.node do
+      node_id = being.node
+      node_bucket_name = Cosmos.BucketNameRegistry.get(node_id)
+      node_pid = Cosmos.Locations.NodeWorkerCache.worker_process(node_bucket_name, node_id)
+      {:ok, resource_type, amount} = NodeWorker.yeild_resource(node_pid)
+      old_resource = Map.get(being.resources, resource_type, 0)
+
+      new_being = %{
+        being
+        | resources: Map.put(being.resources, resource_type, old_resource + amount)
+      }
+
+      put_being(state.bucket_name, state.being_id, new_being)
+
+      Logger.info(
+        "#{inspect(being.id)} harvested #{amount} #{resource_type} from #{inspect(being.node)}."
+      )
+    else
+      Logger.info("#{being.id} is not attached to a node")
+    end
+
+    {:noreply, state}
+  end
+
+  @impl true
   def handle_cast({:update, attribute_type, new_value}, state) do
     being = get_being(state.bucket_name, state.being_id)
     new_being = %{being | attribute_type => new_value}
@@ -140,30 +164,10 @@ defmodule Cosmos.Beings.BeingWorker do
     new_being = %{being | node: node_id}
     put_being(state.bucket_name, state.being_id, new_being)
 
-    # update the node
+    # node_id has already been generated
     node_bucket_name = Cosmos.BucketNameRegistry.get(node_id)
     node_pid = Cosmos.Locations.NodeWorkerCache.worker_process(node_bucket_name, node_id)
     NodeWorker.attach(node_pid, new_being.id)
-    {:noreply, state}
-  end
-
-  @impl true
-  def handle_cast(:harvest, state) do
-    being = get_being(state.bucket_name, state.being_id)
-
-    if being.node do
-      node_pid = Cosmos.BucketNameRegistry.get(being.node)
-      {:ok, resource_type, amount} = NodeWorker.yeild_resource(node_pid)
-      old_resource = Map.get(being.resources, resource_type, 0)
-
-      new_being = %{
-        being
-        | resources: Map.put(being.resources, resource_type, old_resource + amount)
-      }
-
-      put_being(state.bucket_name, state.being_id, new_being)
-    end
-
     {:noreply, state}
   end
 
@@ -203,14 +207,6 @@ defmodule Cosmos.Beings.BeingWorker do
     {:noreply, state}
   end
 
-  @impl true
-  def handle_cast({:move, new_node_pid}, state) do
-    being = get_being(state.bucket_name, state.being_id)
-    new_being = %{being | node: new_node_pid}
-    put_being(state.bucket_name, state.being_id, new_being)
-    {:noreply, state}
-  end
-
   # already assumes that being has sufficient resources to perform this
   @impl true
   def handle_cast({:perform_ritual, ritual_index}, state) do
@@ -241,6 +237,12 @@ defmodule Cosmos.Beings.BeingWorker do
     {:noreply, state}
   end
 
+  @impl true
+  def handle_info(msg, state) do
+    Logger.info("Unexpected message in Cosmos.Beings.BeingWorker: #{inspect(msg)}")
+    {:noreply, state}
+  end
+
   # public helpers ------------------------------------------------------------------------
   def get_default_being_bucket_name() do
     @default_being_bucket_name
@@ -249,7 +251,6 @@ defmodule Cosmos.Beings.BeingWorker do
   # Private functions ---------------------------------------------------------------------
   defp get_being(bucket_name, being_id) do
     {:ok, bucket_pid} = Cosmos.Beings.Registry.lookup(Cosmos.Beings.Registry, bucket_name)
-    Logger.info("Got bucket PID #{inspect(bucket_pid)}")
     Bucket.get(bucket_pid, being_id)
   end
 
@@ -262,7 +263,6 @@ defmodule Cosmos.Beings.BeingWorker do
     being = get_being(bucket_name, being_id)
 
     if being.alive do
-      Logger.info("#{inspect(self())} is updating being #{Cosmos.Beings.Name.string(being.name)}")
       # perform updates required each cycle
       # ---
       # first pay the ichor to continue living
@@ -293,14 +293,17 @@ defmodule Cosmos.Beings.BeingWorker do
   end
 
   defp make_decision(bucket_name, being) do
-    Logger.info("#{Cosmos.Beings.Name.string(being.name)} will make a decision")
+    # Logger.info("#{Cosmos.Beings.Name.string(being.name)} will make a decision")
 
     # TODO update to load parameters from being instance
     parameters = %Parameters{
       ichor_threshold: 10
     }
 
-    node = NodeWorker.get(being.node)
+    node_id = being.node
+    node_bucket_name = Cosmos.BucketNameRegistry.get(node_id)
+    node_pid = Cosmos.Locations.NodeWorkerCache.worker_process(node_bucket_name, node_id)
+    node = NodeWorker.get(node_pid)
 
     observations = %Observations{
       bucket_name: bucket_name,

@@ -79,8 +79,13 @@ defmodule Cosmos.Locations.NodeWorker do
   def handle_cast({:attach, being_id}, state) do
     node = get_node(state.bucket_name, state.node_id)
     old_occupants = node.occupants
-    new_node = %{node | occupants: [being_id | old_occupants]}
-    put_node(state.bucket_name, state.node_id, new_node)
+
+    # only attach beings which are not already attached.
+    if being_id in old_occupants do
+      new_node = %{node | occupants: [being_id | old_occupants]}
+      put_node(state.bucket_name, state.node_id, new_node)
+    end
+
     {:noreply, state}
   end
 
