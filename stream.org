@@ -3,7 +3,7 @@
 * Tasks
 ** Once Per Stream
 be sure to reset these each stream.
-*** TODO update weird eldrich beings names and location names.
+*** TODO update weird Eldrich beings names and location names.
 These are stored in the [[file:apps/cosmos/data/node_name_registry.yaml][being names]] yaml.
 Also update the node places [[file:apps/cosmos/data/node_name_registry.yaml][node names]] yaml.
 
@@ -46,7 +46,51 @@ asserted property ownership.
 
 
 ** Cosmos Application
-*** TODO update being_worker_test to not use the worker pid generated at the beginning.
+*** TODO fix unexpected message for being worker
+*** TODO build historian process
+*** TODO launch basic simulation.
+*** TODO move Cosmos.Beings.Supervisor to Cosmos.Supervisor
+*** TODO move Cosmos.Beings.Bucket to Cosmos.Bucket
+*** TODO move Cosmos.Beings.BucketSupervisor to Cosmos.BucketSupervisor
+
+*** TODO build view of the beings
+
+*** TODO add database to the backend
+- [ ] beings
+- [ ] nodes
+- [ ] events
+
+*** TODO create name generator that won't repeat names and is quick
+
+*** TODO create an enumeration of all unique names
+This way we can sequentially create all possible being and node names.
+
+*** TODO add additional commands to configure newly created beings and nodes
+Update CosmosServer application
+
+*** TODO add knowledge to beings
+Beings store the spells/recipes they know in
+their knowledge map
+
+*** TODO add memories to beings
+
+*** TODO implement ranks
+
+*** DONE what to do when worker processes crash
+It's fine if they crash but I need to restart them
+so that they continue to update appropriately.
+
+I'll have an historian process which checks the status of beings over
+time.
+
+This historian will send relevant updates to the UI for
+display.
+
+*** DONE update nodes and beings to store ids instead of process ids
+process ids may change over time, they should store ids of nodes
+and beings instead in their neighbor properties since these are
+not expected to change over time.
+
 *** DONE update worker Caches to remove dependence on bucket name
 Store another registry that updates what bucket name a worker process is in
 or hard code the name of the bucket for use by the simulation. One for beings,
@@ -56,40 +100,10 @@ For the sake of moving on, I'll hard code the bucket name into
 the application. In the future I might to refactor this if it
 becomes apparent that multiple buckets for beings are required.
 
-*** TODO create an enumeration of all unique names
-This way we can sequentially create all possible being and node names.
-
-*** TODO what to do when worker processes crash
-It's fine if they crash but I need to restart them
-so that they continue to update appropriately.
-
-*** TODO update nodes and beings to store ids instead of process ids
-process ids may change over time, they should store ids of nodes
-and beings instead in their neighbor properties since these are
-not expected to change over time.
-
-*** TODO create node worker cache
+*** DONE create node worker cache
 This cache will return the pid of a node worker given the node_id
 
-*** TODO create name generator that won't repeat names and is quick
-
-*** TODO add database to the backend
-- [ ] beings
-- [ ] nodes
-- [ ] events
-
-*** TODO add additional commands to configure newly created beings and nodes
-Update CosmosServer application
-
-*** TODO launch basic simulation.
-
-*** TODO add knowledge to beings
-Beings store the spells/recipes they know in
-their knowledge map
-
-*** TODO add memories to beings
-
-*** TODO implement ranks
+*** DONE update being_worker_test to not use the worker pid generated at the beginning.
 
 *** DONE create being worker cache
 This cache will return the pid of a being worker given the being_id
