@@ -1,6 +1,17 @@
 defmodule Cosmos.Beings.BeingWorker do
   @moduledoc """
-  Updates the being state held in the bucket
+  Updates the being state held in the bucket.
+
+  Updating self vs interacting with others:
+      The BeingWorker is responsible for updating
+      its associated being. To do these updates,
+      action/update functions are used. These
+      functions take as input some information about the being
+      and return an updated being which is then stored in the appropriate
+      bucket by the being worker process.
+
+      When interacting with other beings, the present being worker process
+      will utlize the client api implemented in this module.
   """
   use GenServer, restart: :temporary
   require Logger
@@ -26,12 +37,12 @@ defmodule Cosmos.Beings.BeingWorker do
     GenServer.start_link(__MODULE__, init_args)
   end
 
-  def get(pid, attribute_type) do
-    GenServer.call(pid, {:get, attribute_type})
+  def get(pid) do
+    GenServer.call(pid, :get)
   end
 
-  def harvest(pid) do
-    GenServer.cast(pid, {:harvest})
+  def get(pid, attribute_type) do
+    GenServer.call(pid, {:get, attribute_type})
   end
 
   def update(pid, attribute_type, new_value) do
@@ -73,6 +84,7 @@ defmodule Cosmos.Beings.BeingWorker do
     # this allows other processes to find the bucket
     # given only the id
     Cosmos.BucketNameRegistry.register(being_id, bucket_name)
+    Logger.info("Bucket name `#{bucket_name}` registered for being id #{inspect(being_id)}")
 
     cycle(bucket_name, being_id)
 
@@ -91,6 +103,7 @@ defmodule Cosmos.Beings.BeingWorker do
     # this allows other processes to find the bucket
     # given only the id
     Cosmos.BucketNameRegistry.register(being_id, bucket_name)
+    Logger.info("Bucket name `#{bucket_name}` registered for being id #{inspect(being_id)}")
 
     cycle(bucket_name, being_id)
 
@@ -98,38 +111,16 @@ defmodule Cosmos.Beings.BeingWorker do
   end
 
   @impl true
+  def handle_call(:get, _from, state) do
+    being = get_being(state.bucket_name, state.being_id)
+    {:reply, being, state}
+  end
+
+  @impl true
   def handle_call({:get, attribute_type}, _from, state) do
     being = get_being(state.bucket_name, state.being_id)
     amount = Map.get(being, attribute_type)
     {:reply, amount, state}
-  end
-
-  @impl true
-  def handle_cast({:harvest}, state) do
-    being = get_being(state.bucket_name, state.being_id)
-
-    if being.node do
-      node_id = being.node
-      node_bucket_name = Cosmos.BucketNameRegistry.get(node_id)
-      node_pid = Cosmos.Locations.NodeWorkerCache.worker_process(node_bucket_name, node_id)
-      {:ok, resource_type, amount} = NodeWorker.yeild_resource(node_pid)
-      old_resource = Map.get(being.resources, resource_type, 0)
-
-      new_being = %{
-        being
-        | resources: Map.put(being.resources, resource_type, old_resource + amount)
-      }
-
-      put_being(state.bucket_name, state.being_id, new_being)
-
-      Logger.info(
-        "#{inspect(being.id)} harvested #{amount} #{resource_type} from #{inspect(being.node)}."
-      )
-    else
-      Logger.info("#{being.id} is not attached to a node")
-    end
-
-    {:noreply, state}
   end
 
   @impl true
@@ -266,33 +257,18 @@ defmodule Cosmos.Beings.BeingWorker do
       # perform updates required each cycle
       # ---
       # first pay the ichor to continue living
-      pay_ichor(bucket_name, being)
+      Cosmos.Beings.Actions.pay_ichor(being.id)
 
       # make a decision
-      make_decision(bucket_name, being)
+      # TODO replace with DecisionTree call
+      Cosmos.Beings.Actions.harvest(being.id)
 
       # to simulate passage of time
       Process.send_after(self(), :cycle, @cycle_duration)
     end
   end
 
-  defp pay_ichor(bucket_name, being) do
-    old_amount = Map.get(being, :ichor)
-    new_amount = old_amount - 1
-
-    being =
-      if new_amount <= 0 do
-        Logger.info("#{inspect(being.id)} will cease to exist")
-        being = %{being | alive: false}
-      else
-        being
-      end
-
-    new_being = %{being | ichor: new_amount}
-    put_being(bucket_name, being.id, new_being)
-  end
-
-  defp make_decision(bucket_name, being) do
+  defp make_decision(:survival_tree, bucket_name, being) do
     # Logger.info("#{Cosmos.Beings.Name.string(being.name)} will make a decision")
 
     # TODO update to load parameters from being instance
@@ -312,6 +288,17 @@ defmodule Cosmos.Beings.BeingWorker do
     }
 
     DecisionTree.take_action(:survival_tree, observations, parameters)
+  end
+
+  defp make_decision(:harvest, bucket_name, being) do
+    observations = %Observations{
+      bucket_name: bucket_name,
+      being: being,
+      node: node
+    }
+
+    parameters = %{}
+    DecisionTree.take_action(:harvest, observations, parameters)
   end
 
   defp choose_action(policy, observations) do

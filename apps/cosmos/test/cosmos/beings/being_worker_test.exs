@@ -88,25 +88,6 @@ defmodule Cosmos.Beings.BeingWorkerTest do
     assert new_ichor == old_ichor - 1
   end
 
-  test "harvest resources", %{b_id: b_id, n_id: n_id} do
-    worker = Cosmos.Beings.BeingWorkerCache.worker_process("beings", b_id)
-    node_worker = Cosmos.Locations.NodeWorkerCache.worker_process("nodes", n_id)
-    BeingWorker.attach(worker, n_id)
-    assert BeingWorker.get(worker, :node) != nil
-    resource_type = NodeWorker.get(node_worker, :resource_type)
-    resource_yeild = NodeWorker.get(node_worker, :resource_yeild)
-    old_resource = Map.get(BeingWorker.get(worker, :resources), resource_type)
-    # nil because we did a cycle without havesting
-    assert old_resource == nil
-
-    BeingWorker.harvest(worker)
-
-    worker = Cosmos.Beings.BeingWorkerCache.worker_process("beings", b_id)
-
-    new_resource = Map.get(BeingWorker.get(worker, :resources), resource_type)
-    assert new_resource == resource_yeild
-  end
-
   test "give resource", %{b_id: b_id, c_id: c_id} do
     worker1 = Cosmos.Beings.BeingWorkerCache.worker_process("beings", b_id)
     worker2 = Cosmos.Beings.BeingWorkerCache.worker_process("beings", c_id)

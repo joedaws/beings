@@ -46,8 +46,18 @@ asserted property ownership.
 
 
 ** Cosmos Application
+*** TODO refactor being_worker code
+move actions and transformation into their own functions
+
+updates that will only occur to the being itself such as harvest
+don't need a client API since they will just be updating itself
+
+updates that require another being like give and receive resources
+are different
+*** TODO create new decision tree based on actions and observations
+*** TODO create additional actions for beings
+*** TODO rework decision tree
 *** TODO fix unexpected message for being worker
-*** TODO build historian process
 *** TODO launch basic simulation.
 *** TODO move Cosmos.Beings.Supervisor to Cosmos.Supervisor
 *** TODO move Cosmos.Beings.Bucket to Cosmos.Bucket
@@ -76,6 +86,7 @@ their knowledge map
 
 *** TODO implement ranks
 
+*** DONE build historian process
 *** DONE what to do when worker processes crash
 It's fine if they crash but I need to restart them
 so that they continue to update appropriately.

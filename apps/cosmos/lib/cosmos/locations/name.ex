@@ -75,10 +75,16 @@ defmodule Cosmos.Locations.Name do
                :rand.uniform(Map.get(@max_syllables, part))
              )}
 
-    %Name{
+    name = %Name{
       template: template,
       parts: parts
     }
+
+    Logger.info(
+      "Created a #{template_type} random name `#{string(name)}` from tempalte: #{Enum.join(template, " ")}"
+    )
+
+    name
   end
 
   @doc """

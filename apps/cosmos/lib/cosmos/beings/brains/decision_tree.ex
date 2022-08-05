@@ -127,4 +127,14 @@ defmodule Cosmos.Beings.Brains.DecisionTree do
 
     Task.async(fn -> BeingWorker.attach(worker_pid, new_node_id) end)
   end
+
+  def make_choice(:harvest, observations, _) do
+    worker_pid =
+      Cosmos.Beings.BeingWorkerCache.worker_process(
+        observations.bucket_name,
+        observations.being.id
+      )
+
+    :harvest
+  end
 end

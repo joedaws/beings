@@ -39,7 +39,6 @@ defmodule Cosmos do
   end
 
   defp generate_nodes([name | tail]) do
-    Logger.info("Generating node #{Name.string(name)}")
     create_node(name)
     generate_nodes(tail)
   end
@@ -116,7 +115,6 @@ defmodule Cosmos do
   """
   defp connect([w1, w2, w3, w4]) do
     primary_node = NodeWorker.get(w1, :name)
-    Logger.info("Connecting #{Name.string(primary_node)}")
     NodeWorker.connect(w1, w2)
     NodeWorker.connect(w2, w1)
 
