@@ -1,6 +1,7 @@
 defmodule Cosmos.Beings.BeingWorkerTest do
   use ExUnit.Case
 
+  alias Cosmos.Beings.Actions
   alias Cosmos.Beings.Being
   alias Cosmos.Beings.BeingWorker
   alias Cosmos.Locations.Node
@@ -82,7 +83,8 @@ defmodule Cosmos.Beings.BeingWorkerTest do
 
     # ichor should decrease after 1 cycle
     old_ichor = BeingWorker.get(worker, :ichor)
-    BeingWorker.revive(worker)
+    Actions.revive(b_id)
+
     BeingWorker.hibernate(worker)
     new_ichor = BeingWorker.get(worker, :ichor)
     assert new_ichor == old_ichor - 1
@@ -137,7 +139,7 @@ defmodule Cosmos.Beings.BeingWorkerTest do
 
     old_ichor = BeingWorker.get(worker, :ichor)
     # when the being is alive, it will call cycle and make a decision after paying ichor
-    BeingWorker.revive(worker)
+    Actions.revive(b_id)
     BeingWorker.hibernate(worker)
     new_ichor = BeingWorker.get(worker, :ichor)
     assert new_ichor == old_ichor - 1

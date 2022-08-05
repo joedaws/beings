@@ -49,10 +49,6 @@ defmodule Cosmos.Beings.BeingWorker do
     GenServer.cast(pid, {:update, attribute_type, new_value})
   end
 
-  def revive(pid) do
-    GenServer.cast(pid, :revive)
-  end
-
   def hibernate(pid) do
     GenServer.cast(pid, :hibernate)
   end
@@ -128,15 +124,6 @@ defmodule Cosmos.Beings.BeingWorker do
     being = get_being(state.bucket_name, state.being_id)
     new_being = %{being | attribute_type => new_value}
     put_being(state.bucket_name, state.being_id, new_being)
-    {:noreply, state}
-  end
-
-  @impl true
-  def handle_cast(:revive, state) do
-    being = get_being(state.bucket_name, state.being_id)
-    new_being = %{being | alive: true}
-    put_being(state.bucket_name, state.being_id, new_being)
-    cycle(state.bucket_name, state.being_id)
     {:noreply, state}
   end
 

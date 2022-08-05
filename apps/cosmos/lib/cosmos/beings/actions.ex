@@ -49,6 +49,24 @@ defmodule Cosmos.Beings.Actions do
     put_being(new_being.id, new_being)
   end
 
+  def revive(being_id) do
+    being = get_being(being_id)
+
+    if not being.alive do
+      new_being = %{being | alive: true}
+      put_being(being_id, new_being)
+
+      # start the cycle again
+      bucket_name = Cosmos.BucketNameRegistry.get(being_id)
+      worker_pid = Cosmos.Beings.BeingWorkerCache.worker_process(bucket_name, being_id)
+      send(worker_pid, :cycle)
+
+      Logger.info("Being #{inspect(being_id)} revived.")
+    else
+      Logger.info("Being #{inspect(being_id)} cannot be revived since it is currently alive.")
+    end
+  end
+
   @doc """
   The first being greets the second by name
 

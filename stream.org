@@ -54,6 +54,10 @@ don't need a client API since they will just be updating itself
 
 updates that require another being like give and receive resources
 are different
+*** TODO refactor historian to create it's own event records
+Implement some kind of diff function
+
+Also pass the action taken from within the action function
 *** TODO create new decision tree based on actions and observations
 *** TODO create additional actions for beings
 *** TODO rework decision tree
