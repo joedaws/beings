@@ -23,7 +23,7 @@ defmodule Cosmos.Beings.Being do
     :node,
     age: 0,
     ichor: 0,
-    alive: false,
+    status: "hibernating",
     rank: Rank.get_lowest_rank(),
     resources: %{},
     rituals: [],
@@ -46,7 +46,7 @@ defmodule Cosmos.Beings.Being do
         node,
         age \\ 0,
         ichor \\ 0,
-        alive \\ false,
+        status \\ "active",
         rank \\ Rank.get_lowest_rank(),
         resources \\ %{},
         rituals \\ []
@@ -56,7 +56,7 @@ defmodule Cosmos.Beings.Being do
       node: node,
       age: age,
       ichor: ichor,
-      alive: alive,
+      status: status,
       rank: rank,
       resources: resources,
       rituals: rituals

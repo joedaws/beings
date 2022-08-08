@@ -250,10 +250,12 @@ Run simulation with:
 - 100k beings
 - 10k nodes
 - preference for survival
+- basic view of each being
 
 We won't implement:
 - generations
 - Social interactions
+- no published website yet
 
 ** Release Radon
 - 100k beings

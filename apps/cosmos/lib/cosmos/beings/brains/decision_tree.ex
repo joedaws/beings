@@ -23,12 +23,16 @@ defmodule Cosmos.Beings.Brains.DecisionTree do
   alias Cosmos.Magic.Ritual
   alias Cosmos.Beings.BeingWorker
   alias Cosmos.Beings.Being
+  alias Cosmos.Beings.Actions
 
   defstruct ichor_threshold: 10
 
   # first function called by the being worker
   def take_action(root_function, observations, parameters) do
     make_choice(root_function, observations, parameters)
+  end
+
+  def take_action(f) do
   end
 
   # this starts the very basic survival logic for a single being

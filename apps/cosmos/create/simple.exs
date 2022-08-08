@@ -22,8 +22,8 @@ defmodule Cosmos.Create.Simple do
 
     # being ----------------------------------------------------------
     b = Being.get_random_being()
-    # alive false prevents the cycle logic from running while testing
-    b = %{b | ichor: 100, alive: false}
+    # hibernation prevents the being cycle from running
+    b = %{b | ichor: 100, status: "hibernating"}
     b_id = Being.generate_id(b)
     Cosmos.Beings.Bucket.put(beings, b_id, b)
     {:ok, being_worker} = BeingWorker.start_link([beings, b_id])

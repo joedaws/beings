@@ -49,10 +49,6 @@ defmodule Cosmos.Beings.BeingWorker do
     GenServer.cast(pid, {:update, attribute_type, new_value})
   end
 
-  def hibernate(pid) do
-    GenServer.cast(pid, :hibernate)
-  end
-
   def attach(pid, node_id) do
     GenServer.cast(pid, {:attach, node_id})
   end
@@ -123,14 +119,6 @@ defmodule Cosmos.Beings.BeingWorker do
   def handle_cast({:update, attribute_type, new_value}, state) do
     being = get_being(state.bucket_name, state.being_id)
     new_being = %{being | attribute_type => new_value}
-    put_being(state.bucket_name, state.being_id, new_being)
-    {:noreply, state}
-  end
-
-  @impl true
-  def handle_cast(:hibernate, state) do
-    being = get_being(state.bucket_name, state.being_id)
-    new_being = %{being | alive: false}
     put_being(state.bucket_name, state.being_id, new_being)
     {:noreply, state}
   end
@@ -240,7 +228,7 @@ defmodule Cosmos.Beings.BeingWorker do
   defp cycle(bucket_name, being_id) do
     being = get_being(bucket_name, being_id)
 
-    if being.alive do
+    if being.status == "active" do
       # perform updates required each cycle
       # ---
       # first pay the ichor to continue living

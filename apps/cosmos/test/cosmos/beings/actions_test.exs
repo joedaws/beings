@@ -52,13 +52,13 @@ defmodule Cosmos.Beings.ActionsTest do
     {:ok, nodes} = Cosmos.Beings.Registry.lookup(Cosmos.Beings.Registry, "nodes")
 
     b = Being.get_random_being()
-    # alive false prevents the cycle logic from running while testing
-    b = %{b | ichor: 100, alive: false}
+    # A hibernating being does not run cycle logic
+    b = %{b | ichor: 100, status: "hibernating"}
     b_id = b.id
 
     c = Being.get_random_being()
     # alive false prevents the cycle logic from running while testing
-    c = %{c | ichor: 100, alive: false}
+    c = %{c | ichor: 100, status: "hibernating"}
     c_id = c.id
 
     Cosmos.Beings.Bucket.put(beings, b.id, b)

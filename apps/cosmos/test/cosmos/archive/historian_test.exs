@@ -9,8 +9,8 @@ defmodule Cosmos.Archive.HistorianTest do
     {:ok, beings} = Cosmos.Beings.Registry.lookup(Cosmos.Beings.Registry, "beings")
 
     b = Being.get_random_being()
-    # alive false prevents the cycle logic from running while testing
-    b = %{b | ichor: 100, alive: false}
+    # hibernating beings do not run cycles
+    b = %{b | ichor: 100, status: "hibernating"}
     b_id = b.id
 
     %{b_id: b_id}

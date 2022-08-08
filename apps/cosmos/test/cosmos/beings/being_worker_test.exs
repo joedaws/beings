@@ -16,13 +16,13 @@ defmodule Cosmos.Beings.BeingWorkerTest do
     {:ok, nodes} = Cosmos.Beings.Registry.lookup(Cosmos.Beings.Registry, "nodes")
 
     b = Being.get_random_being()
-    # alive false prevents the cycle logic from running while testing
-    b = %{b | ichor: 100, alive: false}
+    # hibernation prevents the cycle from running
+    b = %{b | ichor: 100, status: "hibernating"}
     b_id = b.id
 
     c = Being.get_random_being()
-    # alive false prevents the cycle logic from running while testing
-    c = %{c | ichor: 100, alive: false}
+    # hibernation prevents the cycle from running
+    c = %{c | ichor: 100}
     c_id = c.id
 
     Cosmos.Beings.Bucket.put(beings, b.id, b)
@@ -81,11 +81,10 @@ defmodule Cosmos.Beings.BeingWorkerTest do
     # tests don't always run in the same order
     BeingWorker.attach(worker, n_id)
 
-    # ichor should decrease after 1 cycle
     old_ichor = BeingWorker.get(worker, :ichor)
+    # revive then hibernate to run 1 cycle
     Actions.revive(b_id)
-
-    BeingWorker.hibernate(worker)
+    Actions.hibernate(b_id)
     new_ichor = BeingWorker.get(worker, :ichor)
     assert new_ichor == old_ichor - 1
   end
@@ -138,9 +137,9 @@ defmodule Cosmos.Beings.BeingWorkerTest do
     BeingWorker.attach(worker, n_id)
 
     old_ichor = BeingWorker.get(worker, :ichor)
-    # when the being is alive, it will call cycle and make a decision after paying ichor
+    # revive then hibernate to run 1 cycle
     Actions.revive(b_id)
-    BeingWorker.hibernate(worker)
+    Actions.hibernate(b_id)
     new_ichor = BeingWorker.get(worker, :ichor)
     assert new_ichor == old_ichor - 1
   end

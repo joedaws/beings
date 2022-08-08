@@ -3,6 +3,8 @@ defmodule Cosmos.Beings.Actions do
   alias Cosmos.Beings.Being
   alias Cosmos.Beings.Bucket
 
+  @ichor_cycle_amount 1
+
   @moduledoc """
   Definitions of basic actions that beings may take
   """
@@ -35,25 +37,24 @@ defmodule Cosmos.Beings.Actions do
   def pay_ichor(being_id) do
     being = get_being(being_id)
     old_amount = Map.get(being, :ichor)
-    new_amount = old_amount - 1
+    new_amount = old_amount - @ichor_cycle_amount
 
-    being =
+    new_being =
       if new_amount <= 0 do
         Logger.info("#{inspect(being.id)} will cease to exist")
-        being = %{being | alive: false}
+        new_being = %{being | status: "deceased", ichor: 0}
       else
-        being
+        new_being = %{being | ichor: new_amount}
       end
 
-    new_being = %{being | ichor: new_amount}
     put_being(new_being.id, new_being)
   end
 
   def revive(being_id) do
     being = get_being(being_id)
 
-    if not being.alive do
-      new_being = %{being | alive: true}
+    if being.status != "active" do
+      new_being = %{being | status: "active"}
       put_being(being_id, new_being)
 
       # start the cycle again
@@ -61,9 +62,20 @@ defmodule Cosmos.Beings.Actions do
       worker_pid = Cosmos.Beings.BeingWorkerCache.worker_process(bucket_name, being_id)
       send(worker_pid, :cycle)
 
-      Logger.info("Being #{inspect(being_id)} revived.")
+      Logger.info("Being #{inspect(being_id)} revived and is now active.")
     else
-      Logger.info("Being #{inspect(being_id)} cannot be revived since it is currently alive.")
+      Logger.info("Being #{inspect(being_id)} cannot be revived since it is currently active.")
+    end
+  end
+
+  def hibernate(being_id) do
+    being = get_being(being_id)
+
+    if being.status != "hibernating" do
+      new_being = %{being | status: "hibernating"}
+      put_being(being_id, new_being)
+    else
+      Logger.info("Being #{inspect(being_id)} cannot hiberate since it is currently hibernating.")
     end
   end
 
