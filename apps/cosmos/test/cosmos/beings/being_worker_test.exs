@@ -71,7 +71,7 @@ defmodule Cosmos.Beings.BeingWorkerTest do
     worker = Cosmos.Beings.BeingWorkerCache.worker_process("beings", b_id)
     BeingWorker.update(worker, :node, nil)
     assert BeingWorker.get(worker, :node) == nil
-    BeingWorker.attach(worker, n_id)
+    Actions.move_to_node(b_id, n_id)
     assert BeingWorker.get(worker, :node) == n_id
   end
 
@@ -79,7 +79,7 @@ defmodule Cosmos.Beings.BeingWorkerTest do
     worker = Cosmos.Beings.BeingWorkerCache.worker_process("beings", b_id)
     # must be attached to node in order to cycle at the moment
     # tests don't always run in the same order
-    BeingWorker.attach(worker, n_id)
+    Actions.move_to_node(b_id, n_id)
 
     old_ichor = BeingWorker.get(worker, :ichor)
     # revive then hibernate to run 1 cycle
@@ -97,10 +97,10 @@ defmodule Cosmos.Beings.BeingWorkerTest do
     assert BeingWorker.get(worker2, :resources) == %{}
 
     # the original being should have bones
-    BeingWorker.update(worker1, :resources, %{bones: 10})
+    new_being = BeingWorker.update(worker1, :resources, %{bones: 10})
     amount = 5
 
-    BeingWorker.give_resource(worker1, "beings", c_id, :bones, amount)
+    Actions.give_resource(b_id, c_id, :bones, amount)
 
     assert BeingWorker.get(worker1, :resources) == %{bones: 5}
     assert BeingWorker.get(worker2, :resources) == %{bones: 5}
@@ -123,18 +123,18 @@ defmodule Cosmos.Beings.BeingWorkerTest do
     worker = Cosmos.Beings.BeingWorkerCache.worker_process("beings", b_id)
 
     # move being to new node
-    BeingWorker.attach(worker, n_id)
+    Actions.move_to_node(b_id, n_id)
     assert BeingWorker.get(worker, :node) == n_id
 
     # move being to new node
-    BeingWorker.attach(worker, m_id)
+    Actions.move_to_node(b_id, m_id)
     assert BeingWorker.get(worker, :node) == m_id
   end
 
   test "make decision", %{b_id: b_id, n_id: n_id} do
     worker = Cosmos.Beings.BeingWorkerCache.worker_process("beings", b_id)
     # being should be attached to a node
-    BeingWorker.attach(worker, n_id)
+    Actions.move_to_node(b_id, n_id)
 
     old_ichor = BeingWorker.get(worker, :ichor)
     # revive then hibernate to run 1 cycle
@@ -165,7 +165,7 @@ defmodule Cosmos.Beings.BeingWorkerTest do
     BeingWorker.update(worker, :resources, new_resources)
 
     # To change both the ichor and resources of the being, the worker performs the ritual
-    BeingWorker.perform_ritual(worker)
+    Actions.perform_ritual(b_id)
 
     # upon successful completion of the ritual the ichor should have increased.
     new_ichor = BeingWorker.get(worker, :ichor)

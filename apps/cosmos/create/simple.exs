@@ -62,7 +62,7 @@ defmodule Cosmos.Create.Simple do
     NodeWorker.connect(node_worker_d, node_worker_c)
 
     # attach being ----------
-    BeingWorker.attach(being_worker, node_worker_a)
+    Actions.move_to_node(being_id, a_id)
   end
 end
 

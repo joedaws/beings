@@ -2,6 +2,7 @@ defmodule Cosmos.Beings.Actions do
   require Logger
   alias Cosmos.Beings.Being
   alias Cosmos.Beings.Bucket
+  alias Cosmos.Locations.NodeWorker
 
   @ichor_cycle_amount 1
 
@@ -77,6 +78,65 @@ defmodule Cosmos.Beings.Actions do
     else
       Logger.info("Being #{inspect(being_id)} cannot hiberate since it is currently hibernating.")
     end
+  end
+
+  def move_to_node(being_id, node_id) do
+    being = get_being(being_id)
+    new_being = %{being | node: node_id}
+    put_being(being_id, new_being)
+
+    node_bucket_name = Cosmos.BucketNameRegistry.get(node_id)
+    node_pid = Cosmos.Locations.NodeWorkerCache.worker_process(node_bucket_name, node_id)
+    NodeWorker.attach(node_pid, new_being.id)
+    Logger.info("Being #{inspect(being_id)} moved to node #{inspect(node_id)}")
+  end
+
+  def give_resource(being_id, other_being_id, resource_type, amount) do
+    being = get_being(being_id)
+    old_resource = Map.get(being.resources, resource_type)
+
+    {give_amount, new_amount} =
+      cond do
+        old_resource == 0 -> {0, 0}
+        old_resource - amount < 0 -> {old_resource, 0}
+        true -> {amount, old_resource - amount}
+      end
+
+    # update being state
+    new_being = %{being | resources: Map.put(being.resources, resource_type, new_amount)}
+    put_being(being_id, new_being)
+
+    # send amount to other being
+    other_bucket_name = Cosmos.BucketNameRegistry.get(being_id)
+    other_pid = Cosmos.Beings.BeingWorkerCache.worker_process(other_bucket_name, other_being_id)
+    Cosmos.Beings.BeingWorker.receive_resource(other_pid, resource_type, amount)
+
+    Logger.info(
+      "Being #{inspect(being_id)} gave #{amount} #{resource_type} to #{inspect(other_being_id)}"
+    )
+  end
+
+  @doc """
+  already assumes that being has sufficient resources to perform the specified ritual
+  """
+  def perform_ritual(being_id, ritual_index \\ 0) do
+    being = get_being(being_id)
+    resources = being.resources
+    ritual = Enum.at(being.rituals, ritual_index)
+
+    new_resources =
+      for {k, v} <- resources,
+          into: %{},
+          do:
+            if(k in Map.keys(ritual.requirements),
+              do: {k, Map.get(resources, k) - Map.get(ritual.requirements, k)},
+              else: {k, v}
+            )
+
+    new_ichor = being.ichor + ritual.ichor_yeild
+
+    new_being = %{being | resources: new_resources, ichor: new_ichor}
+    put_being(being_id, new_being)
   end
 
   @doc """

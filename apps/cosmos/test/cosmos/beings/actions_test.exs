@@ -94,7 +94,7 @@ defmodule Cosmos.Beings.ActionsTest do
   test "harvest resources", %{b_id: b_id, n_id: n_id} do
     worker = Cosmos.Beings.BeingWorkerCache.worker_process("beings", b_id)
     node_worker = Cosmos.Locations.NodeWorkerCache.worker_process("nodes", n_id)
-    BeingWorker.attach(worker, n_id)
+    Actions.move_to_node(b_id, n_id)
     assert BeingWorker.get(worker, :node) != nil
     resource_type = NodeWorker.get(node_worker, :resource_type)
     resource_yeild = NodeWorker.get(node_worker, :resource_yeild)

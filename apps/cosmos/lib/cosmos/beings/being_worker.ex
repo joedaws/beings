@@ -46,15 +46,7 @@ defmodule Cosmos.Beings.BeingWorker do
   end
 
   def update(pid, attribute_type, new_value) do
-    GenServer.cast(pid, {:update, attribute_type, new_value})
-  end
-
-  def attach(pid, node_id) do
-    GenServer.cast(pid, {:attach, node_id})
-  end
-
-  def give_resource(pid, other_bucket_name, other_id, resource_type, amount) do
-    GenServer.cast(pid, {:give_resource, other_bucket_name, other_id, resource_type, amount})
+    GenServer.call(pid, {:update, attribute_type, new_value})
   end
 
   def receive_resource(pid, resource_type, amount) do
@@ -116,52 +108,11 @@ defmodule Cosmos.Beings.BeingWorker do
   end
 
   @impl true
-  def handle_cast({:update, attribute_type, new_value}, state) do
+  def handle_call({:update, attribute_type, new_value}, _from, state) do
     being = get_being(state.bucket_name, state.being_id)
     new_being = %{being | attribute_type => new_value}
     put_being(state.bucket_name, state.being_id, new_being)
-    {:noreply, state}
-  end
-
-  @impl true
-  def handle_cast({:attach, node_id}, state) do
-    # update the being
-    being = get_being(state.bucket_name, state.being_id)
-    new_being = %{being | node: node_id}
-    put_being(state.bucket_name, state.being_id, new_being)
-
-    # node_id has already been generated
-    node_bucket_name = Cosmos.BucketNameRegistry.get(node_id)
-    node_pid = Cosmos.Locations.NodeWorkerCache.worker_process(node_bucket_name, node_id)
-    NodeWorker.attach(node_pid, new_being.id)
-    {:noreply, state}
-  end
-
-  @impl true
-  def handle_cast(
-        {:give_resource, other_bucket_name, other_being_id, resource_type, amount},
-        state
-      ) do
-    being = get_being(state.bucket_name, state.being_id)
-    # check to make sure that this being has enough resource to give
-    old_resource = Map.get(being.resources, resource_type)
-
-    {give_amount, new_amount} =
-      cond do
-        old_resource == 0 -> {0, 0}
-        old_resource - amount < 0 -> {old_resource, 0}
-        true -> {amount, old_resource - amount}
-      end
-
-    # update being state
-    new_being = %{being | resources: Map.put(being.resources, resource_type, new_amount)}
-    put_being(state.bucket_name, state.being_id, new_being)
-
-    # send resource to other being
-    other_pid = Cosmos.Beings.BeingWorkerCache.worker_process(other_bucket_name, other_being_id)
-    Cosmos.Beings.BeingWorker.receive_resource(other_pid, resource_type, amount)
-
-    {:noreply, state}
+    {:reply, new_being, state}
   end
 
   @impl true

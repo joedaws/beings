@@ -86,7 +86,7 @@ defmodule Cosmos.Beings.Brains.DecisionTree do
 
     Logger.info("Decision: #{Being.get_full_name(observations.being)} will perform a ritual")
 
-    Task.async(fn -> BeingWorker.perform_ritual(worker_pid) end)
+    Actions.perform_ritual(observations.being.id)
   end
 
   def make_choice({:can_perform_ritual, false}, observations, parameters) do
@@ -117,6 +117,7 @@ defmodule Cosmos.Beings.Brains.DecisionTree do
 
   # LEAF!
   def make_choice({:find_necessary_resources, false}, observations, parameters) do
+    # TODO add better choice of next node
     new_node_id = Enum.random(observations.node.neighbors)
 
     Logger.info(
@@ -129,7 +130,7 @@ defmodule Cosmos.Beings.Brains.DecisionTree do
         observations.being.id
       )
 
-    Task.async(fn -> BeingWorker.attach(worker_pid, new_node_id) end)
+    Actions.move_to_node(observations.being.id, new_node_id)
   end
 
   def make_choice(:harvest, observations, _) do
