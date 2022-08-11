@@ -24,8 +24,63 @@ defmodule Cosmos.Beings.Brains.DecisionTree do
   alias Cosmos.Beings.BeingWorker
   alias Cosmos.Beings.Being
   alias Cosmos.Beings.Actions
+  alias Cosmos.Beings.Brains.DecisionTreeNode
 
-  defstruct ichor_threshold: 10
+  @doc """
+  This function returns the root node of a tree geared at survival.
+  """
+  def get_graph(:survival_tree, observations, parameters) do
+    n_move_to_node = %DecisionTreeNode{
+      action: fn ->
+        Actions.move_to_node(observations.being.id, Enum.random(observations.node.neighbors))
+      end,
+      description: "Action: move to a random node."
+    }
+
+    n_perform_ritual = %DecisionTreeNode{
+      action: fn ->
+        Actions.perform_ritual(
+          observations.being.id,
+          :random.uniform(length(observations.being.rituals) - 1)
+        )
+      end,
+      description: "Action: perform random ritual."
+    }
+
+    n_harvest = %DecisionTreeNode{
+      action: fn -> Actions.harvest(observations.being.id) end,
+      description: "Action: harvest from current node."
+    }
+
+    # next == 0 means we can obtain needed resources
+    n11 = %DecisionTreeNode{
+      next:
+        if observations.node.resource_type in Map.keys(observations.being.resources) do
+          0
+        else
+          1
+        end,
+      children: [n_harvest, n_move_to_node],
+      description: "Can I collect needed ritual resources?"
+    }
+
+    # next == 1 means we can perform ritual
+    n10 = %DecisionTreeNode{
+      next: DecisionTreeNode.get_can_perform_any_ritual_index(observations.being),
+      children: [n11, n_perform_ritual],
+      description: "Can I perform a ritual?"
+    }
+
+    n00 = %DecisionTreeNode{
+      next:
+        DecisionTreeNode.get_partition_index(
+          [parameters.ichor_threshold],
+          observations.being.ichor
+        ),
+      children: [n10, n11],
+      description: "Am I low on ichor?"
+    }
+  end
 
   # first function called by the being worker
   def take_action(root_function, observations, parameters) do

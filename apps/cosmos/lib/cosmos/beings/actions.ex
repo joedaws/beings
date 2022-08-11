@@ -75,6 +75,7 @@ defmodule Cosmos.Beings.Actions do
     if being.status != "hibernating" do
       new_being = %{being | status: "hibernating"}
       put_being(being_id, new_being)
+      Logger.info("Being #{inspect(being_id)} is now hiberating and is not active.")
     else
       Logger.info("Being #{inspect(being_id)} cannot hiberate since it is currently hibernating.")
     end

@@ -53,10 +53,6 @@ defmodule Cosmos.Beings.BeingWorker do
     GenServer.cast(pid, {:receive_resource, resource_type, amount})
   end
 
-  def perform_ritual(pid, ritual_index \\ 0) do
-    GenServer.cast(pid, {:perform_ritual, ritual_index})
-  end
-
   # callbacks ------------------------------
   @impl true
   def init([bucket_name, being_id]) do

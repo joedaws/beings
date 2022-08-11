@@ -46,21 +46,14 @@ asserted property ownership.
 
 
 ** Cosmos Application
-*** TODO refactor being_worker code
-move actions and transformation into their own functions
-
-updates that will only occur to the being itself such as harvest
-don't need a client API since they will just be updating itself
-
-updates that require another being like give and receive resources
-are different
+*** TODO create function to use a decision to take an action
+*** TODO create additional actions for beings
+*** TODO figure out a worker around for a mutex for a being
+This will be a useful thing if we must require synchronous execution.
 *** TODO refactor historian to create it's own event records
 Implement some kind of diff function
 
 Also pass the action taken from within the action function
-*** TODO create new decision tree based on actions and observations
-*** TODO create additional actions for beings
-*** TODO rework decision tree
 *** TODO fix unexpected message for being worker
 *** TODO launch basic simulation.
 *** TODO move Cosmos.Beings.Supervisor to Cosmos.Supervisor
@@ -90,6 +83,15 @@ their knowledge map
 
 *** TODO implement ranks
 
+*** DONE create new decision tree based on actions and observations
+*** DONE refactor being_worker code
+move actions and transformation into their own functions
+
+updates that will only occur to the being itself such as harvest
+don't need a client API since they will just be updating itself
+
+updates that require another being like give and receive resources
+are different
 *** DONE build historian process
 *** DONE what to do when worker processes crash
 It's fine if they crash but I need to restart them
