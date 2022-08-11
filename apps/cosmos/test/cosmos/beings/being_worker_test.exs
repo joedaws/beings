@@ -86,6 +86,7 @@ defmodule Cosmos.Beings.BeingWorkerTest do
     Actions.revive(b_id)
     Actions.hibernate(b_id)
     new_ichor = BeingWorker.get(worker, :ichor)
+    new_ichor = BeingWorker.get(worker, :ichor)
     assert new_ichor == old_ichor - 1
   end
 

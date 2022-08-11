@@ -80,4 +80,26 @@ defmodule Cosmos.Beings.Brains.DecisionTreeTest do
 
     assert length(root_node.children) >= 0
   end
+
+  test "traverse graph", %{b_id: b_id, n_id: n_id, param: param} do
+    # attach b being to node n
+    Actions.move_to_node(b_id, n_id)
+
+    worker = Cosmos.Beings.BeingWorkerCache.worker_process("beings", b_id)
+    node_worker = Cosmos.Locations.NodeWorkerCache.worker_process("nodes", n_id)
+    being = BeingWorker.get(worker)
+    node = NodeWorker.get(node_worker)
+
+    obs = %Observations{
+      bucket_name: "beings",
+      being: being,
+      node: node
+    }
+
+    root_node = DecisionTree.get_graph(:survival_tree, obs, param)
+
+    DecisionTree.traverse_graph(root_node)
+
+    assert 1
+  end
 end

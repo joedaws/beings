@@ -82,12 +82,24 @@ defmodule Cosmos.Beings.Brains.DecisionTree do
     }
   end
 
+  def traverse_graph(node) do
+    # action == nil means the node is not a leaf
+    # TODO remove this logging statement
+    Logger.info("At node #{node.description}")
+
+    if node.action == nil do
+      # move to next node
+      traverse_graph(Enum.at(node.children, node.next))
+    else
+      # perform the action
+      node.action.()
+      Logger.info("Decision: Performed action #{node.description}")
+    end
+  end
+
   # first function called by the being worker
   def take_action(root_function, observations, parameters) do
     make_choice(root_function, observations, parameters)
-  end
-
-  def take_action(f) do
   end
 
   # this starts the very basic survival logic for a single being

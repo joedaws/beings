@@ -46,7 +46,6 @@ asserted property ownership.
 
 
 ** Cosmos Application
-*** TODO create function to use a decision to take an action
 *** TODO create additional actions for beings
 *** TODO figure out a worker around for a mutex for a being
 This will be a useful thing if we must require synchronous execution.
@@ -83,6 +82,7 @@ their knowledge map
 
 *** TODO implement ranks
 
+*** DONE create function to use a decision to take an action
 *** DONE create new decision tree based on actions and observations
 *** DONE refactor being_worker code
 move actions and transformation into their own functions
