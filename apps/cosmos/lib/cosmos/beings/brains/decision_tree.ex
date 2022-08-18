@@ -82,18 +82,22 @@ defmodule Cosmos.Beings.Brains.DecisionTree do
     }
   end
 
-  def traverse_graph(node) do
+  @doc """
+  Given a root node of a tree, this function follows the path
+  based on the decisions to a leaf node containing a decision.
+  """
+  def decision_path(node) do
     # action == nil means the node is not a leaf
     # TODO remove this logging statement
     Logger.info("At node #{node.description}")
 
     if node.action == nil do
       # move to next node
-      traverse_graph(Enum.at(node.children, node.next))
+      decision_path(Enum.at(node.children, node.next))
     else
       # perform the action
       node.action.()
-      Logger.info("Decision: Performed action #{node.description}")
+      Logger.info("Decision: #{node.description}")
     end
   end
 

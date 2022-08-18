@@ -1,6 +1,10 @@
 defmodule Cosmos.Beings.Being do
   require Logger
 
+  @default_being_bucket_name "beings"
+
+  @default_being_worker_module Cosmos.Beings.BeingWorker
+
   @moduledoc """
   Beings have:
     - name
@@ -16,7 +20,8 @@ defmodule Cosmos.Beings.Being do
 
   @max_age 99999
   @max_ichor 99999
-  @max_starting_ichor 88
+  @min_starting_ichor 100
+  @max_starting_ichor 200
 
   defstruct [
     :name,
@@ -45,11 +50,12 @@ defmodule Cosmos.Beings.Being do
         name,
         node,
         age \\ 0,
-        ichor \\ 0,
+        ichor \\ @min_starting_ichor,
         status \\ "active",
         rank \\ Rank.get_lowest_rank(),
         resources \\ %{},
-        rituals \\ []
+        rituals \\ [],
+        bucket_name \\ @default_being_bucket_name
       ) do
     being = %Being{
       name: name,
@@ -64,6 +70,8 @@ defmodule Cosmos.Beings.Being do
 
     being_id = generate_id(being)
 
+    entity_id_registries(being_id, bucket_name)
+
     being = %{being | id: being_id}
   end
 
@@ -71,17 +79,16 @@ defmodule Cosmos.Beings.Being do
     # TODO create centralized place for all being cultures
     being_cultures = Map.keys(Name.name_syllables())
     name = Name.generate_name(Enum.random(being_cultures))
+    age = :rand.uniform(@max_age)
+    ichor = @min_starting_ichor + :rand.uniform(@max_starting_ichor - @min_starting_ichor)
+    node = nil
+    status = "active"
+    rank = Rank.get_lowest_rank()
+    resources = %{}
+    rituals = []
+    bucket_name = @default_being_bucket_name
 
-    being = %Being{
-      name: name,
-      age: :rand.uniform(@max_age),
-      ichor: :rand.uniform(@max_starting_ichor),
-      node: nil
-    }
-
-    being_id = generate_id(being)
-
-    being = %{being | id: being_id}
+    new(name, node, age, ichor, status, rank, resources, rituals, bucket_name)
   end
 
   @doc """
@@ -111,5 +118,22 @@ defmodule Cosmos.Beings.Being do
   """
   def generate_id(being) do
     :erlang.md5(get_full_name(being) <> (:os.system_time(:millisecond) |> to_string))
+  end
+
+  def get_default_being_bucket_name() do
+    @default_being_bucket_name
+  end
+
+  defp entity_id_registries(being_id, bucket_name) do
+    # this allows other processes to find the bucket
+    # given only the id
+    Cosmos.BucketNameRegistry.register(being_id, bucket_name)
+    Logger.info("Bucket name `#{bucket_name}` registered for being id #{inspect(being_id)}")
+    # this allows the historian to use the correct get function
+    Cosmos.EntityWorkerModuleNameRegistry.register(being_id, @default_being_worker_module)
+
+    Logger.info(
+      "Module `#{@default_being_worker_module}` registered for being id #{inspect(being_id)}"
+    )
   end
 end

@@ -7,6 +7,8 @@ defmodule Cosmos.Archive.Historian do
   """
   use GenServer
   require Logger
+  alias Cosmos.Beings.Bucket
+  alias Cosmos.Beings.BeingWorker
 
   # length of a cycle in milliseconds
   @cycle_duration 5000
@@ -29,8 +31,13 @@ defmodule Cosmos.Archive.Historian do
   end
 
   def record_event(entity_id, event) do
-    Logger.info("Historian will record event for #{inspect(entity_id)}")
     GenServer.cast(__MODULE__, {:record_event, entity_id, event})
+    Logger.info("Historian recorded event for #{inspect(entity_id)}")
+  end
+
+  def register_entities_in_bucket(bucket_name) do
+    GenServer.cast(__MODULE__, {:register_entities_in_bucket, bucket_name})
+    Logger.info("Historian registred entities from bucket #{bucket_name}")
   end
 
   def stash_events() do
@@ -42,6 +49,8 @@ defmodule Cosmos.Archive.Historian do
   @impl true
   def init(_) do
     history = %{}
+
+    cycle(history)
     {:ok, history}
   end
 
@@ -52,8 +61,16 @@ defmodule Cosmos.Archive.Historian do
   end
 
   @impl true
+  def handle_cast({:register_entities_in_bucket, bucket_name}, history) do
+    {:ok, bucket_worker} = Cosmos.Beings.Registry.lookup(Cosmos.Beings.Registry, bucket_name)
+    all_entity_ids = Bucket.keys(bucket_worker)
+    history = register_entities(history, all_entity_ids)
+    {:noreply, history}
+  end
+
+  @impl true
   def handle_cast({:register_entity, entity_id}, history) do
-    history = Map.put_new(history, entity_id, [])
+    history = register_entity(history, entity_id)
     Logger.info("Historian registered entity #{inspect(entity_id)}")
     {:noreply, history}
   end
@@ -67,11 +84,33 @@ defmodule Cosmos.Archive.Historian do
     {:noreply, history}
   end
 
+  def handle_info(:cycle, history) do
+    cycle(history)
+    {:noreply, history}
+  end
+
   # private functions ---------------------------------------------------------------
   defp cycle(history) do
+    collect_diff(history)
+
     publish(history)
 
-    # TODO add send after
+    # to simulate passage of time
+    Process.send_after(self(), :cycle, @cycle_duration)
+  end
+
+  defp collect_diff(history) do
+    diff_map =
+      for {entity_id, event_history} <- history,
+          into: %{},
+          do:
+            {entity_id,
+             Cosmos.EntityWorkerModuleNameRegistry.get(entity_id).get(
+               Cosmos.Beings.BeingWorkerCache.worker_process(
+                 Cosmos.BucketNameRegistry.get(entity_id),
+                 entity_id
+               )
+             )}
   end
 
   defp publish(history) do
@@ -81,5 +120,18 @@ defmodule Cosmos.Archive.Historian do
           do: {entity_id, List.first(history)}
 
     Logger.info("Publishing most recent events")
+  end
+
+  defp register_entity(history, entity_id) do
+    Map.put_new(history, entity_id, [])
+  end
+
+  defp register_entities(history, [entity_id | tail]) do
+    history = register_entity(history, entity_id)
+    register_entities(history, tail)
+  end
+
+  defp register_entities(history, []) do
+    history
   end
 end

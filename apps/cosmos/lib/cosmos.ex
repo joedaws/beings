@@ -16,6 +16,7 @@ defmodule Cosmos do
     # This bucket will hold the map between entity ids and
     # the buck in which they are currently held.
     Cosmos.Beings.Registry.create(Cosmos.Beings.Registry, "bucket_names")
+    Cosmos.Beings.Registry.create(Cosmos.Beings.Registry, "entity_worker_names")
     # In order for the graph to be setup we need a place to hold nodes.
     Cosmos.Beings.Registry.create(Cosmos.Beings.Registry, "nodes")
 

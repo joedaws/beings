@@ -21,9 +21,6 @@ defmodule Cosmos.Beings.BeingWorker do
   alias Cosmos.Beings.Brains.Parameters
   alias Cosmos.Beings.Brains.DecisionTree
 
-  # defines the default being bucket name
-  @default_being_bucket_name "beings"
-
   # defines the length of time a cycle takes in milliseconds
   @cycle_duration 1 * 1000
 
@@ -64,6 +61,8 @@ defmodule Cosmos.Beings.BeingWorker do
     # this allows other processes to find the bucket
     # given only the id
     Cosmos.BucketNameRegistry.register(being_id, bucket_name)
+    # this allows the historian to use the correct get function
+    Cosmos.BucketNameRegistry.register(being_id, bucket_name)
     Logger.info("Bucket name `#{bucket_name}` registered for being id #{inspect(being_id)}")
 
     cycle(bucket_name, being_id)
@@ -73,17 +72,12 @@ defmodule Cosmos.Beings.BeingWorker do
 
   @impl true
   def init([being_id]) do
-    bucket_name = @default_being_bucket_name
+    bucket_name = Being.get_default_being_bucket_name()
 
     bw = %Cosmos.Beings.BeingWorker{
       bucket_name: bucket_name,
       being_id: being_id
     }
-
-    # this allows other processes to find the bucket
-    # given only the id
-    Cosmos.BucketNameRegistry.register(being_id, bucket_name)
-    Logger.info("Bucket name `#{bucket_name}` registered for being id #{inspect(being_id)}")
 
     cycle(bucket_name, being_id)
 
@@ -120,29 +114,6 @@ defmodule Cosmos.Beings.BeingWorker do
     {:noreply, state}
   end
 
-  # already assumes that being has sufficient resources to perform this
-  @impl true
-  def handle_cast({:perform_ritual, ritual_index}, state) do
-    being = get_being(state.bucket_name, state.being_id)
-    resources = being.resources
-    ritual = Enum.at(being.rituals, ritual_index)
-
-    new_resources =
-      for {k, v} <- resources,
-          into: %{},
-          do:
-            if(k in Map.keys(ritual.requirements),
-              do: {k, Map.get(resources, k) - Map.get(ritual.requirements, k)},
-              else: {k, v}
-            )
-
-    new_ichor = being.ichor + ritual.ichor_yeild
-
-    new_being = %{being | resources: new_resources, ichor: new_ichor}
-    put_being(state.bucket_name, state.being_id, new_being)
-    {:noreply, state}
-  end
-
   @impl true
   def handle_info(:cycle, state) do
     being = get_being(state.bucket_name, state.being_id)
@@ -157,9 +128,6 @@ defmodule Cosmos.Beings.BeingWorker do
   end
 
   # public helpers ------------------------------------------------------------------------
-  def get_default_being_bucket_name() do
-    @default_being_bucket_name
-  end
 
   # Private functions ---------------------------------------------------------------------
   defp get_being(bucket_name, being_id) do

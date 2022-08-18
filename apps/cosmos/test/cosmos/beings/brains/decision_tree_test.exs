@@ -81,7 +81,7 @@ defmodule Cosmos.Beings.Brains.DecisionTreeTest do
     assert length(root_node.children) >= 0
   end
 
-  test "traverse graph", %{b_id: b_id, n_id: n_id, param: param} do
+  test "decision path", %{b_id: b_id, n_id: n_id, param: param} do
     # attach b being to node n
     Actions.move_to_node(b_id, n_id)
 
@@ -98,7 +98,7 @@ defmodule Cosmos.Beings.Brains.DecisionTreeTest do
 
     root_node = DecisionTree.get_graph(:survival_tree, obs, param)
 
-    DecisionTree.traverse_graph(root_node)
+    DecisionTree.decision_path(root_node)
 
     assert 1
   end

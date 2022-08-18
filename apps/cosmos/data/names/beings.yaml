@@ -25,6 +25,9 @@ dream_realm:
     - "hy"
     - "ptu"
     - "my"
+    - "wgah"
+    - "fh"
+    - "tagn"
 
   core_name:
     - "gyla"
@@ -33,6 +36,7 @@ dream_realm:
     - "tyr"
     - "chiu"
     - "xo"
+    - "nglui"
 
   core_prefix:
     - "l'"
@@ -43,6 +47,7 @@ dream_realm:
     - "fa-"
     - "mus-"
     - "qy-"
+    - "ph"
 
 deep_denizen:
   epithet:

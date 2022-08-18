@@ -31,7 +31,7 @@ defmodule Cosmos.Beings.Actions do
         "Harvest: #{inspect(being.id)} harvested #{amount} #{resource_type} from #{inspect(being.node)}."
       )
     else
-      Logger.info("Harvest: #{being.id} is not attached to a node")
+      Logger.info("Harvest: #{inspect(being.id)} is not attached to a node")
     end
   end
 

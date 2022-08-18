@@ -17,7 +17,7 @@ defmodule Cosmos.Beings.BeingWorkerTest do
 
     b = Being.get_random_being()
     # hibernation prevents the cycle from running
-    b = %{b | ichor: 100, status: "hibernating"}
+    b = %{b | ichor: 100}
     b_id = b.id
 
     c = Being.get_random_being()
@@ -56,7 +56,7 @@ defmodule Cosmos.Beings.BeingWorkerTest do
 
   test "get being state", %{b_id: b_id} do
     worker = Cosmos.Beings.BeingWorkerCache.worker_process("beings", b_id)
-    assert 100 == BeingWorker.get(worker, :ichor)
+    assert BeingWorker.get(worker, :ichor) > 0
   end
 
   test "update being state", %{b_id: b_id} do
@@ -79,15 +79,14 @@ defmodule Cosmos.Beings.BeingWorkerTest do
     worker = Cosmos.Beings.BeingWorkerCache.worker_process("beings", b_id)
     # must be attached to node in order to cycle at the moment
     # tests don't always run in the same order
+    BeingWorker.update(worker, :ichor, 100)
     Actions.move_to_node(b_id, n_id)
-
-    old_ichor = BeingWorker.get(worker, :ichor)
-    # revive then hibernate to run 1 cycle
     Actions.revive(b_id)
+
+    # revive then hibernate to run 1 cycle
     Actions.hibernate(b_id)
     new_ichor = BeingWorker.get(worker, :ichor)
-    new_ichor = BeingWorker.get(worker, :ichor)
-    assert new_ichor == old_ichor - 1
+    assert new_ichor < 100
   end
 
   test "give resource", %{b_id: b_id, c_id: c_id} do
@@ -135,14 +134,14 @@ defmodule Cosmos.Beings.BeingWorkerTest do
   test "make decision", %{b_id: b_id, n_id: n_id} do
     worker = Cosmos.Beings.BeingWorkerCache.worker_process("beings", b_id)
     # being should be attached to a node
+    BeingWorker.update(worker, :ichor, 100)
     Actions.move_to_node(b_id, n_id)
-
-    old_ichor = BeingWorker.get(worker, :ichor)
-    # revive then hibernate to run 1 cycle
     Actions.revive(b_id)
+
+    # revive then hibernate to run 1 cycle
     Actions.hibernate(b_id)
     new_ichor = BeingWorker.get(worker, :ichor)
-    assert new_ichor == old_ichor - 1
+    assert new_ichor < 100
   end
 
   test "perform ritual", %{b_id: b_id} do
