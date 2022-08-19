@@ -2,7 +2,7 @@ defmodule Cosmos.Archive.HistorianTest do
   use ExUnit.Case
 
   alias Cosmos.Beings.Being
-  alias Cosmos.Archive.EventRecord
+  alias Cosmos.Archive.Event
 
   setup do
     Cosmos.Beings.Registry.create(Cosmos.Beings.Registry, "beings")
@@ -37,7 +37,7 @@ defmodule Cosmos.Archive.HistorianTest do
   end
 
   test "record event" do
-    ev = %EventRecord{
+    ev = %Event{
       created_at: NaiveDateTime.utc_now(),
       event_type: "being_update",
       description: "This is a test update"

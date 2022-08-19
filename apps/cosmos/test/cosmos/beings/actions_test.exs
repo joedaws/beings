@@ -13,38 +13,6 @@ defmodule Cosmos.Beings.ActionsTest do
   alias Cosmos.Locations.NodeWorker
 
   setup do
-    # setup a test being
-    n1 = "Ghulop"
-    n2 = "Jorsa"
-    np = "L'"
-    name_template = ["shell_name", "core_prefix", "core_name"]
-    parts = %{"shell_name" => n1, "core_prefix" => np, "core_name" => n2}
-
-    name = %Name{template: name_template, parts: parts}
-
-    test_being_1 = %Being{
-      name: name,
-      age: 666,
-      node: nil,
-      ichor: 7,
-      rank: Rank.get_lowest_rank()
-    }
-
-    # setup a test being
-    n1 = "Shaptuwy"
-    n2 = "Fe"
-    np = "L'"
-    name_template = ["shell_name", "core_prefix", "core_name"]
-    parts = %{"shell_name" => n1, "core_prefix" => np, "core_name" => n2}
-
-    name = %Name{template: name_template, parts: parts}
-
-    test_being_2 = %Being{
-      name: name,
-      age: 3,
-      ichor: 111
-    }
-
     Cosmos.Beings.Registry.create(Cosmos.Beings.Registry, "nodes")
     Cosmos.Beings.Registry.create(Cosmos.Beings.Registry, "beings")
 
@@ -86,8 +54,7 @@ defmodule Cosmos.Beings.ActionsTest do
       b_id: b_id,
       c_id: c_id,
       n_id: n_id,
-      m_id: m_id,
-      test_beings: [test_being_1, test_being_2]
+      m_id: m_id
     }
   end
 
@@ -111,19 +78,8 @@ defmodule Cosmos.Beings.ActionsTest do
     assert new_resource == resource_yeild
   end
 
-  test "greet each other", %{test_beings: [b1, b2]} do
-    assert is_bitstring(Actions.greet(b1, b2))
-  end
-
-  test "perform transfer", %{test_beings: [b1, b2]} do
-    b1_original_ichor = b1.ichor
-    b2_original_ichor = b2.ichor
-    amount = 3
-    commodity = :ichor
-
-    {:ok, b1, b2} = Actions.transfer(commodity, amount, b1, b2)
-
-    assert b1.ichor == b1_original_ichor - amount
-    assert b2.ichor == b2_original_ichor + amount
+  test "greet each other", %{b_id: b_id, c_id: c_id} do
+    Actions.greet(b_id, c_id)
+    assert true
   end
 end

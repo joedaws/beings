@@ -61,10 +61,6 @@ defmodule Cosmos.Locations.Name do
     syllables = Map.get(all_syllables, template_type)
     template = Map.get(@templates, template_type)
 
-    Logger.info(
-      "Creating a #{template_type} random name with tempalte: #{Enum.join(template, " ")}"
-    )
-
     parts =
       for part <- template,
           into: %{},

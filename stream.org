@@ -46,6 +46,9 @@ asserted property ownership.
 
 
 ** Cosmos Application
+*** TODO fix events to string conversion so that we can record to file the changes.
+*** TODO fix historian crash causing all other processes to crash.
+This should be a restart setting somewhere
 *** TODO use register node name, module name etc. IN node creation
 see what was done in `beings.ex`
 *** TODO refactor historian to create it's own event records

@@ -3,6 +3,8 @@ defmodule Cosmos.Beings.Actions do
   alias Cosmos.Beings.Being
   alias Cosmos.Beings.Bucket
   alias Cosmos.Locations.NodeWorker
+  alias Cosmos.Archive.Event
+  alias Cosmos.Archive.Historian
 
   @ichor_cycle_amount 1
 
@@ -30,6 +32,11 @@ defmodule Cosmos.Beings.Actions do
       Logger.info(
         "Harvest: #{inspect(being.id)} harvested #{amount} #{resource_type} from #{inspect(being.node)}."
       )
+
+      Historian.record_event(
+        being_id,
+        Event.new("being_action", "harvested #{resource_type} from node")
+      )
     else
       Logger.info("Harvest: #{inspect(being.id)} is not attached to a node")
     end
@@ -49,6 +56,11 @@ defmodule Cosmos.Beings.Actions do
       end
 
     put_being(new_being.id, new_being)
+
+    Historian.record_event(
+      being_id,
+      Event.new("being_update", "continues to exist by paying ichor")
+    )
   end
 
   def revive(being_id) do
@@ -64,6 +76,11 @@ defmodule Cosmos.Beings.Actions do
       send(worker_pid, :cycle)
 
       Logger.info("Being #{inspect(being_id)} revived and is now active.")
+
+      Historian.record_event(
+        being_id,
+        Event.new("being_update", "revived from hibernation")
+      )
     else
       Logger.info("Being #{inspect(being_id)} cannot be revived since it is currently active.")
     end
@@ -76,6 +93,11 @@ defmodule Cosmos.Beings.Actions do
       new_being = %{being | status: "hibernating"}
       put_being(being_id, new_being)
       Logger.info("Being #{inspect(being_id)} is now hiberating and is not active.")
+
+      Historian.record_event(
+        being_id,
+        Event.new("being_update", "began hibernation")
+      )
     else
       Logger.info("Being #{inspect(being_id)} cannot hiberate since it is currently hibernating.")
     end
@@ -90,6 +112,11 @@ defmodule Cosmos.Beings.Actions do
     node_pid = Cosmos.Locations.NodeWorkerCache.worker_process(node_bucket_name, node_id)
     NodeWorker.attach(node_pid, new_being.id)
     Logger.info("Being #{inspect(being_id)} moved to node #{inspect(node_id)}")
+
+    Historian.record_event(
+      being_id,
+      Event.new("being_action", "moved to a new node")
+    )
   end
 
   def give_resource(being_id, other_being_id, resource_type, amount) do
@@ -115,6 +142,16 @@ defmodule Cosmos.Beings.Actions do
     Logger.info(
       "Being #{inspect(being_id)} gave #{amount} #{resource_type} to #{inspect(other_being_id)}"
     )
+
+    other_being = get_being(other_being_id)
+
+    Historian.record_event(
+      being_id,
+      Event.new(
+        "being_action",
+        "gave #{amount} #{resource_type} to another being, #{Being.get_full_name(other_being)}"
+      )
+    )
   end
 
   @doc """
@@ -138,37 +175,29 @@ defmodule Cosmos.Beings.Actions do
 
     new_being = %{being | resources: new_resources, ichor: new_ichor}
     put_being(being_id, new_being)
+
+    Historian.record_event(
+      being_id,
+      Event.new("being_action", "performed ritual and gained #{ritual.ichor_yeild} ichor")
+    )
   end
 
   @doc """
   The first being greets the second by name
 
-  if they don't know each other then only use names.
+  If they don't know each other then only use names.
   """
-  def greet(b1, b2) do
-    b1_says = "#{Being.get_full_name(b1)}: Hello, I'm #{Being.get_full_name(b1)}"
+  def greet(b1_id, b2_id) do
+    b1 = get_being(b1_id)
+    b2 = get_being(b2_id)
 
-    b2_says = "#{Being.get_full_name(b2)}: Greetins fellow being, I'm #{Being.get_full_name(b2)}}"
-
-    Logger.info(b1_says)
-    Logger.info(b2_says)
-    b1_says <> "\n" <> b2_says
+    Historian.record_event(
+      b1_id,
+      Event.new("being_social_interaction", "greeted another being, #{Being.get_full_name(b2)}")
+    )
   end
 
-  @doc """
-  Function to perform the transfer of commodity between two beings
-
-  The giver gives amount of commodity to the receiver
-  """
-  def transfer(commodity, amount, giver, receiver) do
-    # TODO add in check to make sure that giver has enough commodity to transfer
-    # take commodity away from giver
-    giver = %{giver | commodity => Map.get(giver, commodity) - amount}
-    # give commodity to receiver
-    receiver = %{receiver | commodity => Map.get(receiver, commodity) + amount}
-
-    {:ok, giver, receiver}
-  end
+  # Private functions --------------------------------------------------------------------------------------------------
 
   defp get_being(being_id) do
     bucket_name = Cosmos.BucketNameRegistry.get(being_id)

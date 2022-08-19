@@ -2,6 +2,7 @@ defmodule Cosmos do
   use Application
   require Logger
 
+  alias Cosmos.Beings.Being
   alias Cosmos.Locations.Node
   alias Cosmos.Locations.Name
   alias Cosmos.Locations.NodeWorker
@@ -19,13 +20,18 @@ defmodule Cosmos do
     Cosmos.Beings.Registry.create(Cosmos.Beings.Registry, "entity_worker_names")
     # In order for the graph to be setup we need a place to hold nodes.
     Cosmos.Beings.Registry.create(Cosmos.Beings.Registry, "nodes")
+    # same for beings
+    Cosmos.Beings.Registry.create(Cosmos.Beings.Registry, "beings")
 
     setup_graph(:basic)
+    setup_beings(:basic)
 
     {:ok, sup_pid}
   end
 
-  # setup a collection of nodes at start up
+  @doc """
+  Setup basic grpah of nodes and their connections.
+  """
   def setup_graph(:basic) do
     node_types = Map.keys(Name.name_syllables())
     names = for x <- 1..12, do: Name.generate_name(Enum.random(node_types))
@@ -35,8 +41,15 @@ defmodule Cosmos do
     connect_nodes(:random_lookahead)
   end
 
+  @doc """
+  Setup a few initial beings at some of the locations
+  """
+  def setup_beings(:basic) do
+    generate_beings(for x <- 1..12, do: x)
+  end
+
   defp generate_nodes([]) do
-    Logger.info("Done setting up nodes.")
+    Logger.info("Done generating starting nodes.")
   end
 
   defp generate_nodes([name | tail]) do
@@ -52,6 +65,23 @@ defmodule Cosmos do
     Cosmos.Beings.Bucket.put(nodes, node.id, node)
 
     node_worker = Cosmos.Locations.NodeWorkerCache.worker_process("nodes", node.id)
+  end
+
+  defp generate_beings([]) do
+    Logger.info("Done generating starting beings.")
+  end
+
+  defp generate_beings([head | tail]) do
+    create_being()
+    generate_beings(tail)
+  end
+
+  defp create_being() do
+    {:ok, beings} = Cosmos.Beings.Registry.lookup(Cosmos.Beings.Registry, "beings")
+    b = Being.get_random_being()
+    Cosmos.Beings.Bucket.put(beings, b.id, b)
+
+    worker = Cosmos.Beings.BeingWorkerCache.worker_process("beings", b.id)
   end
 
   @doc """

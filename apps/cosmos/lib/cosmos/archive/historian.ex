@@ -9,9 +9,10 @@ defmodule Cosmos.Archive.Historian do
   require Logger
   alias Cosmos.Beings.Bucket
   alias Cosmos.Beings.BeingWorker
+  alias Cosmos.Archive.Event
 
   # length of a cycle in milliseconds
-  @cycle_duration 5000
+  @cycle_duration 5 * 1000
 
   # maximum length of history list per entity
   @max_history_legnth 10
@@ -91,9 +92,11 @@ defmodule Cosmos.Archive.Historian do
 
   # private functions ---------------------------------------------------------------
   defp cycle(history) do
-    collect_diff(history)
-
-    publish(history)
+    if length(Map.keys(history)) > 0 do
+      publish(history)
+    else
+      Logger.info("Historian has no registered entities")
+    end
 
     # to simulate passage of time
     Process.send_after(self(), :cycle, @cycle_duration)
@@ -114,12 +117,33 @@ defmodule Cosmos.Archive.Historian do
   end
 
   defp publish(history) do
+    history_dir = Application.fetch_env!(:cosmos, :history_path)
+    history_path = Path.join(history_dir, "dev_history.txt")
+    {:ok, file} = File.open(history_path, [:write])
+    IO.binwrite(file, "I am publishing the history")
+    File.close(file)
+
     events =
       for {entity_id, history} <- Map.keys(history),
           into: %{},
           do: {entity_id, List.first(history)}
 
-    Logger.info("Publishing most recent events")
+    e =
+      for {entity_id, event} <- events,
+          do: IO.puts(event)
+
+    events_str_list =
+      for {entity_id, event} <- events,
+          do: Enum.join([inspect(entity_id), Event.string(event)], "\n")
+
+    # history_dir = Application.fetch_env!(:cosmos, :history_path)
+    # history_path = Path.join(history_dir, "dev_history.txt")
+
+    # {:ok, file} = File.open(history_path, [:write])
+    # IO.binwrite(file, Enum.join(events_str_list, "\n"))
+    # File.close(file)
+
+    Logger.info("Published most recent events")
   end
 
   defp register_entity(history, entity_id) do

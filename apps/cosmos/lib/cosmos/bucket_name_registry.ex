@@ -2,6 +2,8 @@ defmodule Cosmos.BucketNameRegistry do
   @moduledoc """
   Assumes that the application registry already has
   a bucket by the name bucket_names
+
+  Don't actually need to start this because it is not a genserver.
   """
   @registry_bucket_name "bucket_names"
 

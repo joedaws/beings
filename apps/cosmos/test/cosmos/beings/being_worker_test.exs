@@ -81,10 +81,9 @@ defmodule Cosmos.Beings.BeingWorkerTest do
     # tests don't always run in the same order
     BeingWorker.update(worker, :ichor, 100)
     Actions.move_to_node(b_id, n_id)
-    Actions.revive(b_id)
-
-    # revive then hibernate to run 1 cycle
+    # hibernate then revive to run one cycle
     Actions.hibernate(b_id)
+    Actions.revive(b_id)
     new_ichor = BeingWorker.get(worker, :ichor)
     assert new_ichor < 100
   end
@@ -136,10 +135,9 @@ defmodule Cosmos.Beings.BeingWorkerTest do
     # being should be attached to a node
     BeingWorker.update(worker, :ichor, 100)
     Actions.move_to_node(b_id, n_id)
-    Actions.revive(b_id)
-
-    # revive then hibernate to run 1 cycle
+    # hibernate then revive to run 1 cycle
     Actions.hibernate(b_id)
+    Actions.revive(b_id)
     new_ichor = BeingWorker.get(worker, :ichor)
     assert new_ichor < 100
   end
