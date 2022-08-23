@@ -117,31 +117,21 @@ defmodule Cosmos.Archive.Historian do
   end
 
   defp publish(history) do
-    history_dir = Application.fetch_env!(:cosmos, :history_path)
+    history_dir = Application.fetch_env!(:cosmos, :history_dir)
     history_path = Path.join(history_dir, "dev_history.txt")
-    {:ok, file} = File.open(history_path, [:write])
-    IO.binwrite(file, "I am publishing the history")
-    File.close(file)
 
     events =
-      for {entity_id, history} <- Map.keys(history),
+      for {entity_id, entity_history} <- history,
           into: %{},
-          do: {entity_id, List.first(history)}
-
-    e =
-      for {entity_id, event} <- events,
-          do: IO.puts(event)
+          do: {entity_id, List.first(entity_history)}
 
     events_str_list =
       for {entity_id, event} <- events,
-          do: Enum.join([inspect(entity_id), Event.string(event)], "\n")
+          do: Enum.join([inspect(entity_id), Event.string(event)], ",")
 
-    # history_dir = Application.fetch_env!(:cosmos, :history_path)
-    # history_path = Path.join(history_dir, "dev_history.txt")
-
-    # {:ok, file} = File.open(history_path, [:write])
-    # IO.binwrite(file, Enum.join(events_str_list, "\n"))
-    # File.close(file)
+    {:ok, file} = File.open(history_path, [:write])
+    IO.binwrite(file, Enum.join(events_str_list, "\n"))
+    File.close(file)
 
     Logger.info("Published most recent events")
   end

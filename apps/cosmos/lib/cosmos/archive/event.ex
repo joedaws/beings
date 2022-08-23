@@ -27,7 +27,7 @@ defmodule Cosmos.Archive.Event do
   end
 
   def string(event) do
-    Enum.join([inspect(event.created_at), event.type, event.desc], "\n")
+    Enum.join([event.created_at, event.event_type, event.description], ",")
   end
 
   def all_event_types() do

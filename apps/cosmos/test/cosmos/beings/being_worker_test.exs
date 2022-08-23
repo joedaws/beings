@@ -29,11 +29,9 @@ defmodule Cosmos.Beings.BeingWorkerTest do
     Cosmos.Beings.Bucket.put(beings, c.id, c)
 
     n = Node.generate_random_node()
-    n_id = Node.generate_id(n)
-    n = %{n | id: n_id}
+    n_id = n.id
     m = Node.generate_random_node()
-    m_id = Node.generate_id(m)
-    m = %{m | id: m_id}
+    m_id = m.id
 
     Cosmos.Beings.Bucket.put(nodes, n_id, n)
     Cosmos.Beings.Bucket.put(nodes, m_id, m)
@@ -76,12 +74,13 @@ defmodule Cosmos.Beings.BeingWorkerTest do
   end
 
   test "ichor decrease each cycle", %{b_id: b_id, n_id: n_id} do
+    Actions.move_to_node(b_id, n_id)
     worker = Cosmos.Beings.BeingWorkerCache.worker_process("beings", b_id)
+    node_worker = Cosmos.Locations.NodeWorkerCache.worker_process("nodes", n_id)
+    being = BeingWorker.get(worker)
+    node = NodeWorker.get(node_worker)
     # must be attached to node in order to cycle at the moment
     # tests don't always run in the same order
-    BeingWorker.update(worker, :ichor, 100)
-    Actions.move_to_node(b_id, n_id)
-    # hibernate then revive to run one cycle
     Actions.hibernate(b_id)
     Actions.revive(b_id)
     new_ichor = BeingWorker.get(worker, :ichor)
@@ -131,10 +130,11 @@ defmodule Cosmos.Beings.BeingWorkerTest do
   end
 
   test "make decision", %{b_id: b_id, n_id: n_id} do
-    worker = Cosmos.Beings.BeingWorkerCache.worker_process("beings", b_id)
-    # being should be attached to a node
-    BeingWorker.update(worker, :ichor, 100)
     Actions.move_to_node(b_id, n_id)
+    worker = Cosmos.Beings.BeingWorkerCache.worker_process("beings", b_id)
+    node_worker = Cosmos.Locations.NodeWorkerCache.worker_process("nodes", n_id)
+    being = BeingWorker.get(worker)
+    node = NodeWorker.get(node_worker)
     # hibernate then revive to run 1 cycle
     Actions.hibernate(b_id)
     Actions.revive(b_id)

@@ -1,6 +1,7 @@
 defmodule Cosmos.Beings.Brains.DecisionTreeTest do
   use ExUnit.Case
 
+  alias Cosmos.Archive.Historian
   alias Cosmos.Beings.Actions
   alias Cosmos.Beings.Being
   alias Cosmos.Beings.BeingWorker
@@ -31,11 +32,9 @@ defmodule Cosmos.Beings.Brains.DecisionTreeTest do
     Cosmos.Beings.Bucket.put(beings, c.id, c)
 
     n = Node.generate_random_node()
-    n_id = Node.generate_id(n)
-    n = %{n | id: n_id}
+    n_id = n.id
     m = Node.generate_random_node()
-    m_id = Node.generate_id(m)
-    m = %{m | id: m_id}
+    m_id = m.id
 
     Cosmos.Beings.Bucket.put(nodes, n_id, n)
     Cosmos.Beings.Bucket.put(nodes, m_id, m)
@@ -100,6 +99,28 @@ defmodule Cosmos.Beings.Brains.DecisionTreeTest do
 
     DecisionTree.decision_path(root_node)
 
-    assert 1
+    history = Historian.get_entity_history(b_id)
+    assert length(history) > 0
+  end
+
+  test "make decision - survival tree", %{b_id: b_id, n_id: n_id, param: param} do
+    # attach b being to node n
+    Actions.move_to_node(b_id, n_id)
+
+    worker = Cosmos.Beings.BeingWorkerCache.worker_process("beings", b_id)
+    node_worker = Cosmos.Locations.NodeWorkerCache.worker_process("nodes", n_id)
+    being = BeingWorker.get(worker)
+    node = NodeWorker.get(node_worker)
+
+    obs = %Observations{
+      bucket_name: "beings",
+      being: being,
+      node: node
+    }
+
+    DecisionTree.make_decision(:survival_tree, obs, param)
+
+    history = Historian.get_entity_history(b_id)
+    assert length(history) > 0
   end
 end

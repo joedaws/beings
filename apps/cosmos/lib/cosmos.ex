@@ -2,6 +2,7 @@ defmodule Cosmos do
   use Application
   require Logger
 
+  alias Cosmos.Beings.Actions
   alias Cosmos.Beings.Being
   alias Cosmos.Locations.Node
   alias Cosmos.Locations.Name
@@ -43,9 +44,14 @@ defmodule Cosmos do
 
   @doc """
   Setup a few initial beings at some of the locations
+
+  Looks in the bucket "nodes" for all node ids.
+  Puts one being at each of the nodes
   """
   def setup_beings(:basic) do
-    generate_beings(for x <- 1..12, do: x)
+    {:ok, nodes} = Cosmos.Beings.Registry.lookup(Cosmos.Beings.Registry, "nodes")
+    node_ids = Cosmos.Beings.Bucket.keys(nodes)
+    generate_beings(node_ids)
   end
 
   defp generate_nodes([]) do
@@ -59,8 +65,6 @@ defmodule Cosmos do
 
   defp create_node(name) do
     node = Node.generate_node(name)
-    node_id = Node.generate_id(node)
-    node = %{node | id: node_id}
     {:ok, nodes} = Cosmos.Beings.Registry.lookup(Cosmos.Beings.Registry, "nodes")
     Cosmos.Beings.Bucket.put(nodes, node.id, node)
 
@@ -72,16 +76,17 @@ defmodule Cosmos do
   end
 
   defp generate_beings([head | tail]) do
-    create_being()
+    create_being(head)
     generate_beings(tail)
   end
 
-  defp create_being() do
+  defp create_being(node_id) do
     {:ok, beings} = Cosmos.Beings.Registry.lookup(Cosmos.Beings.Registry, "beings")
     b = Being.get_random_being()
     Cosmos.Beings.Bucket.put(beings, b.id, b)
 
     worker = Cosmos.Beings.BeingWorkerCache.worker_process("beings", b.id)
+    Actions.move_to_node(b.id, node_id)
   end
 
   @doc """

@@ -61,8 +61,6 @@ defmodule Cosmos.Beings.BeingWorker do
     # this allows other processes to find the bucket
     # given only the id
     Cosmos.BucketNameRegistry.register(being_id, bucket_name)
-    # this allows the historian to use the correct get function
-    Cosmos.BucketNameRegistry.register(being_id, bucket_name)
     Logger.info("Bucket name `#{bucket_name}` registered for being id #{inspect(being_id)}")
 
     cycle(bucket_name, being_id)
@@ -149,49 +147,26 @@ defmodule Cosmos.Beings.BeingWorker do
       # first pay the ichor to continue living
       Cosmos.Beings.Actions.pay_ichor(being.id)
 
-      # make a decision
-      # TODO replace with DecisionTree call
-      Cosmos.Beings.Actions.harvest(being.id)
+      parameters = %Parameters{
+        ichor_threshold: 10
+      }
+
+      if being.node != nil do
+        node_worker = Cosmos.Locations.NodeWorkerCache.worker_process("nodes", being.node)
+        node = NodeWorker.get(node_worker)
+
+        observations = %Observations{
+          bucket_name: "beings",
+          being: being,
+          node: node
+        }
+
+        # make a decision
+        DecisionTree.make_decision(:survival_tree, observations, parameters)
+      end
 
       # to simulate passage of time
       Process.send_after(self(), :cycle, @cycle_duration)
     end
-  end
-
-  defp make_decision(:survival_tree, bucket_name, being) do
-    # Logger.info("#{Cosmos.Beings.Name.string(being.name)} will make a decision")
-
-    # TODO update to load parameters from being instance
-    parameters = %Parameters{
-      ichor_threshold: 10
-    }
-
-    node_id = being.node
-    node_bucket_name = Cosmos.BucketNameRegistry.get(node_id)
-    node_pid = Cosmos.Locations.NodeWorkerCache.worker_process(node_bucket_name, node_id)
-    node = NodeWorker.get(node_pid)
-
-    observations = %Observations{
-      bucket_name: bucket_name,
-      being: being,
-      node: node
-    }
-
-    DecisionTree.take_action(:survival_tree, observations, parameters)
-  end
-
-  defp make_decision(:harvest, bucket_name, being) do
-    observations = %Observations{
-      bucket_name: bucket_name,
-      being: being,
-      node: node
-    }
-
-    parameters = %{}
-    DecisionTree.take_action(:harvest, observations, parameters)
-  end
-
-  defp choose_action(policy, observations) do
-    :not_implemented
   end
 end

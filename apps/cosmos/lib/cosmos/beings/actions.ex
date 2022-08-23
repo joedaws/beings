@@ -47,20 +47,24 @@ defmodule Cosmos.Beings.Actions do
     old_amount = Map.get(being, :ichor)
     new_amount = old_amount - @ichor_cycle_amount
 
-    new_being =
-      if new_amount <= 0 do
-        Logger.info("#{inspect(being.id)} will cease to exist")
-        new_being = %{being | status: "deceased", ichor: 0}
-      else
-        new_being = %{being | ichor: new_amount}
-      end
+    if being.node do
+      new_being =
+        if new_amount <= 0 do
+          Logger.info("#{inspect(being.id)} will cease to exist")
+          new_being = %{being | status: "deceased", ichor: 0}
+        else
+          new_being = %{being | ichor: new_amount}
+        end
 
-    put_being(new_being.id, new_being)
+      put_being(new_being.id, new_being)
 
-    Historian.record_event(
-      being_id,
-      Event.new("being_update", "continues to exist by paying ichor")
-    )
+      Historian.record_event(
+        being_id,
+        Event.new("being_update", "continues to exist by paying ichor")
+      )
+    else
+      Logger.info("Pay ichor: #{inspect(being.id)} is not attached to a node")
+    end
   end
 
   def revive(being_id) do

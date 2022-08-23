@@ -11,7 +11,7 @@ import Config
 
 config :cosmos,
   data_path: System.get_env("COSMOS_BEING_DATA_PATH"),
-  history_path: System.get_env("COSMOS_HISTORY_PATH")
+  history_dir: System.get_env("COSMOS_HISTORY_DIR_PATH")
 
 # Sample configuration:
 #

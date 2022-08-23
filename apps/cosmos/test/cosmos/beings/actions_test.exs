@@ -33,11 +33,10 @@ defmodule Cosmos.Beings.ActionsTest do
     Cosmos.Beings.Bucket.put(beings, c.id, c)
 
     n = Node.generate_random_node()
-    n_id = Node.generate_id(n)
-    n = %{n | id: n_id}
+    n_id = n.id
+
     m = Node.generate_random_node()
-    m_id = Node.generate_id(m)
-    m = %{m | id: m_id}
+    m_id = m.id
 
     Cosmos.Beings.Bucket.put(nodes, n_id, n)
     Cosmos.Beings.Bucket.put(nodes, m_id, m)

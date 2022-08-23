@@ -15,7 +15,11 @@ defmodule Cosmos.Locations.NodeWorker do
     GenServer.start_link(__MODULE__, init_args)
   end
 
-  def get(pid, attribute_type \\ nil) do
+  def get(pid) do
+    GenServer.call(pid, :get)
+  end
+
+  def get(pid, attribute_type) do
     # get the process id
     GenServer.call(pid, {:get, attribute_type})
   end
@@ -90,7 +94,7 @@ defmodule Cosmos.Locations.NodeWorker do
   end
 
   @impl true
-  def handle_call({:get, nil}, _from, state) do
+  def handle_call(:get, _from, state) do
     node = get_node(state.bucket_name, state.node_id)
     {:reply, node, state}
   end
