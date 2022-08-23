@@ -46,6 +46,7 @@ asserted property ownership.
 
 
 ** Cosmos Application
+*** TODO fix connect in cosmos.ex so that correct calls are used.
 *** TODO fix events to string conversion so that we can record to file the changes.
 *** TODO fix historian crash causing all other processes to crash.
 This should be a restart setting somewhere

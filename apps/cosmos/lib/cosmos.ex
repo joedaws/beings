@@ -151,14 +151,14 @@ defmodule Cosmos do
   """
   defp connect([w1, w2, w3, w4]) do
     primary_node = NodeWorker.get(w1, :name)
-    NodeWorker.connect(w1, w2)
-    NodeWorker.connect(w2, w1)
+    NodeWorker.connect(w1, NodeWorker.get(w2, :id))
+    NodeWorker.connect(w2, NodeWorker.get(w1, :id))
 
-    NodeWorker.connect(w1, w3)
-    NodeWorker.connect(w3, w1)
+    NodeWorker.connect(w1, NodeWorker.get(w3, :id))
+    NodeWorker.connect(w3, NodeWorker.get(w1, :id))
 
-    NodeWorker.connect(w1, w4)
-    NodeWorker.connect(w4, w1)
+    NodeWorker.connect(w1, NodeWorker.get(w4, :id))
+    NodeWorker.connect(w4, NodeWorker.get(w1, :id))
   end
 
   defp connect([w1, w2, w3]) do
