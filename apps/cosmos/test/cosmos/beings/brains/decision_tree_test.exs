@@ -12,11 +12,11 @@ defmodule Cosmos.Beings.Brains.DecisionTreeTest do
   alias Cosmos.Locations.NodeWorker
 
   setup do
-    Cosmos.Beings.Registry.create(Cosmos.Beings.Registry, "nodes")
-    Cosmos.Beings.Registry.create(Cosmos.Beings.Registry, "beings")
+    Cosmos.Registry.create(Cosmos.Registry, "nodes")
+    Cosmos.Registry.create(Cosmos.Registry, "beings")
 
-    {:ok, beings} = Cosmos.Beings.Registry.lookup(Cosmos.Beings.Registry, "beings")
-    {:ok, nodes} = Cosmos.Beings.Registry.lookup(Cosmos.Beings.Registry, "nodes")
+    {:ok, beings} = Cosmos.Registry.lookup(Cosmos.Registry, "beings")
+    {:ok, nodes} = Cosmos.Registry.lookup(Cosmos.Registry, "nodes")
 
     b = Being.get_random_being()
     # A hibernating being does not run cycle logic
@@ -28,16 +28,16 @@ defmodule Cosmos.Beings.Brains.DecisionTreeTest do
     c = %{c | ichor: 100, status: "hibernating"}
     c_id = c.id
 
-    Cosmos.Beings.Bucket.put(beings, b.id, b)
-    Cosmos.Beings.Bucket.put(beings, c.id, c)
+    Cosmos.Bucket.put(beings, b.id, b)
+    Cosmos.Bucket.put(beings, c.id, c)
 
     n = Node.generate_random_node()
     n_id = n.id
     m = Node.generate_random_node()
     m_id = m.id
 
-    Cosmos.Beings.Bucket.put(nodes, n_id, n)
-    Cosmos.Beings.Bucket.put(nodes, m_id, m)
+    Cosmos.Bucket.put(nodes, n_id, n)
+    Cosmos.Bucket.put(nodes, m_id, m)
 
     worker = Cosmos.Beings.BeingWorkerCache.worker_process("beings", b.id)
 

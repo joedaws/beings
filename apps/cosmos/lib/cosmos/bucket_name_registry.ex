@@ -8,12 +8,12 @@ defmodule Cosmos.BucketNameRegistry do
   @registry_bucket_name "bucket_names"
 
   def register(being_id, bucket_name) do
-    {:ok, bucket} = Cosmos.Beings.Registry.lookup(Cosmos.Beings.Registry, @registry_bucket_name)
-    Cosmos.Beings.Bucket.put(bucket, being_id, bucket_name)
+    {:ok, bucket} = Cosmos.Registry.lookup(Cosmos.Registry, @registry_bucket_name)
+    Cosmos.Bucket.put(bucket, being_id, bucket_name)
   end
 
   def get(being_id) do
-    {:ok, bucket} = Cosmos.Beings.Registry.lookup(Cosmos.Beings.Registry, @registry_bucket_name)
-    Cosmos.Beings.Bucket.get(bucket, being_id)
+    {:ok, bucket} = Cosmos.Registry.lookup(Cosmos.Registry, @registry_bucket_name)
+    Cosmos.Bucket.get(bucket, being_id)
   end
 end

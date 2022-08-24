@@ -1,7 +1,7 @@
 defmodule Cosmos.Engine.BasicRunner do
   use GenServer
   # alias Cosmos.Beings.Being
-  # alias Cosmos.Beings.Bucket
+  # alias Cosmos.Bucket
 
   def start_link(opts) do
     GenServer.start_link(__MODULE__, :ok, opts)

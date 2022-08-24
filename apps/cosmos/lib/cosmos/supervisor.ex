@@ -1,4 +1,4 @@
-defmodule Cosmos.Beings.Supervisor do
+defmodule Cosmos.Supervisor do
   use Supervisor
 
   def start_link(opts) do
@@ -8,11 +8,11 @@ defmodule Cosmos.Beings.Supervisor do
   @impl true
   def init(:ok) do
     children = [
-      {DynamicSupervisor, name: Cosmos.Beings.BucketSupervisor, strategy: :one_for_one},
+      {DynamicSupervisor, name: Cosmos.BucketSupervisor, strategy: :one_for_one},
       {DynamicSupervisor, name: Cosmos.Beings.BeingWorkerSupervisor, strategy: :one_for_one},
       {DynamicSupervisor, name: Cosmos.Locations.NodeWorkerSupervisor, strategy: :one_for_one},
       {Cosmos.Archive.Historian, name: Cosmos.Archive.Historian},
-      {Cosmos.Beings.Registry, name: Cosmos.Beings.Registry},
+      {Cosmos.Registry, name: Cosmos.Registry},
       {Cosmos.Beings.BeingWorkerCache, name: Cosmos.Beings.BeingWorkerCache},
       {Cosmos.Locations.NodeWorkerCache, name: Cosmos.Locations.NodeWorkerCache}
     ]

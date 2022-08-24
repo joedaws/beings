@@ -5,8 +5,8 @@ defmodule Cosmos.Archive.HistorianTest do
   alias Cosmos.Archive.Event
 
   setup do
-    Cosmos.Beings.Registry.create(Cosmos.Beings.Registry, "beings")
-    {:ok, beings} = Cosmos.Beings.Registry.lookup(Cosmos.Beings.Registry, "beings")
+    Cosmos.Registry.create(Cosmos.Registry, "beings")
+    {:ok, beings} = Cosmos.Registry.lookup(Cosmos.Registry, "beings")
 
     b = Being.get_random_being()
     b = %{b | ichor: 100, status: "hibernating"}
@@ -16,8 +16,8 @@ defmodule Cosmos.Archive.HistorianTest do
     c = %{c | ichor: 100, status: "hibernating"}
     c_id = c.id
 
-    Cosmos.Beings.Bucket.put(beings, b.id, b)
-    Cosmos.Beings.Bucket.put(beings, c.id, c)
+    Cosmos.Bucket.put(beings, b.id, b)
+    Cosmos.Bucket.put(beings, c.id, c)
 
     %{b_id: b_id, c_id: c_id}
   end

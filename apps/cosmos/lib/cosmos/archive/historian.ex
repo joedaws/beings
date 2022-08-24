@@ -5,9 +5,9 @@ defmodule Cosmos.Archive.Historian do
   The history is a map whose keys are entity ids and
   whose values are lists of events.
   """
-  use GenServer
+  use GenServer, restart: :permanent
   require Logger
-  alias Cosmos.Beings.Bucket
+  alias Cosmos.Bucket
   alias Cosmos.Beings.BeingWorker
   alias Cosmos.Archive.Event
 
@@ -63,7 +63,7 @@ defmodule Cosmos.Archive.Historian do
 
   @impl true
   def handle_cast({:register_entities_in_bucket, bucket_name}, history) do
-    {:ok, bucket_worker} = Cosmos.Beings.Registry.lookup(Cosmos.Beings.Registry, bucket_name)
+    {:ok, bucket_worker} = Cosmos.Registry.lookup(Cosmos.Registry, bucket_name)
     all_entity_ids = Bucket.keys(bucket_worker)
     history = register_entities(history, all_entity_ids)
     {:noreply, history}

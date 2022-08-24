@@ -15,7 +15,7 @@ defmodule Cosmos.Beings.BeingWorker do
   """
   use GenServer, restart: :temporary
   require Logger
-  alias Cosmos.Beings.Bucket
+  alias Cosmos.Bucket
   alias Cosmos.Locations.NodeWorker
   alias Cosmos.Beings.Brains.Observations
   alias Cosmos.Beings.Brains.Parameters
@@ -129,12 +129,12 @@ defmodule Cosmos.Beings.BeingWorker do
 
   # Private functions ---------------------------------------------------------------------
   defp get_being(bucket_name, being_id) do
-    {:ok, bucket_pid} = Cosmos.Beings.Registry.lookup(Cosmos.Beings.Registry, bucket_name)
+    {:ok, bucket_pid} = Cosmos.Registry.lookup(Cosmos.Registry, bucket_name)
     Bucket.get(bucket_pid, being_id)
   end
 
   defp put_being(bucket_name, being_id, being) do
-    {:ok, bucket_pid} = Cosmos.Beings.Registry.lookup(Cosmos.Beings.Registry, bucket_name)
+    {:ok, bucket_pid} = Cosmos.Registry.lookup(Cosmos.Registry, bucket_name)
     Bucket.put(bucket_pid, being_id, being)
   end
 

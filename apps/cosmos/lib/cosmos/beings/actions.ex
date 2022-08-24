@@ -1,7 +1,7 @@
 defmodule Cosmos.Beings.Actions do
   require Logger
   alias Cosmos.Beings.Being
-  alias Cosmos.Beings.Bucket
+  alias Cosmos.Bucket
   alias Cosmos.Locations.NodeWorker
   alias Cosmos.Archive.Event
   alias Cosmos.Archive.Historian
@@ -205,13 +205,13 @@ defmodule Cosmos.Beings.Actions do
 
   defp get_being(being_id) do
     bucket_name = Cosmos.BucketNameRegistry.get(being_id)
-    {:ok, bucket_pid} = Cosmos.Beings.Registry.lookup(Cosmos.Beings.Registry, bucket_name)
+    {:ok, bucket_pid} = Cosmos.Registry.lookup(Cosmos.Registry, bucket_name)
     Bucket.get(bucket_pid, being_id)
   end
 
   defp put_being(being_id, being) do
     bucket_name = Cosmos.BucketNameRegistry.get(being_id)
-    {:ok, bucket_pid} = Cosmos.Beings.Registry.lookup(Cosmos.Beings.Registry, bucket_name)
+    {:ok, bucket_pid} = Cosmos.Registry.lookup(Cosmos.Registry, bucket_name)
     Bucket.put(bucket_pid, being_id, being)
   end
 end

@@ -1,7 +1,7 @@
 defmodule Cosmos.Locations.NodeWorker do
   use GenServer, restart: :temporary
   alias Cosmos.Locations.NodeWorker
-  alias Cosmos.Beings.Bucket
+  alias Cosmos.Bucket
 
   defstruct [
     :bucket_name,
@@ -121,12 +121,12 @@ defmodule Cosmos.Locations.NodeWorker do
 
   # Private functions ---------------------------------------------------------------------
   defp get_node(bucket_name, node_id) do
-    {:ok, bucket_pid} = Cosmos.Beings.Registry.lookup(Cosmos.Beings.Registry, bucket_name)
+    {:ok, bucket_pid} = Cosmos.Registry.lookup(Cosmos.Registry, bucket_name)
     Bucket.get(bucket_pid, node_id)
   end
 
   defp put_node(bucket_name, node_id, node) do
-    {:ok, bucket_pid} = Cosmos.Beings.Registry.lookup(Cosmos.Beings.Registry, bucket_name)
+    {:ok, bucket_pid} = Cosmos.Registry.lookup(Cosmos.Registry, bucket_name)
     Bucket.put(bucket_pid, node_id, node)
   end
 end

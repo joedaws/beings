@@ -44,20 +44,20 @@ defmodule CosmosServer.Command do
   end
 
   def run({:create, :bucket, bucket}) do
-    Cosmos.Beings.Registry.create(Cosmos.Beings.Registry, bucket)
+    Cosmos.Registry.create(Cosmos.Registry, bucket)
     {:ok, "OK\r\n"}
   end
 
   def run({:create, :being, bucket}) do
     being = Cosmos.Beings.Being.get_random_being()
-    {:ok, bucket} = Cosmos.Beings.Registry.lookup(Cosmos.Beings.Registry, bucket)
-    Cosmos.Beings.Bucket.put(bucket, Cosmos.Beings.Being.generate_id(being), being)
+    {:ok, bucket} = Cosmos.Registry.lookup(Cosmos.Registry, bucket)
+    Cosmos.Bucket.put(bucket, Cosmos.Beings.Being.generate_id(being), being)
     {:ok, "OK\r\n"}
   end
 
   def run({:get, :being, :all, bucket}) do
-    {:ok, bucket} = Cosmos.Beings.Registry.lookup(Cosmos.Beings.Registry, bucket)
-    values = Cosmos.Beings.Bucket.keys(bucket)
+    {:ok, bucket} = Cosmos.Registry.lookup(Cosmos.Registry, bucket)
+    values = Cosmos.Bucket.keys(bucket)
     string_values = Enum.map(values, fn x -> Base.encode64(x) end)
     {:ok, "#{string_values}\n"}
   end

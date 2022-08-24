@@ -1,9 +1,9 @@
-defmodule Cosmos.Beings.BucketTest do
+defmodule Cosmos.BucketTest do
   use ExUnit.Case, async: true
 
   @moduletag :capture_log
 
-  alias Cosmos.Beings.Bucket
+  alias Cosmos.Bucket
 
   setup do
     bucket = start_supervised!(Bucket)
@@ -21,13 +21,13 @@ defmodule Cosmos.Beings.BucketTest do
   end
 
   test "are temporary workers" do
-    assert Supervisor.child_spec(Cosmos.Beings.Bucket, []).restart == :temporary
+    assert Supervisor.child_spec(Cosmos.Bucket, []).restart == :temporary
   end
 
   test "get keys", %{bucket: bucket} do
     b = Cosmos.Beings.Being.get_random_being()
     b_id = "TEST_BEING"
     Bucket.put(bucket, b_id, b)
-    assert Cosmos.Beings.Bucket.keys(bucket) == ["TEST_BEING"]
+    assert Cosmos.Bucket.keys(bucket) == ["TEST_BEING"]
   end
 end

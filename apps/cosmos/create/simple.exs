@@ -13,19 +13,19 @@ defmodule Cosmos.Create.Simple do
   being starts in node A
   """
   def one_being_four_nodes() do
-    registry = start_supervised!(Cosmos.Beings.Registry)
-    Cosmos.Beings.Registry.create(registry, "beings")
-    Cosmos.Beings.Registry.create(registry, "nodes")
+    registry = start_supervised!(Cosmos.Registry)
+    Cosmos.Registry.create(registry, "beings")
+    Cosmos.Registry.create(registry, "nodes")
 
-    {:ok, beings} = Cosmos.Beings.Registry.lookup(registry, "beings")
-    {:ok, nodes} = Cosmos.Beings.Registry.lookup(registry, "nodes")
+    {:ok, beings} = Cosmos.Registry.lookup(registry, "beings")
+    {:ok, nodes} = Cosmos.Registry.lookup(registry, "nodes")
 
     # being ----------------------------------------------------------
     b = Being.get_random_being()
     # hibernation prevents the being cycle from running
     b = %{b | ichor: 100, status: "hibernating"}
     b_id = Being.generate_id(b)
-    Cosmos.Beings.Bucket.put(beings, b_id, b)
+    Cosmos.Bucket.put(beings, b_id, b)
     {:ok, being_worker} = BeingWorker.start_link([beings, b_id])
 
     # nodes ----------------------------------------------------------
@@ -39,10 +39,10 @@ defmodule Cosmos.Create.Simple do
     d = Node.generate_random_node()
     d_id = Node.generate_id(d)
 
-    Cosmos.Beings.Bucket.put(nodes, a_id, a)
-    Cosmos.Beings.Bucket.put(nodes, b_id, b)
-    Cosmos.Beings.Bucket.put(nodes, c_id, c)
-    Cosmos.Beings.Bucket.put(nodes, d_id, d)
+    Cosmos.Bucket.put(nodes, a_id, a)
+    Cosmos.Bucket.put(nodes, b_id, b)
+    Cosmos.Bucket.put(nodes, c_id, c)
+    Cosmos.Bucket.put(nodes, d_id, d)
 
     {:ok, node_worker_a} = NodeWorker.start_link([nodes, a_id])
     {:ok, node_worker_b} = NodeWorker.start_link([nodes, b_id])

@@ -1,6 +1,6 @@
-defmodule Cosmos.Beings.Registry do
+defmodule Cosmos.Registry do
   use GenServer
-  alias Cosmos.Beings.Bucket
+  alias Cosmos.Bucket
 
   # Client API
   @doc """
@@ -46,8 +46,7 @@ defmodule Cosmos.Beings.Registry do
     if Map.has_key?(names, name) do
       {:noreply, {names, refs}}
     else
-      {:ok, pid} =
-        DynamicSupervisor.start_child(Cosmos.Beings.BucketSupervisor, Cosmos.Beings.Bucket)
+      {:ok, pid} = DynamicSupervisor.start_child(Cosmos.BucketSupervisor, Cosmos.Bucket)
 
       ref = Process.monitor(pid)
       refs = Map.put(refs, ref, name)
@@ -66,7 +65,7 @@ defmodule Cosmos.Beings.Registry do
   @impl true
   def handle_info(msg, state) do
     require Logger
-    Logger.debug("Unexpected message in Cosmos.Beings.Registry: #{inspect(msg)}")
+    Logger.debug("Unexpected message in Cosmos.Registry: #{inspect(msg)}")
     {:noreply, state}
   end
 end

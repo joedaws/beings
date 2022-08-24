@@ -1,4 +1,4 @@
-defmodule Cosmos.Beings.Bucket do
+defmodule Cosmos.Bucket do
   use Agent, restart: :temporary
 
   @doc """

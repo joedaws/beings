@@ -13,16 +13,16 @@ defmodule Cosmos do
   def start(_type, _args) do
     # Although we don't use the supervisor name below directly,
     # it can be useful when debugging or introspecting the system.
-    {:ok, sup_pid} = Cosmos.Beings.Supervisor.start_link(name: Cosmos.Beings.Supervisor)
+    {:ok, sup_pid} = Cosmos.Supervisor.start_link(name: Cosmos.Supervisor)
 
     # This bucket will hold the map between entity ids and
     # the buck in which they are currently held.
-    Cosmos.Beings.Registry.create(Cosmos.Beings.Registry, "bucket_names")
-    Cosmos.Beings.Registry.create(Cosmos.Beings.Registry, "entity_worker_names")
+    Cosmos.Registry.create(Cosmos.Registry, "bucket_names")
+    Cosmos.Registry.create(Cosmos.Registry, "entity_worker_names")
     # In order for the graph to be setup we need a place to hold nodes.
-    Cosmos.Beings.Registry.create(Cosmos.Beings.Registry, "nodes")
+    Cosmos.Registry.create(Cosmos.Registry, "nodes")
     # same for beings
-    Cosmos.Beings.Registry.create(Cosmos.Beings.Registry, "beings")
+    Cosmos.Registry.create(Cosmos.Registry, "beings")
 
     setup_graph(:basic)
     setup_beings(:basic)
@@ -49,8 +49,8 @@ defmodule Cosmos do
   Puts one being at each of the nodes
   """
   def setup_beings(:basic) do
-    {:ok, nodes} = Cosmos.Beings.Registry.lookup(Cosmos.Beings.Registry, "nodes")
-    node_ids = Cosmos.Beings.Bucket.keys(nodes)
+    {:ok, nodes} = Cosmos.Registry.lookup(Cosmos.Registry, "nodes")
+    node_ids = Cosmos.Bucket.keys(nodes)
     generate_beings(node_ids)
   end
 
@@ -65,8 +65,8 @@ defmodule Cosmos do
 
   defp create_node(name) do
     node = Node.generate_node(name)
-    {:ok, nodes} = Cosmos.Beings.Registry.lookup(Cosmos.Beings.Registry, "nodes")
-    Cosmos.Beings.Bucket.put(nodes, node.id, node)
+    {:ok, nodes} = Cosmos.Registry.lookup(Cosmos.Registry, "nodes")
+    Cosmos.Bucket.put(nodes, node.id, node)
 
     node_worker = Cosmos.Locations.NodeWorkerCache.worker_process("nodes", node.id)
   end
@@ -81,9 +81,9 @@ defmodule Cosmos do
   end
 
   defp create_being(node_id) do
-    {:ok, beings} = Cosmos.Beings.Registry.lookup(Cosmos.Beings.Registry, "beings")
+    {:ok, beings} = Cosmos.Registry.lookup(Cosmos.Registry, "beings")
     b = Being.get_random_being()
-    Cosmos.Beings.Bucket.put(beings, b.id, b)
+    Cosmos.Bucket.put(beings, b.id, b)
 
     worker = Cosmos.Beings.BeingWorkerCache.worker_process("beings", b.id)
     Actions.move_to_node(b.id, node_id)
@@ -109,8 +109,8 @@ defmodule Cosmos do
   There should be 4 or more nodes for this to work.
   """
   defp connect_nodes(:random_lookahead) do
-    {:ok, node_bucket} = Cosmos.Beings.Registry.lookup(Cosmos.Beings.Registry, "nodes")
-    node_ids = Cosmos.Beings.Bucket.keys(node_bucket)
+    {:ok, node_bucket} = Cosmos.Registry.lookup(Cosmos.Registry, "nodes")
+    node_ids = Cosmos.Bucket.keys(node_bucket)
 
     build_edges(node_ids)
   end
