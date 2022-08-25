@@ -50,6 +50,10 @@ defmodule Cosmos.Beings.Name do
     all_syllables
   end
 
+  def get_max_syllables() do
+    @max_syllables
+  end
+
   @doc """
   Template types
   - "weird_science"
@@ -138,7 +142,7 @@ defmodule Cosmos.Beings.Name do
   Let $k$ be the number of parts in a template
   Let $n_i$ for $i=1,...,k$ be the max number of syllables for
   that part.
-  Let $m_i$ for $i=1,...k$ be the number of syllabes from the
+  Let $m_i$ for $i=1,...k$ be the number of syllables from the
   name file for the part associated with index i.
   Then for a single part, the number of unique
   possible names is

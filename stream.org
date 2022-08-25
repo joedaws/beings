@@ -46,13 +46,12 @@ asserted property ownership.
 
 
 ** Cosmos Application
+*** TODO create name generator that won't repeat names and is quick
 *** TODO create additional actions for beings
 *** TODO add database to the backend
 - [ ] beings
 - [ ] nodes
 - [ ] events
-
-*** TODO create name generator that won't repeat names and is quick
 
 *** TODO build view of the beings
 
