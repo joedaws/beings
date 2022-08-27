@@ -117,7 +117,7 @@ defmodule Cosmos.Beings.Being do
   have the same name without colliding in the cosmos bucket
   """
   def generate_id(being) do
-    :erlang.md5(get_full_name(being) <> (:os.system_time(:millisecond) |> to_string))
+    Ksuid.generate()
   end
 
   def get_default_being_bucket_name() do

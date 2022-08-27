@@ -92,7 +92,7 @@ defmodule Cosmos.Locations.Node do
   end
 
   def generate_id(node) do
-    :erlang.md5(get_name(node) <> (:os.system_time(:millisecond) |> to_string))
+    Ksuid.generate()
   end
 
   defp entity_id_registries(node_id, bucket_name) do

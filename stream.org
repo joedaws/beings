@@ -46,6 +46,7 @@ asserted property ownership.
 
 
 ** Cosmos Application
+*** TODO replace entity ids ksuid
 *** TODO create name generator that won't repeat names and is quick
 *** TODO create additional actions for beings
 *** TODO add database to the backend

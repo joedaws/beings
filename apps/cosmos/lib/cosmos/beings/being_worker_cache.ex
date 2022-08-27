@@ -1,17 +1,6 @@
 defmodule Cosmos.Beings.BeingWorkerCache do
   @doc """
-  GenServer for getting BeingWorkers
-
-  ## Examples
-
-      iex> {:ok, cache} = Cosmos.Beings.BeingWorkerCache.start()
-      {:ok, cache}
-
-      iex> being = Cosmos.Beings.Being.get_random_being()
-      being
-
-      iex> being_id = Cosmos.Beings.Being.generate_id(being)
-      being_id
+  GenServer for getting BeingWorker processes
   """
   use GenServer
   require Logger
