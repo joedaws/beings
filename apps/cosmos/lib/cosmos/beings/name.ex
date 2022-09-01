@@ -60,6 +60,40 @@ defmodule Cosmos.Beings.Name do
   - "dream_realm"
   - "deep_denizen"
   """
+  def generate_name(template_type, name_tuple) do
+    all_syllables = name_syllables()
+
+    syllables = Map.get(all_syllables, template_type)
+    template = Map.get(@templates, template_type)
+
+    parts =
+      for part <- template,
+          into: %{},
+          do:
+            {part,
+             create_name_part(
+               Map.get(syllables, part),
+               :rand.uniform(Map.get(@max_syllables, part))
+             )}
+
+    name = %Name{
+      template: template,
+      parts: parts
+    }
+
+    Logger.info(
+      "Created a #{template_type} random name `#{string(name)}` from tempalte: #{Enum.join(template, " ")}"
+    )
+
+    name
+  end
+
+  @doc """
+  Template types
+  - "weird_science"
+  - "dream_realm"
+  - "deep_denizen"
+  """
   def generate_name(template_type) do
     all_syllables = name_syllables()
 
@@ -75,6 +109,35 @@ defmodule Cosmos.Beings.Name do
                Map.get(syllables, part),
                :rand.uniform(Map.get(@max_syllables, part))
              )}
+
+    name = %Name{
+      template: template,
+      parts: parts
+    }
+
+    Logger.info(
+      "Created a #{template_type} random name `#{string(name)}` from tempalte: #{Enum.join(template, " ")}"
+    )
+
+    name
+  end
+
+  @doc """
+  Template types
+  - "weird_science"
+  - "dream_realm"
+  - "deep_denizen"
+  """
+  def get_name_from_tuple(template_type, part_name_to_tuple_map) do
+    all_syllables = name_syllables()
+
+    syllables = Map.get(all_syllables, template_type)
+    template = Map.get(@templates, template_type)
+
+    parts =
+      for {part, tup} <- part_name_to_tuple_map,
+          into: %{},
+          do: {part, for(idx <- Tuple.to_list(tup), do: Enum.at(Map.get(syllables, part), idx))}
 
     name = %Name{
       template: template,

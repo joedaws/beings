@@ -111,10 +111,7 @@ defmodule Cosmos.Beings.Being do
   end
 
   @doc """
-  Generate a md5 for hashing the beings
-
-  time is added to the hash string so that two beings can
-  have the same name without colliding in the cosmos bucket
+  Generate a Ksuid for the being
   """
   def generate_id(being) do
     Ksuid.generate()

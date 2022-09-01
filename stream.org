@@ -46,15 +46,25 @@ asserted property ownership.
 
 
 ** Cosmos Application
-*** TODO replace entity ids ksuid
+*** TODO build view of the beings
+- Work through live view tutorial
+- multiple views
+  - profile view -- each being has a profile page
+  - word view -- see the distribution of beings accross the nodes
+
+*** TODO complete redesign of the name generation process
+- use :ets table
+- use queue and have beings pull names out of the queue
+- optimistic locking style -- keep a list of generated names, keep drawing until a not yet genereated name is made.
+
 *** TODO create name generator that won't repeat names and is quick
+
 *** TODO create additional actions for beings
+
 *** TODO add database to the backend
 - [ ] beings
 - [ ] nodes
 - [ ] events
-
-*** TODO build view of the beings
 
 *** TODO create an enumeration of all unique names
 This way we can sequentially create all possible being and node names.
@@ -70,6 +80,12 @@ their knowledge map
 
 *** TODO implement ranks
 *** TODO add a taxidermy
+*** DONE add `get_name_from_tuple` function to Name modules
+DID NOT DO
+- [x] Cosmos.Beings.Name
+- [x] Cosmos.Locations.Name
+*** DONE replace entity ids ksuid
+k-sortable unique identifier
 *** DONE move Cosmos.Beings.Supervisor to Cosmos.Supervisor
 *** DONE move Cosmos.Beings.Bucket to Cosmos.Bucket
 *** DONE move Cosmos.Beings.BucketSupervisor to Cosmos.BucketSupervisor
@@ -284,13 +300,16 @@ We will not implement:
 - social interactions
 
 * Learnings
+** Getting the size of tuple is easy
+Just use `tuple_size` from the Kernel module!
+** If you really have to update a value in a tuple
+Just use `put_elem` but probably should avoid this.
 ** Build a system first, then figure out more complicated behavior later.
 In the first pass, I'll just build beings that make observaitons
 of their environment and don't store a history of interactions other
 than possibly their friends. Based on this observation they will make
 decisions. Later iterations can include more complex traditional AI
 systems. And much later reinforcement learning can be used.
-
 ** Focus on single being behavior first
 Before working on the multi-being behavior too much I think
 I will focus more on single being behavior and flush-out
