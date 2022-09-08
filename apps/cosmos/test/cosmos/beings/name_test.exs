@@ -27,4 +27,11 @@ defmodule Cosmos.Beings.NameTest do
     assert is_bitstring(Enum.at(Map.keys(name.parts), 0))
     assert is_bitstring(Enum.at(name.template, 0))
   end
+
+  test "weird science being all name list" do
+    name_list = Name.get_all_names_list("weird_science")
+    name = Enum.at(name_list, 0)
+    assert name.template == ["model_name", "signifier"]
+    assert length(name.parts) == 2
+  end
 end

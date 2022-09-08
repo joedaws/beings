@@ -122,6 +122,44 @@ defmodule Cosmos.Beings.Name do
     name
   end
 
+  def permutations([]) do
+    [[]]
+  end
+
+  def permutations(list) do
+    for h <- list, t <- permutations(list -- [h]), do: [h | t]
+  end
+
+  @doc """
+  Creates a queue for each tempalte type of all permutations of
+  all possible being names.
+
+  "weird_science" => ["model_name", "signifier"],
+  "dream_realm" => ["shell_name", "core_prefix", "core_name"],
+  "deep_denizen" => ["epithet", "deep_name"]
+  """
+  def get_all_names_list() do
+    %{
+      "weird_science" => get_all_names_list("weird_science")
+    }
+  end
+
+  def get_all_names_list("weird_science") do
+    all_syllables = name_syllables()
+    template = Map.get(@templates, "weird_science")
+
+    syllables = Map.get(all_syllables, "weird_science")
+
+    all_parts_combos =
+      for syl1 <- Map.get(syllables, "model_name"),
+          syl2 <- Map.get(syllables, "signifier"),
+          do: [syl1, syl2]
+
+    all_parts_combos = Enum.shuffle(all_parts_combos)
+
+    all_names = for p <- all_parts_combos, do: %Name{template: template, parts: p}
+  end
+
   @doc """
   Template types
   - "weird_science"

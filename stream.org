@@ -46,37 +46,37 @@ asserted property ownership.
 
 
 ** Cosmos Application
+*** TODO complete redesign of the name generation process
+- follow example of weird science name in name.ex for beings
+  we can use this approach for the other types
+  Once the changes to name.ex are complete then build a
+  name generator which holds an index for each name type.
+- use :ets table
+  Probably won't do this
+- use queue and have beings pull names out of the queue
+  cool but probably don't need it
+
+*** TODO create additional actions for beings
+
 *** TODO build view of the beings
 - Work through live view tutorial
 - multiple views
   - profile view -- each being has a profile page
   - word view -- see the distribution of beings accross the nodes
 
-*** TODO complete redesign of the name generation process
-- use :ets table
-- use queue and have beings pull names out of the queue
-- optimistic locking style -- keep a list of generated names, keep drawing until a not yet genereated name is made.
-
-*** TODO create name generator that won't repeat names and is quick
-
-*** TODO create additional actions for beings
-
 *** TODO add database to the backend
 - [ ] beings
 - [ ] nodes
 - [ ] events
-
-*** TODO create an enumeration of all unique names
-This way we can sequentially create all possible being and node names.
-
-*** TODO add additional commands to configure newly created beings and nodes
-Update CosmosServer application
 
 *** TODO add knowledge to beings
 Beings store the spells/recipes they know in
 their knowledge map
 
 *** TODO add memories to beings
+
+*** TODO add additional commands to configure newly created beings and nodes
+Update CosmosServer application
 
 *** TODO implement ranks
 *** TODO add a taxidermy
