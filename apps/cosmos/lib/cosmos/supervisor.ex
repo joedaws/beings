@@ -13,6 +13,7 @@ defmodule Cosmos.Supervisor do
       {DynamicSupervisor, name: Cosmos.Locations.NodeWorkerSupervisor, strategy: :one_for_one},
       {Cosmos.Archive.Historian, name: Cosmos.Archive.Historian},
       {Cosmos.Registry, name: Cosmos.Registry},
+      {Cosmos.NameGenerator, name: Cosmos.NameGenerator},
       {Cosmos.Beings.BeingWorkerCache, name: Cosmos.Beings.BeingWorkerCache},
       {Cosmos.Locations.NodeWorkerCache, name: Cosmos.Locations.NodeWorkerCache}
     ]

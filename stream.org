@@ -56,6 +56,9 @@ asserted property ownership.
 - use queue and have beings pull names out of the queue
   cool but probably don't need it
 
+*** TODO add simple phoenix web view to the application
+Follow the approach of users from phoenix_live_view_example
+
 *** TODO create additional actions for beings
 
 *** TODO build view of the beings
@@ -65,6 +68,7 @@ asserted property ownership.
   - word view -- see the distribution of beings accross the nodes
 
 *** TODO add database to the backend
+Let's use Postgresql why not
 - [ ] beings
 - [ ] nodes
 - [ ] events

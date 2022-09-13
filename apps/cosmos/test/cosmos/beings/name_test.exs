@@ -33,5 +33,9 @@ defmodule Cosmos.Beings.NameTest do
     name = Enum.at(name_list, 0)
     assert name.template == ["model_name", "signifier"]
     assert length(name.parts) == 2
+
+    name = Enum.at(name_list, 1)
+    assert name.template == ["model_name", "signifier"]
+    assert length(name.parts) == 2
   end
 end
