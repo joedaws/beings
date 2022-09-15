@@ -28,7 +28,7 @@ defmodule Cosmos.Beings.Name do
   @max_syllables %{
     "model_name" => 1,
     "signifier" => 1,
-    "shell_name" => 2,
+    "shell_name" => 3,
     "core_prefix" => 1,
     "core_name" => 3,
     "epithet" => 1,
@@ -140,7 +140,8 @@ defmodule Cosmos.Beings.Name do
   """
   def get_all_names_list() do
     %{
-      "weird_science" => get_all_names_list("weird_science")
+      "weird_science" => get_all_names_list("weird_science"),
+      "dream_realm" => get_all_names_list("dream_realm")
     }
   end
 
@@ -158,6 +159,80 @@ defmodule Cosmos.Beings.Name do
     all_parts_combos = Enum.shuffle(all_parts_combos)
 
     all_names = for p <- all_parts_combos, do: %Name{template: template, parts: p}
+  end
+
+  def get_all_names_list("dream_realm") do
+    all_syllables = name_syllables()
+    template = Map.get(@templates, "dream_realm")
+
+    syllables = Map.get(all_syllables, "dream_realm")
+
+    all_parts_combos =
+      for syl1 <-
+            all_combos(
+              Map.get(syllables, "shell_name"),
+              [],
+              Map.get(@max_syllables, "shell_name")
+            ),
+          syl2 <-
+            all_combos(
+              Map.get(syllables, "core_prefix"),
+              [],
+              Map.get(@max_syllables, "core_prefix")
+            ),
+          syl3 <-
+            all_combos(Map.get(syllables, "core_name"), [], Map.get(@max_syllables, "core_name")),
+          do: [syl1, syl2, syl3]
+
+    all_parts_combos = Enum.shuffle(all_parts_combos)
+
+    all_names = for p <- all_parts_combos, do: %Name{template: template, parts: p}
+  end
+
+  def all_combos(syllables_list, accumulator, 1) do
+    for(syl <- syllables_list, do: [syl]) ++ accumulator
+  end
+
+  @doc """
+  Returns all names composed of 1,...,n syllables from the given list
+  """
+  def all_combos(syllables_list, accumulator, n) do
+    new_combos =
+      case n do
+        4 -> all_4_combos(syllables_list)
+        3 -> all_3_combos(syllables_list)
+        2 -> all_2_combos(syllables_list)
+      end
+
+    all_combos(syllables_list, new_combos ++ accumulator, n - 1)
+  end
+
+  @doc """
+  Returns all names composed of 2 syllables from the given list
+  """
+  def all_2_combos(syllable_list) do
+    for syl1 <- syllable_list, syl2 <- syllable_list, do: [syl1, syl2]
+  end
+
+  @doc """
+  Returns all names composed of 3 syllables from the given list
+  """
+  def all_3_combos(syllable_list) do
+    for syl1 <- syllable_list,
+        syl2 <- syllable_list,
+        syl3 <- syllable_list,
+        do: [syl1, syl2, syl3]
+  end
+
+  @doc """
+  Returns all names composed of 3 syllables from the given list
+  """
+  def all_4_combos(syllable_list) do
+    for syl1 <- syllable_list,
+        syl2 <- syllable_list,
+        syl3 <- syllable_list,
+        syl4 <- syllable_list,
+        do: [syl1, syl2, syl3, syl4]
   end
 
   @doc """

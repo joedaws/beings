@@ -16,7 +16,7 @@ defmodule Cosmos.NameGenerator do
   def init(args) do
     state = %{
       "being_names" => Cosmos.Beings.Name.get_all_names_list(),
-      "being_name_idx" => %{"weird_science" => 0}
+      "being_name_idx" => %{"weird_science" => 0, "dream_realm" => 0}
     }
 
     {:ok, state}

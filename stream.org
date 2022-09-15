@@ -56,6 +56,8 @@ asserted property ownership.
 - use queue and have beings pull names out of the queue
   cool but probably don't need it
 
+*** TODO build centralized name helper function module
+
 *** TODO add simple phoenix web view to the application
 Follow the approach of users from phoenix_live_view_example
 

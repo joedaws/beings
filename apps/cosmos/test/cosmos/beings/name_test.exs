@@ -38,4 +38,13 @@ defmodule Cosmos.Beings.NameTest do
     assert name.template == ["model_name", "signifier"]
     assert length(name.parts) == 2
   end
+
+  test "all combos generation" do
+    syllables_list = ["ya", "di", "do", "so"]
+
+    assert length(Name.all_combos(syllables_list, [], 1)) == 4
+    assert length(Name.all_combos(syllables_list, [], 2)) == 4 * 4 + 4
+    assert length(Name.all_combos(syllables_list, [], 3)) == 4 * 4 * 4 + 4 * 4 + 4
+    assert length(Name.all_combos(syllables_list, [], 4)) == 4 * 4 * 4 * 4 + 4 * 4 * 4 + 4 * 4 + 4
+  end
 end
