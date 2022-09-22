@@ -17,6 +17,7 @@ defmodule Cosmos.Beings.Being do
   alias Cosmos.Beings.Rank
   alias Cosmos.Locations.Node
   alias Cosmos.Beings.Name
+  alias Cosmos.NameGenerator
 
   @max_age 99999
   @max_ichor 99999
@@ -72,6 +73,8 @@ defmodule Cosmos.Beings.Being do
       rituals: rituals
     }
 
+    Logger.info("Being #{Name.string(name)} has come into existince.")
+
     being_id = generate_id(being)
 
     entity_id_registries(being_id, bucket_name)
@@ -81,7 +84,8 @@ defmodule Cosmos.Beings.Being do
 
   def get_random_being() do
     being_cultures = Map.keys(Name.name_syllables())
-    name = Name.generate_name(Enum.random(being_cultures))
+    # name = Name.generate_name(Enum.random(being_cultures))
+    name = NameGenerator.get_name("beings", Enum.random(being_cultures))
     age = :rand.uniform(@max_age)
     ichor = @min_starting_ichor + :rand.uniform(@max_starting_ichor - @min_starting_ichor)
     orichalcum = @min_orichalcum

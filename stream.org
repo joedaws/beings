@@ -70,8 +70,15 @@ asserted property ownership.
 - similar cultural aspect
 - similar goals
 
-
 ** Cosmos Application
+*** TODO fix name change related errors
+*** DONE fix name string method to accept new form of struct
+now the parts is no longer a map but a list.
+It's a bit redundant to include part names in both the
+template entry of the name struct as well as the parts (which)
+previously were maps.
+
+This will require an update of name and name test
 *** TODO add action to rank up
 *** TODO add new decision tree to prioritize ranking up
 *** TODO modify harvest actions with rank check

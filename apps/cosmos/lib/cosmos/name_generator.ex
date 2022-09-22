@@ -24,7 +24,8 @@ defmodule Cosmos.NameGenerator do
       }
     }
 
-    Logger.info("NameGenerator is ready to accept name requests")
+    Logger.info("NameGenerator is ready to accept name requests.")
+
     {:ok, state}
   end
 

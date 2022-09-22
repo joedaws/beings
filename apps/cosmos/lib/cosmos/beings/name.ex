@@ -153,8 +153,18 @@ defmodule Cosmos.Beings.Name do
     syllables = Map.get(all_syllables, "weird_science")
 
     all_parts_combos =
-      for syl1 <- Map.get(syllables, "model_name"),
-          syl2 <- Map.get(syllables, "signifier"),
+      for syl1 <-
+            all_combos(
+              Map.get(syllables, "model_name"),
+              [],
+              Map.get(@max_syllables, "model_name")
+            ),
+          syl2 <-
+            all_combos(
+              Map.get(syllables, "signifier"),
+              [],
+              Map.get(@max_syllables, "signifier")
+            ),
           do: [syl1, syl2]
 
     all_parts_combos = Enum.shuffle(all_parts_combos)
@@ -309,9 +319,12 @@ defmodule Cosmos.Beings.Name do
   - core name
   """
   def string(["shell_name", "core_prefix", "core_name"], name) do
-    shell = "#{String.capitalize(Map.get(name.parts, "shell_name", @default_part))}"
-    prefix = "#{String.capitalize(Map.get(name.parts, "core_prefix", @default_part))}"
-    core = "#{String.capitalize(Map.get(name.parts, "core_name", @default_part))}"
+    # shell = "#{String.capitalize(Map.get(name.parts, "shell_name", @default_part))}"
+    # prefix = "#{String.capitalize(Map.get(name.parts, "core_prefix", @default_part))}"
+    # core = "#{String.capitalize(Map.get(name.parts, "core_name", @default_part))}"
+    shell = "#{String.capitalize(Enum.join(Enum.at(name.parts, 0), " "))}"
+    prefix = "#{String.capitalize(Enum.join(Enum.at(name.parts, 1), " "))}"
+    core = "#{String.capitalize(Enum.join(Enum.at(name.parts, 2), " "))}"
     shell <> "\s" <> prefix <> core
   end
 
@@ -321,14 +334,18 @@ defmodule Cosmos.Beings.Name do
   - deep_name
   """
   def string(["epithet", "deep_name"], name) do
-    epithet = "#{String.capitalize(Map.get(name.parts, "epithet", @default_part))}"
-    deep_name = "#{String.capitalize(Map.get(name.parts, "deep_name", @default_part))}"
+    # epithet = "#{String.capitalize(Map.get(name.parts, "epithet", @default_part))}"
+    # deep_name = "#{String.capitalize(Map.get(name.parts, "deep_name", @default_part))}"
+    epithet = "#{String.capitalize(Enum.join(Enum.at(name.parts, 0), " "))}"
+    deep_name = "#{String.capitalize(Enum.join(Enum.at(name.parts, 1), " "))}"
     epithet <> "\s" <> deep_name
   end
 
   def string(["model_name", "signifier"], name) do
-    model = "#{String.capitalize(Map.get(name.parts, "model_name", @default_part))}"
-    signifier = "#{String.capitalize(Map.get(name.parts, "signifier", @default_part))}"
+    # model = "#{String.capitalize(Map.get(name.parts, "model_name", @default_part))}"
+    # signifier = "#{String.capitalize(Map.get(name.parts, "signifier", @default_part))}"
+    model = "#{String.capitalize(Enum.join(Enum.at(name.parts, 0), " "))}"
+    signifier = "#{String.capitalize(Enum.join(Enum.at(name.parts, 1), " "))}"
     model <> "\s" <> signifier
   end
 
