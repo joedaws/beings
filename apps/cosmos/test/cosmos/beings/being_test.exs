@@ -36,6 +36,7 @@ defmodule Cosmos.Beings.BeingTest do
     b = Being.new(name, node)
 
     assert b.id != nil
+    assert b.orichalcum != nil
   end
 
   test "being nil defaults" do

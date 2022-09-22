@@ -13,4 +13,15 @@ defmodule Cosmos.NameGeneratorTest do
     assert name.template == ["shell_name", "core_prefix", "core_name"]
     assert length(name.parts) == 3
   end
+
+  test "deep denizen being names" do
+    name = NameGenerator.get_name("beings", "deep_denizen")
+    assert name.template == ["epithet", "deep_name"]
+    assert length(name.parts) == 2
+
+    name2 = NameGenerator.get_name("beings", "deep_denizen")
+    assert name2.template == ["epithet", "deep_name"]
+    assert length(name2.parts) == 2
+    assert name.parts != name2.parts
+  end
 end

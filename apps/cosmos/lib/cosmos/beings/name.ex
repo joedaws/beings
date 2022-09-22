@@ -141,7 +141,8 @@ defmodule Cosmos.Beings.Name do
   def get_all_names_list() do
     %{
       "weird_science" => get_all_names_list("weird_science"),
-      "dream_realm" => get_all_names_list("dream_realm")
+      "dream_realm" => get_all_names_list("dream_realm"),
+      "deep_denizen" => get_all_names_list("deep_denizen")
     }
   end
 
@@ -183,6 +184,32 @@ defmodule Cosmos.Beings.Name do
           syl3 <-
             all_combos(Map.get(syllables, "core_name"), [], Map.get(@max_syllables, "core_name")),
           do: [syl1, syl2, syl3]
+
+    all_parts_combos = Enum.shuffle(all_parts_combos)
+
+    all_names = for p <- all_parts_combos, do: %Name{template: template, parts: p}
+  end
+
+  def get_all_names_list("deep_denizen") do
+    all_syllables = name_syllables()
+    template = Map.get(@templates, "deep_denizen")
+
+    syllables = Map.get(all_syllables, "deep_denizen")
+
+    all_parts_combos =
+      for syl1 <-
+            all_combos(
+              Map.get(syllables, "epithet"),
+              [],
+              Map.get(@max_syllables, "epithet")
+            ),
+          syl2 <-
+            all_combos(
+              Map.get(syllables, "deep_name"),
+              [],
+              Map.get(@max_syllables, "deep_name")
+            ),
+          do: [syl1, syl2]
 
     all_parts_combos = Enum.shuffle(all_parts_combos)
 

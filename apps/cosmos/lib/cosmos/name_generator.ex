@@ -1,5 +1,6 @@
 defmodule Cosmos.NameGenerator do
   use GenServer, restart: :permanent
+  require Logger
 
   @entity_module %{"being" => Cosmos.Beings.Name, "node" => Cosmos.Locations.Name}
 
@@ -16,9 +17,14 @@ defmodule Cosmos.NameGenerator do
   def init(args) do
     state = %{
       "being_names" => Cosmos.Beings.Name.get_all_names_list(),
-      "being_name_idx" => %{"weird_science" => 0, "dream_realm" => 0}
+      "being_name_idx" => %{
+        "weird_science" => 0,
+        "dream_realm" => 0,
+        "deep_denizen" => 0
+      }
     }
 
+    Logger.info("NameGenerator is ready to accept name requests")
     {:ok, state}
   end
 

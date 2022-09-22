@@ -19,7 +19,7 @@ There are three classes of Eldrich beings in the simulation
   creators. Now they scour the world for resources to perform rituals
   to build more of the ichor that powers them.
 
-- citizens of the dream realm
+- citizens of the dream realm (dream realm)
 
   An emergent property of a universe with sentient beings is a
   realm of mirrored consciousness and echos of sentient thought.
@@ -32,8 +32,29 @@ There are three classes of Eldrich beings in the simulation
 
 - deep denizen
 
-  Fiercely independent and
-  Those that dwell in the vast voids between the stars.
+  Fiercely independent and often solitary, the deep denizens
+  are born in the great voids between stars. During the course
+  of their existence they drift through space. Sometimes these beings
+  drift into the space around earth, bring weirdness and chaos with them.
+  Their desire for ichor is much more akin to a tree seeking sunlight than
+  an animal seeking food.
+
+*** Being Rank
+Beings have a strict social hierarchy which is determined by their rank.
+All beings begin at the lowest rank and can increase their rank by
+paying some amount of ichor and orichalcum. Beings higher in the social
+hierarchy have benefits that the lower ranking beings do not have. For
+instance, they may possess nodes and collect resources from the nodes
+and have other co-occupying beings give part of their harvest to the
+higher ranking beings.
+
+*** Individual Goals
+- These change over time.
+- The current main goal determines what kinds of decisions a being will make
+- A goal is related to specific completable task
+- Once the task is complete they might pick up a new goal.
+- Beings with similar goals may be more likely to help each other
+  or to become friends.
 
 *** Property Ownership
 Beings can own nodes and prevent other beings from fully utilizing the
@@ -44,8 +65,19 @@ resources there.
 Beings can choose to cooperate with one another and not enforce any claimed or
 asserted property ownership.
 
+**** Why might a being choose be friends with another?
+- similar in likes and dislikes
+- similar cultural aspect
+- similar goals
+
 
 ** Cosmos Application
+*** TODO add action to rank up
+*** TODO add new decision tree to prioritize ranking up
+*** TODO modify harvest actions with rank check
+if there is a higher ranking being co-occupying the node then
+the lower ranking being must give part of the harvest to the
+higher ranking being.
 *** TODO complete redesign of the name generation process
 - follow example of weird science name in name.ex for beings
   we can use this approach for the other types
@@ -85,7 +117,10 @@ their knowledge map
 Update CosmosServer application
 
 *** TODO implement ranks
+
 *** TODO add a taxidermy
+
+*** DONE add orichalcum to beings
 *** DONE add `get_name_from_tuple` function to Name modules
 DID NOT DO
 - [x] Cosmos.Beings.Name
@@ -95,14 +130,12 @@ k-sortable unique identifier
 *** DONE move Cosmos.Beings.Supervisor to Cosmos.Supervisor
 *** DONE move Cosmos.Beings.Bucket to Cosmos.Bucket
 *** DONE move Cosmos.Beings.BucketSupervisor to Cosmos.BucketSupervisor
-
 *** DONE fix historian crash causing all other processes to crash.
 This should be a restart setting somewhere
 *** DONE use register node name, module name etc. IN node creation
 see what was done in `beings.ex`
 *** DONE refactor historian to create it's own event records
 Implement some kind of diff function
-
 Also pass the action taken from within the action function
 *** DONE figure out a worker around for a mutex for a being
 This will be a useful thing if we must require synchronous execution.

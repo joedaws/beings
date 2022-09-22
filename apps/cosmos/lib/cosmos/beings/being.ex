@@ -22,12 +22,14 @@ defmodule Cosmos.Beings.Being do
   @max_ichor 99999
   @min_starting_ichor 100
   @max_starting_ichor 200
+  @min_starting_orichalcum 10
 
   defstruct [
     :name,
     :node,
     age: 0,
     ichor: 0,
+    orichalcum: 0,
     status: "hibernating",
     rank: Rank.get_lowest_rank(),
     resources: %{},
@@ -51,6 +53,7 @@ defmodule Cosmos.Beings.Being do
         node,
         age \\ 0,
         ichor \\ @min_starting_ichor,
+        orichalcum \\ @min_starting_orichalcum,
         status \\ "active",
         rank \\ Rank.get_lowest_rank(),
         resources \\ %{},
@@ -62,6 +65,7 @@ defmodule Cosmos.Beings.Being do
       node: node,
       age: age,
       ichor: ichor,
+      orichalcum: orichalcum,
       status: status,
       rank: rank,
       resources: resources,
@@ -76,11 +80,11 @@ defmodule Cosmos.Beings.Being do
   end
 
   def get_random_being() do
-    # TODO create centralized place for all being cultures
     being_cultures = Map.keys(Name.name_syllables())
     name = Name.generate_name(Enum.random(being_cultures))
     age = :rand.uniform(@max_age)
     ichor = @min_starting_ichor + :rand.uniform(@max_starting_ichor - @min_starting_ichor)
+    orichalcum = @min_orichalcum
     node = nil
     status = "active"
     rank = Rank.get_lowest_rank()
@@ -88,7 +92,7 @@ defmodule Cosmos.Beings.Being do
     rituals = []
     bucket_name = @default_being_bucket_name
 
-    new(name, node, age, ichor, status, rank, resources, rituals, bucket_name)
+    new(name, node, age, ichor, orichalcum, status, rank, resources, rituals, bucket_name)
   end
 
   @doc """
