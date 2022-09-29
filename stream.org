@@ -151,6 +151,7 @@ Update CosmosServer application
 
 *** TODO add a taxidermy
 
+*** DONE fix name string too many spaces
 *** DONE fix errors from being name test
 *** DONE fix name change related errors
 Look at the name generation code and update the actual name structure.
