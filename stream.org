@@ -71,8 +71,8 @@ asserted property ownership.
 - similar goals
 
 ** Cosmos Application
-*** TODO fix errors from being name test
 *** TODO add coordinate to Nodes struct
+*** TODO add plane of existence to Nodes struct
 *** TODO add write node generation script
 - nodes within a certain range can connected
 - nearby nodes must have similar names.
@@ -151,6 +151,7 @@ Update CosmosServer application
 
 *** TODO add a taxidermy
 
+*** DONE fix errors from being name test
 *** DONE fix name change related errors
 Look at the name generation code and update the actual name structure.
 

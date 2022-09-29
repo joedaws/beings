@@ -7,6 +7,7 @@ defmodule Cosmos.Beings.BeingTest do
   alias Cosmos.Beings.Being
   alias Cosmos.Beings.Rank
   alias Cosmos.Beings.Name
+  alias Cosmos.NameGenerator
 
   setup do
     # setup a test being
@@ -14,7 +15,7 @@ defmodule Cosmos.Beings.BeingTest do
     n2 = "Jorsa"
     np = "L'"
     name_template = ["shell_name", "core_prefix", "core_name"]
-    parts = %{"shell_name" => n1, "core_prefix" => np, "core_name" => n2}
+    parts = [[n1], [np], [n2]]
 
     name = %Name{template: name_template, parts: parts}
 
@@ -30,7 +31,7 @@ defmodule Cosmos.Beings.BeingTest do
   end
 
   test "new being" do
-    name = Name.generate_name("deep_denizen")
+    name = NameGenerator.get_name("beings", "deep_denizen")
     node = Cosmos.Locations.Name.generate_name("warped_nature")
 
     b = Being.new(name, node)
@@ -47,7 +48,8 @@ defmodule Cosmos.Beings.BeingTest do
   end
 
   test "say full name", %{test_being: test_being} do
-    assert Being.get_full_name(test_being) |> is_bitstring
+    assert not is_bitstring(test_being.name)
+    assert Name.string(test_being.name) |> is_bitstring
   end
 
   test "get node name", %{test_being: b} do
