@@ -15,7 +15,7 @@ defmodule Cosmos.Beings.Name do
   alias Cosmos.Beings.Name
 
   defstruct template: [],
-            parts: %{}
+            parts: []
 
   @templates %{
     "weird_science" => ["model_name", "signifier"],

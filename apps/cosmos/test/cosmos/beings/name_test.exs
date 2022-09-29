@@ -3,9 +3,11 @@ defmodule Cosmos.Beings.NameTest do
 
   require Logger
   alias Cosmos.Beings.Name
+  alias Cosmos.NameGenerator
 
   test "generate dream_realm name" do
-    name = Name.generate_name("dream_realm")
+    # name = Name.generate_name("dream_realm")
+    name = NameGenerator.get_name("beings", "dream_realm")
     assert is_list(name.parts)
     assert is_list(name.template)
     assert is_bitstring(Enum.at(Enum.at(name.parts, 0), 0))
@@ -13,16 +15,18 @@ defmodule Cosmos.Beings.NameTest do
   end
 
   test "generate deep_denizen name" do
-    name = Name.generate_name("deep_denizen")
-    assert is_map(name.parts)
+    # name = Name.generate_name("deep_denizen")
+    name = NameGenerator.get_name("beings", "deep_denizen")
+    assert is_list(name.parts)
     assert is_list(name.template)
     assert is_bitstring(Enum.at(Enum.at(name.parts, 0), 0))
     assert is_bitstring(Enum.at(name.template, 0))
   end
 
   test "generate weird_science name" do
-    name = Name.generate_name("weird_science")
-    assert is_map(name.parts)
+    # name = Name.generate_name("weird_science")
+    name = NameGenerator.get_name("beings", "dream_realm")
+    assert is_list(name.parts)
     assert is_list(name.template)
     assert is_bitstring(Enum.at(Enum.at(name.parts, 0), 0))
     assert is_bitstring(Enum.at(name.template, 0))

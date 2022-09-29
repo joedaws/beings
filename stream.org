@@ -71,14 +71,38 @@ asserted property ownership.
 - similar goals
 
 ** Cosmos Application
-*** TODO fix name change related errors
-*** DONE fix name string method to accept new form of struct
-now the parts is no longer a map but a list.
-It's a bit redundant to include part names in both the
-template entry of the name struct as well as the parts (which)
-previously were maps.
+*** TODO fix errors from being name test
+*** TODO add coordinate to Nodes struct
+*** TODO add write node generation script
+- nodes within a certain range can connected
+- nearby nodes must have similar names.
+*** TODO add Utility module
+Add module for Cosmos.Entity.Utility which contains
+- generate_id
 
-This will require an update of name and name test
+this can then be =imported= into other entity modules
+
+*** TODO add Cosmos.Entity.Workers.Utility module
+this module contains the shared calls
+not sure if this should be a protocol or a behaviour?
+
+*** TODO nodes refactor
+**** TODO add spatial location to nodes
+- each culture has an associated "plane of existence"
+- some nodes are shared between the different planes of existence and
+  beings may travel between realms this way.
+- the spacial locaiton is a simple (x, y) pair.
+- Nodes that are close to each other share similar features.
+- build clusters of similar nodes, even accross planes.
+**** TODO refactor names for nodes.
+- spatially close nodes should have similar names
+- each plane has associated naming conventions.
+  - each plan has two or more types of nodes.
+- each plane is associated with a given culture of beings
+  so some of the nodes are special to members of that culture.
+  - for example, the "weird_science" plane contains factories,
+    laboratories, and waste dumps which are special places to
+    the weird_science beings.
 *** TODO add action to rank up
 *** TODO add new decision tree to prioritize ranking up
 *** TODO modify harvest actions with rank check
@@ -127,6 +151,16 @@ Update CosmosServer application
 
 *** TODO add a taxidermy
 
+*** DONE fix name change related errors
+Look at the name generation code and update the actual name structure.
+
+*** DONE fix name string method to accept new form of struct
+now the parts is no longer a map but a list.
+It's a bit redundant to include part names in both the
+template entry of the name struct as well as the parts (which)
+previously were maps.
+
+This will require an update of name and name test
 *** DONE add orichalcum to beings
 *** DONE add `get_name_from_tuple` function to Name modules
 DID NOT DO
