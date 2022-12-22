@@ -149,8 +149,6 @@ defimpl String.Chars, for: Cosmos.Beings.Being do
   def to_string(being) do
     name_string = Name.string(being.name)
 
-    for {k, v} <- being, do: "  #{k}: #{v}"
-
     """
     #{name_string}
       age:    #{being.age}

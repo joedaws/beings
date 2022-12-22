@@ -33,4 +33,9 @@ defmodule Cosmos.Locations.NodeTest do
     node = Node.generate_random_node()
     assert Node.get_name(node) |> is_bitstring
   end
+
+  test "test char to strings protocol", %{test_node: test_node} do
+    node_string = to_string(test_node)
+    assert is_bitstring(node_string)
+  end
 end

@@ -108,3 +108,17 @@ defmodule Cosmos.Locations.Node do
     )
   end
 end
+
+defimpl String.Chars, for: Cosmos.Locations.Node do
+  alias Cosmos.Locations.Name
+
+  def to_string(node) do
+    name_string = Name.string(node.name)
+
+    """
+    #{name_string}
+      type:    #{node.type}
+      resource_type: #{node.resource_type}
+    """
+  end
+end
