@@ -71,6 +71,20 @@ asserted property ownership.
 - similar goals
 
 ** Cosmos Application
+*** TODO add =plane= attribute to nodes
+*** TODO function to load node location file
+
+I'll generate the locations in another application for now
+and export the generated locations via a file
+
+Then generate all the nodes based on a file
+
+Need to also figure out resource generation based on
+node location
+
+Need to figure out how to connect nodes accross different planes of existence
+
+*** TODO function to distribute
 *** TODO add coordinate to Nodes struct
 *** TODO add plane of existence to Nodes struct
 *** TODO add write node generation script
