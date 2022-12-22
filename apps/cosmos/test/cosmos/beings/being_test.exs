@@ -73,4 +73,9 @@ defmodule Cosmos.Beings.BeingTest do
     {:ok, test_being} = Being.change_rank(test_being)
     assert test_being.rank != Rank.get_lowest_rank()
   end
+
+  test "name protocol", %{test_being: test_being} do
+    being_string = to_string(test_being)
+    assert is_bitstring(being_string)
+  end
 end

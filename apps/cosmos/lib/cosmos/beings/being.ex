@@ -142,3 +142,19 @@ defmodule Cosmos.Beings.Being do
     )
   end
 end
+
+defimpl String.Chars, for: Cosmos.Beings.Being do
+  alias Cosmos.Beings.Name
+
+  def to_string(being) do
+    name_string = Name.string(being.name)
+
+    for {k, v} <- being, do: "  #{k}: #{v}"
+
+    """
+    #{name_string}
+      age:    #{being.age}
+      status: #{being.status}
+    """
+  end
+end
