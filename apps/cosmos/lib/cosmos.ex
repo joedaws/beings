@@ -9,6 +9,8 @@ defmodule Cosmos do
   alias Cosmos.Locations.NodeWorker
   alias Cosmos.Locations.NodeWorkerCache
 
+  @nodes_database_path "start_cosmos.db"
+
   @impl true
   def start(_type, _args) do
     # Although we don't use the supervisor name below directly,
@@ -24,10 +26,23 @@ defmodule Cosmos do
     # same for beings
     Cosmos.Registry.create(Cosmos.Registry, "beings")
 
+    # setup_nodes()
     setup_graph(:basic)
     setup_beings(:basic)
 
     {:ok, sup_pid}
+  end
+
+  @doc """
+  Read a list of generated nodes from a sqlitedb
+  """
+  def setup_nodes() do
+    data_path = Application.fetch_env!(:cosmos, :data_path)
+    path = Path.join(data_path, @nodes_database_path)
+
+    {:ok, conn} = Exqlite.Sqlite3.open(path)
+    {:ok, statement} = Exqlite.Sqlite3.prepare(conn, "select * from nodes;")
+    {:row, rows} = Exqlite.Sqlite3.step(conn, statement)
   end
 
   @doc """
