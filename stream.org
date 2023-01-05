@@ -71,7 +71,7 @@ asserted property ownership.
 - similar goals
 
 ** Cosmos Application
-*** TODO add =plane= attribute to nodes
+*** DONE add =plane= attribute to nodes
 *** TODO function to load node location file
 
 I'll generate the locations in another application for now

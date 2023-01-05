@@ -20,8 +20,26 @@ to run the simulation with default configuration.
 - [ ] Build a visualization tool for the simulation.
 - [ ] parameterize the social connections of beings.
 
+## Research
+
+- [ ] Checkout this elixir GUI library called
+[scenic](https://hexdocs.pm/scenic/overview_general.html)
+
 
 ## Streams
+
+### January 11, 2023
+
+- high level architecture diagram
+
+### January 4, 2023
+
+- unified the structure of nodes in the generator and 
+  the application
+- Added `new_node` function to the `Seed` application
+  and wrote tests to check that it creates them appropriately.
+- Found UI tool `Scenic` that we will explore to see
+  if it will create a suitable visualization
 
 ### December 28, 2022
 

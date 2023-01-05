@@ -1,21 +1,16 @@
 # Seed
 
-**TODO: Add description**
+A module for seeding the simulation. 
 
-## Installation
+The entities involved in the simulation
+are initialized using some external process,
+currently [rattle-snake](https://github.com/joedaws/rattle-snake). 
+The external process initializes a `sqlite` database
+holding the information about the different entities
+in tables. 
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `seed` to your list of dependencies in `mix.exs`:
-
-```elixir
-def deps do
-  [
-    {:seed, "~> 0.1.0"}
-  ]
-end
-```
-
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at <https://hexdocs.pm/seed>.
+When the `cosmos` simulation starts up, it loads entities
+from a specified `sqlite` database file. The `Seed` module 
+is responsible for loading entities from a specific database
+file.
 
