@@ -1,3 +1,19 @@
+# moving future work to another repo
+
+The idea behind this project (using elixir to write a simulation with millions of beings interacting)
+has moved to [lofi-eldritch-beings](https://github.com/joedaws/lofi-eldrich-beings).
+
+When I began this project I wasn't familiar with many of the tools and best practices of 
+elixir. I'm still certainly not an expert, however, given what I know now, this iteration
+put too much functionality and responsibility into the 
+[Cosmos.Beings.BeingWorker](https://github.com/joedaws/beings/blob/3281835584e61e908105c893c1c5c2d3e76392aa/apps/cosmos/lib/cosmos/beings/being_worker.ex) module which is responsible for not only
+maintaining and updating being state but also to implement the systems that affect beings.
+Going forward I believe these concerns should be separate.
+It might be a good option to refactor this project and simply split up that module, but
+I'd like to leave it intact while I develop in another direction so that I refer back to
+what I have done here. Moreover, I broke some functionality in this project by aggressively 
+adding a seeding library for starting up the simulation.
+
 # Beings
 
 An elixir app for simulating a large collection of eldrich beings floating through the cosmos, living the social
@@ -40,6 +56,10 @@ that structs have using migrations which seems nice.
 
 - [ ] Checkout this elixir GUI library called
 [scenic](https://hexdocs.pm/scenic/overview_general.html)
+
+- [ ] Try to understand [this approach](https://kevinhoffman.medium.com/hosting-a-lua-script-inside-an-elixir-genserver-for-fun-and-games-2c0662660007) to using
+`lua` in combination with elixir for live scripting of a 
+MUD which is very similar to what I have in mind.
 
 
 ## Streams
