@@ -1,7 +1,7 @@
 # moving future work to another repo
 
 The idea behind this project (using elixir to write a simulation with millions of beings interacting)
-has moved to [lofi-eldritch-beings](https://github.com/joedaws/lofi-eldrich-beings).
+has moved to [lofi-eldritch-cosmos](https://github.com/joedaws/lofi-eldritch-cosmos).
 
 When I began this project I wasn't familiar with many of the tools and best practices of 
 elixir. I'm still certainly not an expert, however, given what I know now, this iteration
